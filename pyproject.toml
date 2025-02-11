@@ -57,6 +57,9 @@ indent-style = "space"
 # Line endings
 line-ending = "lf"
 
+[tool.ruff.lint]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101", "INP001"]
+
 [tool.mypy]
 python_version = "3.10"
 # Strict mode settings
