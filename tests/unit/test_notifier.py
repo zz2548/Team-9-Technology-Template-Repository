@@ -1,6 +1,8 @@
+from typing import Any
+import pytest
 from src.notifier import Notifier
 
-def test_notifier(capsys):
+def test_notifier(capsys: Any) -> None:
     notifier = Notifier(10)
     notifier.notify(15)
     captured = capsys.readouterr()
