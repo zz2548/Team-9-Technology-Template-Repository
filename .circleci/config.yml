@@ -26,6 +26,7 @@ jobs:
           command: |
             uv pip install ".[dev]"
             uv pip install mypy ruff  # Explicitly ensure mypy is installed
+            uv pip install types-pytest  # Ensure the type check
 
       - run:
           name: Run Static Analysis
