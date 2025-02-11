@@ -11,8 +11,9 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          packages:
-            - ".[dev]"
+      - run:
+          name: Install Dependencies
+          command: pip install ".[dev]"
       - run:
           name: Run Static Analysis
           command: |
