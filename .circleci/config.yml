@@ -9,22 +9,40 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
+
+      # Cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+
+      # Install Python packages
       - run:
           name: Install Dependencies
-          command: pip install ".[dev]"
+          command: pip install --upgrade pip && pip install ".[dev]"
+
+      # Save dependencies to cache
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      # Run Static Analysis
       - run:
           name: Run Static Analysis
           command: |
             mypy src tests
             ruff check .
+
+      # Run Tests
       - run:
           name: Run Tests
           command: |
             pytest --junitxml=test-results/junit.xml
+
       - store_test_results:
           path: test-results
+
       - store_artifacts:
           path: htmlcov
           destination: coverage-report
