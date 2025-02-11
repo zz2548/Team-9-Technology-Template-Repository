@@ -11,21 +11,18 @@ authors = [
 license = { file = "LICENSE" }
 requires-python = ">=3.10.9, <3.11"
 
-dependencies = [
-    "coverage>=7.6.12",
-    "mypy>=1.15.0",
-    "nose2>=0.15.1",
-    "ruff>=0.9.6",
-]
-dev-dependencies = [
-    # Testing
-    "nose2>=0.15.1",
-    "coverage>=7.6.12",
+[tool.poetry.dependencies]
+python = "^3.10"
+coverage = ">=7.6.12"
+mypy = ">=1.15.0"
+nose2 = ">=0.15.1"
+ruff = ">=0.9.6"
 
-    # Code Quality
-    "mypy>=1.15.0",
-    "ruff>=0.9.6",
-]
+[tool.poetry.group.dev.dependencies]
+nose2 = ">=0.15.1"
+coverage = ">=7.6.12"
+mypy = ">=1.15.0"
+ruff = ">=0.9.6"
 
 [tool.ruff]
 # Enable all rules by default
