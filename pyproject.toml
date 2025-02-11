@@ -17,6 +17,7 @@ coverage = ">=7.6.12"
 mypy = ">=1.15.0"
 nose2 = ">=0.15.1"
 ruff = ">=0.9.6"
+pytest-cov = "^3.0"
 
 [tool.poetry.group.dev.dependencies]
 nose2 = ">=0.15.1"
