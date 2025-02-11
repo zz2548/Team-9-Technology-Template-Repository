@@ -1,7 +1,6 @@
-from typing import Any
 from src.logger import Logger
 
-def test_logger(capsys: Any) -> None:
+def test_logger(capsys) -> None:
     logger = Logger()
     logger.log("Test message")
     captured = capsys.readouterr()
