@@ -1,9 +1,15 @@
 # Team-9-Technology-Template-Repository
 Team 9 Technology Template Repository OSPSD
 
+Installation Instructions:
+Step 1. Clone the repository and cd into the directory
+For Windows :
+Open Powershell and run this command then restart the shell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+For Mac/Linux:
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-
-
+TODO : write scripts separetely for linux and windows such that all the project dependencies are properly installed.
 
 
 

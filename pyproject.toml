@@ -11,15 +11,20 @@ authors = [
 license = "Apache-2.0"
 requires-python = ">=3.10.9, <3.11"
 
-dependencies = []
+dependencies = [
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "nose2>=0.15.1",
+    "ruff>=0.9.6",
+]
 dev-dependencies = [
     # Testing
-    "pytest>=7.4.0",
-    "coverage>=7.3.0",
+    "nose2>=0.15.1",
+    "coverage>=7.6.12",
 
     # Code Quality
-    "mypy>=1.5.1",
-    "ruff>=0.1.0",
+    "mypy>=1.15.0",
+    "ruff>=0.9.6",
 ]
 
 [tool.ruff]
