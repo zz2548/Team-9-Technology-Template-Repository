@@ -1,0 +1,114 @@
+[project]
+name = "technology-template-repository"
+version = "0.1.0"
+description = "A Python project template."
+authors = [
+    {name = "Jerry Zou", email = "zz2548@nyu.edu"},
+    {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
+    {name = "Terry Xu", email = "xm2204@nyu.edu"},
+    {name = "Jinglin Tao", email = "jt4296@nyu.edu"}
+]
+license = "Apache-2.0"
+requires-python = ">=3.10.9, <3.11"
+dependencies = []
+
+[project]
+dependencies = []
+dev-dependencies = [
+    # Testing
+    "pytest>=7.4.0",
+    "coverage>=7.3.0",
+
+    # Code Quality
+    "mypy>=1.5.1",
+    "ruff>=0.1.0",
+]
+
+[tool.ruff]
+# Enable all rules by default
+select = ["ALL"]
+# Exclude specific rules
+ignore = [
+    "D203",  # Conflicts with D211
+    "D212",  # Conflicts with D213
+    "FIX002",  # Allow TODO comments
+    "TD002",  # Allow TODOs without author names
+    "TD003",  # Allow TODOs without issue links
+]
+# Line length configuration (maintaining black's default)
+line-length = 88
+# Target Python version
+target-version = "py310"
+# Enable autofix behavior
+fix = true
+# Exclude directories (combining previous black/flake8 excludes)
+exclude = [
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.format]
+# Quote style
+quote-style = "double"
+# Indent with 4 spaces
+indent-style = "space"
+# Line endings
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.10"
+# Strict mode settings
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+# Exclude directories
+exclude = [
+    '.venv',
+    'build',
+    'dist',
+]
+
+[tool.pytest.ini_options]
+# Configure pytest
+addopts = "-ra -q --cov=src --cov-report=html --cov-report=xml"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+# Configure coverage.py
+branch = true
+source = ["src"]
+omit = [
+    "tests/*",
+    ".venv/*",
+    "build/*",
+    "dist/*",
+]
+
+[tool.coverage.report]
+# Coverage reporting configuration
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise AssertionError",
+]
+ignore_errors = true
+fail_under = 90
