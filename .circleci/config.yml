@@ -23,7 +23,9 @@ jobs:
 
       - run:
           name: Install Dependencies
-          command: uv pip install ".[dev]"
+          command: |
+            uv pip install ".[dev]"
+            uv pip install mypy ruff  # Explicitly ensure mypy is installed
 
       - run:
           name: Run Static Analysis
