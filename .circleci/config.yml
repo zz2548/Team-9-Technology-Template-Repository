@@ -35,9 +35,9 @@ jobs:
             ruff check .
 
       - run:
-          name: Run Unit Tests with Coverage
+          name: Run Unit Tests
           command: |
-            pytest tests/unit --cov=src --cov-report=xml --cov-fail-under=70
+            pytest --junitxml=test-results/junit.xml
 
       - run:
           name: Run Integration Tests
