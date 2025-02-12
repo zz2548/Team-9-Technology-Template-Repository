@@ -9,24 +9,44 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
-          packages:
-            - ".[dev]"
+
+      - run:
+          name: Install uv
+          command: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - run:
+          name: Create and Activate Virtual Environment
+          command: |
+            uv venv .venv
+            echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
+            source .venv/bin/activate
+
+      - run:
+          name: Install Dependencies
+          command: |
+            uv pip install ".[dev]"
+            uv pip install mypy ruff  # Explicitly ensure mypy is installed
+            uv pip install pytest   # Ensure pytest is installed
+            uv pip install pytest-cov # Ensure pytest-cov is installed
+
       - run:
           name: Run Static Analysismmit
           command: |
             mypy src tests
             ruff check .
+
       - run:
           name: Run Tests
           command: |
             pytest --junitxml=test-results/junit.xml
+
       - store_test_results:
           path: test-results
+
       - store_artifacts:
           path: htmlcov
           destination: coverage-report
+    executor:
 
 workflows:
   main:
