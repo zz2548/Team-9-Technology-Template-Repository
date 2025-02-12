@@ -37,19 +37,18 @@ jobs:
       - run:
           name: Run Unit Tests
           command: |
-            pytest tests/unit --cov=src --cov-report=xml --cov-fail-under=70
+            pytest tests/unit --cov=src --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
 
       - run:
           name: Run Integration Tests
           command: |
-            pytest tests/integration/test_calculator_logger.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
-            pytest tests/integration/test_logger_notifier.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+            pytest tests/integration --cov=src --cov-append --cov-report=xml --cov-fail-under=70 --junitxml=test-results/integration.xml
 
 
       - run:
           name: Run End-to-End Tests
           command: |
-            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-fail-under=70 --junitxml=test-results/e2e.xml
 
       - store_test_results:
           path: test-results
