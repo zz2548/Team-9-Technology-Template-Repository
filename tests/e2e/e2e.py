@@ -17,25 +17,25 @@ def notifier() -> Notifier:
     return Notifier(threshold=10)
 
 def test_end_to_end_flow(
-    calculator: Calculator, logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str]
+    calculator: Calculator,
+    logger: Logger,
+    notifier: Notifier,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test the full end-to-end flow: calculation, logging, and notification."""
-
-    # Step 1: Perform a calculation using the Calculator
+    """Test the full end-to-end flow"""
+    
     result: float = calculator.add(5, 10)
     
-    # Step 2: Log the result using the Logger
     logger.log(f"Result of 5 + 10 = {result}")
 
-    # Step 3: Notify if the result exceeds the threshold using the Notifier
     notifier.notify(result)
 
-    # Capture the output
     captured = capsys.readouterr()
 
-    # Assertions for calculation and logging
     assert result == 15
     assert "LOG: Result of 5 + 10 = 15" in captured.out
 
-    # Assertions for the notifier (since the threshold is 10, the alert should be triggered)
-    assert "ALERT: Value 15 exceeded threshold 10" in captured.out
+    assert (
+        "ALERT: Value 15 exceeded threshold 10"
+        in captured.out
+    )
