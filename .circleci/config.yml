@@ -19,6 +19,7 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
+            echo "export PYTHONPATH=src" >> $BASH_ENV  # Ensure src is in Python path
             source .venv/bin/activate
 
       - run:
@@ -36,9 +37,9 @@ jobs:
             ruff check .
 
       - run:
-          name: Run Tests
+          name: Run Tests With Coverage
           command: |
-            pytest --junitxml=test-results/junit.xml
+            pytest --junitxml=test-results/junit.xml --cov=src --cov-report=xml
 
       - store_test_results:
           path: test-results
