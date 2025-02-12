@@ -42,7 +42,9 @@ jobs:
       - run:
           name: Run Integration Tests
           command: |
-            pytest tests/integration --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+            pytest tests/integration/test_calculator_logger.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+            pytest tests/integration/test_logger_notifier.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+
 
       - run:
           name: Run End-to-End Tests
