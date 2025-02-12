@@ -26,7 +26,8 @@ jobs:
           command: |
             uv pip install ".[dev]"
             uv pip install mypy ruff  # Explicitly ensure mypy is installed
-            uv pip install pytest   # ensure pytest is installed
+            uv pip install pytest   # Ensure pytest is installed
+            uv pip install pytest-cov # Ensure pytest-cov is installed
 
       - run:
           name: Run Static Analysis
@@ -45,6 +46,7 @@ jobs:
       - store_artifacts:
           path: htmlcov
           destination: coverage-report
+    executor:
 
 workflows:
   main:
