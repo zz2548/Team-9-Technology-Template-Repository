@@ -19,15 +19,14 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV  # Ensure src/ is recognized
             source .venv/bin/activate
 
       - run:
           name: Install Dependencies
           command: |
             uv pip install ".[dev]"
-            uv pip install mypy ruff  # Explicitly ensure mypy is installed
-            uv pip install pytest   # Ensure pytest is installed
-            uv pip install pytest-cov # Ensure pytest-cov is installed
+            uv pip install mypy ruff pytest pytest-cov  # Ensure all dependencies
 
       - run:
           name: Run Static Analysis
@@ -36,9 +35,21 @@ jobs:
             ruff check .
 
       - run:
-          name: Run Tests
+          name: Run Unit Tests
           command: |
-            pytest --junitxml=test-results/junit.xml
+            pytest tests/unit --cov=src --cov-report=xml --cov-fail-under=70
+
+      - run:
+          name: Run Integration Tests
+          command: |
+            pytest tests/integration/test_calculator_logger.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+            pytest tests/integration/test_logger_notifier.py --cov=src --cov-append --cov-report=xml --cov-fail-under=70
+
+
+      - run:
+          name: Run End-to-End Tests
+          command: |
+            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-fail-under=70
 
       - store_test_results:
           path: test-results
@@ -46,7 +57,6 @@ jobs:
       - store_artifacts:
           path: htmlcov
           destination: coverage-report
-    executor:
 
 workflows:
   main:
