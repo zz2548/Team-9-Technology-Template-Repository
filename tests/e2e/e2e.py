@@ -17,7 +17,7 @@ def notifier() -> Notifier:
     return Notifier(threshold=10)
 
 def test_end_to_end_flow(
-    calculator: Calculator, logger: Logger, notifier: Notifier, capsys: CaptureFixture[str]
+    calculator: Calculator, logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """Test the full end-to-end flow: calculation, logging, and notification."""
 
