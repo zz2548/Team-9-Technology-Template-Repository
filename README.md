@@ -46,16 +46,16 @@ The project includes unit, integration, and end-to-end tests:
 
 ```bash
 # Run unit tests with coverage
-uv pytest tests/unit --cov=src --cov-report=html
+pytest tests/unit --cov=src --cov-report=html
 
 # Run integration tests
-uv pytest tests/integration
+pytest tests/integration
 
 # Run end-to-end tests
-uv pytest tests/e2e
+pytest tests/e2e
 
 # Run all tests
-uv pytest
+pytest
 ```
 
 ### Coverage Reports
@@ -77,7 +77,7 @@ git checkout -b feature-name
 
 2. Make your changes and ensure all tests pass:
 ```bash
-uv pytest
+pytest
 ```
 
 3. Push your changes and create a pull request:
