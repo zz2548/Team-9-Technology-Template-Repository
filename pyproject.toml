@@ -11,27 +11,20 @@ authors = [
 license = { file = "LICENSE" }
 requires-python = ">=3.10.9, <3.11"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-coverage = ">=7.6.12"
-mypy = ">=1.15.0"
-nose2 = ">=0.15.1"
-ruff = ">=0.9.6"
-pytest-cov = "^3.0"
-
-[tool.poetry.group.dev.dependencies]
-nose2 = ">=0.15.1"
-coverage = ">=7.6.12"
-mypy = ">=1.15.0"
-ruff = ">=0.9.6"
+[project.optional-dependencies]
+dev = [
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "nose2>=0.15.1",
+    "ruff>=0.9.6",
+    "pytest-cov>=3.0"
+]
 
 [tool.ruff]
 # Enable all rules by default
 select = ["ALL"]
 # Exclude specific rules
 ignore = [
-    "D203",  # Conflicts with D211
-    "D212",  # Conflicts with D213
     "FIX002",  # Allow TODO comments
     "TD002",  # Allow TODOs without author names
     "TD003",  # Allow TODOs without issue links
@@ -59,7 +52,8 @@ indent-style = "space"
 line-ending = "lf"
 
 [tool.ruff.lint]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101", "INP001"]
+ignore = ["S101"]
+# S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
 
 [tool.mypy]
 python_version = "3.10"
