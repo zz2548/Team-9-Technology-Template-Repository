@@ -1,10 +1,11 @@
-from typing import Generator
 import pytest
+
 from src.calculator import Calculator
 
+
 @pytest.fixture
-def calculator() -> Generator[Calculator, None, None]:
-    yield Calculator()
+def calculator() -> Calculator:
+    return Calculator()
 
 def test_add(calculator: Calculator) -> None:
     assert calculator.add(2, 3) == 5

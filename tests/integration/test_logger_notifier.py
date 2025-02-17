@@ -1,6 +1,8 @@
 import pytest
+
 from src.logger import Logger
 from src.notifier import Notifier
+
 
 @pytest.fixture
 def logger() -> Logger:
@@ -11,7 +13,7 @@ def notifier() -> Notifier:
     return Notifier(threshold=10)
 
 def test_logger_notifier_no_alert(
-    logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str]
+    logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test that notifier does not send an alert if value is below the threshold."""
     logger.log("Performing a safe operation")
@@ -22,7 +24,7 @@ def test_logger_notifier_no_alert(
     assert "ALERT" not in captured.out  # No alert expected
 
 def test_logger_notifier_with_alert(
-    logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str]
+    logger: Logger, notifier: Notifier, capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test that notifier sends an alert when value exceeds the threshold."""
     logger.log("Checking if value exceeds threshold")

@@ -1,7 +1,9 @@
 import pytest
+
 from src.calculator import Calculator
 from src.logger import Logger
 from src.notifier import Notifier
+
 
 # Fixtures for the components
 @pytest.fixture
@@ -23,10 +25,9 @@ def test_end_to_end_flow(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test the full end-to-end flow."""
-    
     # Step 1: Perform a calculation using the Calculator
     result: float = calculator.add(5, 10)
-    
+
     # Step 2: Log the result using the Logger
     logger.log(f"Result of 5 + 10 = {result}")
 

@@ -1,5 +1,7 @@
-from src.notifier import Notifier
 from _pytest.capture import CaptureFixture
+
+from src.notifier import Notifier
+
 
 def test_notifier(capsys: CaptureFixture[str]) -> None:
     notifier = Notifier(10)
