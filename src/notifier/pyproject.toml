@@ -1,0 +1,102 @@
+[project]
+name = "notifier"
+version = "0.1.0"
+description = "A Python project template component. Sends an alert when the result exceeds a given threshold."
+authors = [
+    {name = "Jerry Zou", email = "zz2548@nyu.edu"},
+    {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
+    {name = "Terry Xu", email = "xm2204@nyu.edu"},
+    {name = "Jinglin Tao", email = "jt4296@nyu.edu"}
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.10.9, <3.11"
+
+[project.optional-dependencies]
+
+dev = [
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "nose2>=0.15.1",
+    "ruff>=0.9.6",
+    "pytest-cov>=3.0"
+]
+
+dependencies = [
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "nose2>=0.15.1",
+    "ruff>=0.9.6",
+    "pytest-cov>=3.0"
+]
+
+[tool.ruff]
+select = ["ALL"]
+
+ignore = [
+    "D203", "D212", "FIX002", "TD002", "TD003"
+]
+
+line-length = 88
+target-version = "py310"
+fix = true
+exclude = [
+    ".git", ".venv", "build", "dist",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101"]
+# S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
+# D104: This is a smaller project, ignoring package docstring rule
+# TRY003: Allowing long messages for raising error in divide function of calculator
+# EM101: Same as above
+# PLR2004: Allow magic value in comparison for our tests
+# D100, D101, D102, D103, D107: Docstring rules we will adhere to later
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+exclude = ['.venv', 'build', 'dist']
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --cov=src --cov-report=html --cov-report=xml"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = [
+    "tests/*", ".venv/*", "build/*", "dist/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise AssertionError",
+]
+ignore_errors = true
+fail_under = 70

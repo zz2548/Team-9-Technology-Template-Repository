@@ -1,7 +1,7 @@
 import pytest
 
-from src.calculator import Calculator
-from src.logger import Logger
+from src.calculator.calculator import Calculator
+from src.logger.logger import Logger
 
 
 @pytest.fixture

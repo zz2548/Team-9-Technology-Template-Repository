@@ -1,8 +1,9 @@
 import pytest
 
-from src.calculator import Calculator
-from src.logger import Logger
-from src.notifier import Notifier
+
+from src.calculator.calculator import Calculator
+from src.logger.logger import Logger
+from src.notifier.notifier import Notifier
 
 
 # Fixtures for the components
