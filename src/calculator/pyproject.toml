@@ -30,12 +30,6 @@ dependencies = [
 ]
 
 [tool.ruff]
-select = ["ALL"]
-
-ignore = [
-    "D203", "D212", "FIX002", "TD002", "TD003"
-]
-
 line-length = 88
 target-version = "py310"
 fix = true
@@ -49,7 +43,9 @@ indent-style = "space"
 line-ending = "lf"
 
 [tool.ruff.lint]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101"]
+select = ["ALL"]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101",
+    "D212", "FIX002", "TD002", "TD003"]
 # S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
 # D104: This is a smaller project, ignoring package docstring rule
 # TRY003: Allowing long messages for raising error in divide function of calculator
