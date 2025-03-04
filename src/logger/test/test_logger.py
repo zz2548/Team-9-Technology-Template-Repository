@@ -1,6 +1,6 @@
 from _pytest.capture import CaptureFixture
 
-from .logger import Logger
+from src.logger.logger import Logger
 
 
 def test_logger(capsys: CaptureFixture[str]) -> None:
