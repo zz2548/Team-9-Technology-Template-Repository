@@ -14,4 +14,6 @@ __version__ = "0.1.0"
 __authors__ = [
     {"name": "Jerry Zou", "email": "zz2548@nyu.edu"},
     {"name": "Keshav Rajput", "email": "kr3412@nyu.edu"},
-    {"name": "Terry Xu", "email":
+    {"name": "Terry Xu", "email": "xm2204@nyu.edu"},
+    {"name": "Jinglin Tao", "email": "jt4296@nyu.edu"}
+]
