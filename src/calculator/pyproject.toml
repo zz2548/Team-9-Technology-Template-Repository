@@ -81,7 +81,7 @@ python_functions = ["test_*"]
 branch = true
 source = ["src"]
 omit = [
-    "tests/*", ".venv/*", "build/*", "dist/*",
+    "tests/*", ".venv/*", "build/*", "dist/*", "*/test/*"
 ]
 
 [tool.coverage.report]
