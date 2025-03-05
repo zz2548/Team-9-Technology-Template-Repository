@@ -37,17 +37,17 @@ jobs:
       - run:
           name: Run Calculator Unit Tests
           command: |
-            pytest src/calculator/test --cov=calculator --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/calculator/test --cov=src/calculator/calculator.py --cov=src/calculator/__init__.py --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
 
       - run:
           name: Run Logger Unit Tests
           command: |
-            pytest src/logger/test --cov=logger --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/logger/test --cov=src/logger/logger.py --cov=src/logger/__init__.py --cov-report=xml --cov-fail-under=70 --junitxml=test-results/logger-unit.xml
 
       - run:
           name: Run Notifier Unit Tests
           command: |
-            pytest src/notifier/test --cov=notifier --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/notifier/test --cov=src/notifier/notifier.py --cov=src/notifier/__init__.py --cov-report=xml --cov-fail-under=70 --junitxml=test-results/notifier-unit.xml
 
       - run:
           name: Run Integration Tests
