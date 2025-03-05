@@ -42,7 +42,7 @@ def test_divide_by_zero(calculator: Calculator) -> None:
 
 
 # API Tests
-def test_calculator_api():
+def test_calculator_api() -> None:
     # Test that the Calculator class is properly exposed
 
 

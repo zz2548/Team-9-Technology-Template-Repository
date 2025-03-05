@@ -10,7 +10,7 @@ def test_notifier(capsys: CaptureFixture[str]) -> None:
     assert "ALERT: Value 15 exceeded threshold 10" in captured.out
 
 
-def test_notifier_metadata():
+def test_notifier_metadata() -> None:
     # Test that metadata is correctly exposed
     from src.notifier import __version__, __authors__
 
