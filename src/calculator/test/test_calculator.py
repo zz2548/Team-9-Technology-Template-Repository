@@ -1,6 +1,13 @@
 import pytest
 
-from src.calculator import Calculator, default_calculator, add, subtract, multiply, divide
+from src.calculator import (
+    Calculator,
+    add,
+    default_calculator,
+    divide,
+    multiply,
+    subtract,
+)
 
 
 @pytest.fixture

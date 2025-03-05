@@ -5,6 +5,8 @@
 A modern Python project template featuring comprehensive test coverage, continuous integration with CircleCI, and dependency management using UV. This template includes configurations for static type checking, code formatting, and automated testing.
 
 ## Prerequisites
+* Any package installer like curl
+* Git
 * Python 3.10 or higher
 * UV for Python dependency management
 
@@ -25,6 +27,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```bash
 uv venv .venv
 source .venv/bin/activate
+```
+Note on windows:
+use
+```bash
+uv venv .venv
+.venv\bin\activate
 ```
 
 4. Install dependencies:

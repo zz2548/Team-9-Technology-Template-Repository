@@ -44,7 +44,7 @@ line-ending = "lf"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101",
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107","D203", "T201", "S101", "PLR2004", "TRY003", "EM101",
     "D212", "FIX002", "TD002", "TD003"]
 # S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
 # D104: This is a smaller project, ignoring package docstring rule
@@ -52,6 +52,7 @@ ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR20
 # EM101: Same as above
 # PLR2004: Allow magic value in comparison for our tests
 # D100, D101, D102, D103, D107: Docstring rules we will adhere to later
+# D203 : Checks for "incorrect blank line before class, conflicts with "D211" which cehcsk for no blank line before class, hence ignoring
 
 [tool.mypy]
 python_version = "3.10"
