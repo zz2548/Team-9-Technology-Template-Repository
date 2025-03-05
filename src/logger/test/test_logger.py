@@ -10,7 +10,7 @@ def test_logger(capsys: CaptureFixture[str]) -> None:
     assert "LOG: Test message" in captured.out
 
 
-def test_logger_api(capsys):
+def test_logger_api(capsys) -> None:
     # Test direct class usage
     custom_logger = Logger()
     custom_logger.log("Custom logger test")
