@@ -1,6 +1,6 @@
 import pytest
 
-from src.calculator.calculator import Calculator
+from src.calculator import Calculator, default_calculator, add, subtract, multiply, divide
 
 
 @pytest.fixture
@@ -39,3 +39,27 @@ def test_divide(calculator: Calculator) -> None:
 def test_divide_by_zero(calculator: Calculator) -> None:
     with pytest.raises(ValueError, match="Cannot divide by zero"):
         calculator.divide(5, 0)
+
+
+# API Tests
+def test_calculator_api():
+    # Test that the Calculator class is properly exposed
+
+
+    # Test direct class usage
+    calc = Calculator()
+    assert calc.add(3, 4) == 7
+    assert calc.subtract(10, 3) == 7
+
+    # Test default instance
+    assert default_calculator.multiply(4, 4) == 16
+
+    # Test function exports
+    assert add(7, 8) == 15
+    assert subtract(25, 10) == 15
+    assert multiply(5, 5) == 25
+    assert divide(20, 4) == 5
+
+    # Test error handling
+    with pytest.raises(ValueError, match="Cannot divide by zero"):
+        divide(10, 0)
