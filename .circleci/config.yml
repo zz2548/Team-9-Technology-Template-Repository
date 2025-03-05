@@ -37,27 +37,28 @@ jobs:
       - run:
           name: Run Calculator Unit Tests
           command: |
-            pytest src/calculator/test --cov=src --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/calculator/test --cov=src/calculator --cov-omit="*/test/* --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
 
       - run:
           name: Run Logger Unit Tests
           command: |
-            pytest src/logger/test --cov=src --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/logger/test --cov=src/logger --cov-omit="*/test/* --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
 
       - run:
           name: Run Notifier Unit Tests
           command: |
-            pytest src/notifier/test --cov=src --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+            pytest src/notifier/test --cov=src/notifier --cov-omit="*/test/* --cov-report=xml --cov-fail-under=70 --junitxml=test-results/unit.xml
+
       - run:
           name: Run Integration Tests
           command: |
-            pytest tests/integration --cov=src --cov-append --cov-report=xml --cov-fail-under=70 --junitxml=test-results/integration.xml
+            pytest tests/integration --cov=src --cov-append --cov-omit="*/test/* --cov-report=xml --cov-fail-under=70 --junitxml=test-results/integration.xml
 
 
       - run:
           name: Run End-to-End Tests
           command: |
-            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-fail-under=70 --junitxml=test-results/e2e.xml
+            pytest tests/e2e --cov=src --cov-append --cov-omit="*/test/* --cov-report=xml --cov-fail-under=70 --junitxml=test-results/e2e.xml
 
       - store_test_results:
           path: test-results
