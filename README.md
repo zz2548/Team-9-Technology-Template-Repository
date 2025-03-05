@@ -46,7 +46,7 @@ The project includes unit, integration, and end-to-end tests:
 
 ```bash
 # Run unit tests with coverage
-pytest tests/unit --cov=src --cov-report=html
+pytest src/calculator/test src/logger/test src/notifier/test --cov=src --cov-report=html
 
 # Run integration tests
 pytest tests/integration

@@ -22,6 +22,7 @@ htmlcov/
 *.cover
 coverage.xml
 *.log
+test-results/unit.xml
 
 # PyInstaller
 *.manifest
@@ -36,3 +37,4 @@ debug.log
 *.swp
 *.swo
 *.swn
+

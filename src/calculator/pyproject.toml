@@ -1,7 +1,7 @@
 [project]
-name = "technology-template-repository"
+name = "calculator"
 version = "0.1.0"
-description = "A Python project template."
+description = "A Python project template component. Performs basic arithmetic operations."
 authors = [
     {name = "Jerry Zou", email = "zz2548@nyu.edu"},
     {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
