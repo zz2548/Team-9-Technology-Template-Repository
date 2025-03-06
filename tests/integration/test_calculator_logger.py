@@ -57,7 +57,7 @@ class TestCalculatorLogger(unittest.TestCase):
         """Ensure dividing by zero raises an error and is logged."""
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
             with pytest.raises(ValueError,
-                               match = "ZeroDivisionError: division by zero"):
+                               match = "Cannot divide by zero"):
                 self.calculator.divide(10, 0)
             self.logger.log("Attempted to divide by zero")
 
