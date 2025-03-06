@@ -29,8 +29,8 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions for calculation and logging using native assert
             assert result == 15, f"Expected 15, got {result}"
-            assert ("LOG: Result of 5 + 10 = 15" in captured_output,
-                    "Logging output is incorrect")
+            assert "LOG: Result of 5 + 10 = 15" in captured_output, \
+                    "Logging output is incorrect"
 
             # Assertions for the notifier (should trigger since threshold is 10)
             assert ("ALERT: Value 15 exceeded "
