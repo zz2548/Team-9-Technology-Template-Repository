@@ -22,7 +22,6 @@ class TestEndToEndFlow(unittest.TestCase):
             # Step 2: Log the result using the Logger
             self.logger.log(f"Result of 5 + 10 = {result}")
 
-            # Step 3: Notify if the result exceeds the threshold using the Notifier
             self.notifier.notify(result)
 
             # Capture the output
@@ -30,10 +29,12 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions for calculation and logging using native assert
             assert result == 15, f"Expected 15, got {result}"
-            assert "LOG: Result of 5 + 10 = 15" in captured_output, "Logging output is incorrect"
+            assert ("LOG: Result of 5 + 10 = 15" in captured_output,
+                    "Logging output is incorrect")
 
             # Assertions for the notifier (should trigger since threshold is 10)
-            assert "ALERT: Value 15 exceeded threshold 10" in captured_output, "Notifier output is incorrect"
+            assert ("ALERT: Value 15 exceeded "
+                    "threshold 10") in captured_output, "Notifier output is incorrect"
 
 if __name__ == "__main__":
     unittest.main()
