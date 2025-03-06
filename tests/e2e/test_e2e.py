@@ -28,12 +28,12 @@ class TestEndToEndFlow(unittest.TestCase):
             # Capture the output
             captured_output = mock_stdout.getvalue()
 
-            # Assertions for calculation and logging
-            self.assertEqual(result, 15)
-            self.assertIn("LOG: Result of 5 + 10 = 15", captured_output)
+            # assertions for calculation and logging
+            assert(result, 15)
+            assert("LOG: Result of 5 + 10 = 15", captured_output)
 
-            # Assertions for the notifier (should trigger since threshold is 10)
-            self.assertIn("ALERT: Value 15 exceeded threshold 10", captured_output)
+            # assertions for the notifier (should trigger since threshold is 10)
+            assert("ALERT: Value 15 exceeded threshold 10", captured_output)
 
 if __name__ == "__main__":
     unittest.main()
