@@ -8,12 +8,12 @@ from src.notifier.notifier import Notifier
 
 
 class TestEndToEndFlow(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.calculator = Calculator()
         self.logger = Logger()
         self.notifier = Notifier(threshold=10)
 
-    def test_end_to_end_flow(self):
+    def test_end_to_end_flow(self) -> None:
         """Test the full end-to-end flow."""
         with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             # Step 1: Perform a calculation using the Calculator
