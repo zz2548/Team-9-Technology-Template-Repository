@@ -1,49 +1,39 @@
-import pytest
-
+import unittest
+import io
+from unittest.mock import patch
 
 from src.calculator.calculator import Calculator
 from src.logger.logger import Logger
 from src.notifier.notifier import Notifier
 
 
-# Fixtures for the components
-@pytest.fixture
-def calculator() -> Calculator:
-    return Calculator()
+class TestEndToEndFlow(unittest.TestCase):
+    def setUp(self):
+        self.calculator = Calculator()
+        self.logger = Logger()
+        self.notifier = Notifier(threshold=10)
 
-@pytest.fixture
-def logger() -> Logger:
-    return Logger()
+    def test_end_to_end_flow(self):
+        """Test the full end-to-end flow."""
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            # Step 1: Perform a calculation using the Calculator
+            result = self.calculator.add(5, 10)
 
-@pytest.fixture
-def notifier() -> Notifier:
-    return Notifier(threshold=10)
+            # Step 2: Log the result using the Logger
+            self.logger.log(f"Result of 5 + 10 = {result}")
 
-def test_end_to_end_flow(
-    calculator: Calculator,
-    logger: Logger,
-    notifier: Notifier,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    """Test the full end-to-end flow."""
-    # Step 1: Perform a calculation using the Calculator
-    result: float = calculator.add(5, 10)
+            # Step 3: Notify if the result exceeds the threshold using the Notifier
+            self.notifier.notify(result)
 
-    # Step 2: Log the result using the Logger
-    logger.log(f"Result of 5 + 10 = {result}")
+            # Capture the output
+            captured_output = mock_stdout.getvalue()
 
-    # Step 3: Notify if the result exceeds the threshold using the Notifier
-    notifier.notify(result)
+            # Assertions for calculation and logging
+            self.assertEqual(result, 15)
+            self.assertIn("LOG: Result of 5 + 10 = 15", captured_output)
 
-    # Capture the output
-    captured = capsys.readouterr()
+            # Assertions for the notifier (should trigger since threshold is 10)
+            self.assertIn("ALERT: Value 15 exceeded threshold 10", captured_output)
 
-    # Assertions for calculation and logging
-    assert result == 15
-    assert "LOG: Result of 5 + 10 = 15" in captured.out
-
-    # Assertions for the notifier (should trigger since threshold is 10)
-    assert (
-        "ALERT: Value 15 exceeded threshold 10"
-        in captured.out
-    )
+if __name__ == "__main__":
+    unittest.main()
