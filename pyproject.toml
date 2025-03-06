@@ -28,6 +28,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 88
+ignore = ["PT027"]   # we don't want to use pytest methods
 target-version = "py310"
 fix = true
 exclude = [
