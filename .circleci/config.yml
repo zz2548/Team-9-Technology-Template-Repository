@@ -37,34 +37,35 @@ jobs:
       - run:
           name: Run Unit Tests
           command: |
-            nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/unit.xml discover src/calculator/test src/logger/test src/notifier/test
-            mv coverage.xml unit-coverage.xml
-            mv htmlcov unit-htmlcov
+            nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
+
+            COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
+
+            COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
+
+            coverage combine .coverage .coverage.logger .coverage.notifier
+
             coverage report --fail-under=70
+            coverage xml -o unit-coverage.xml 
+            coverage html -d unit-htmlcov
 
       # Run integration tests and append coverage
       - run:
           name: Run Integration Tests
           command: |
-            COVERAGE_FILE=.coverage.integration nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/integration.xml discover tests/integration
-            mv coverage.xml integration-coverage.xml
-            mv htmlcov integration-htmlcov
+            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
             coverage report --fail-under=70
+            coverage xml -o integration-coverage.xml
+            coverage html -d integration-htmlcov
 
       # Run e2e tests and generate final coverage report
       - run:
           name: Run End-to-End Tests and Check Coverage
           command: |
-            COVERAGE_FILE=.coverage.e2e nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/e2e.xml discover tests/e2e
-            mv coverage.xml e2e-coverage.xml
-            mv htmlcov e2e-htmlcov
+            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
             coverage report --fail-under=70
-            
-            # Generate combined report (optional)
-            coverage combine .coverage .coverage.integration .coverage.e2e
-            coverage report --fail-under=70
-            coverage xml -o combined-coverage.xml
-            coverage html -d combined-htmlcov
+            coverage xml -o e2e-coverage.xml
+            coverage html -d e2e-htmlcov
 
       - store_test_results:
           path: test-results

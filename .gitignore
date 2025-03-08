@@ -38,3 +38,4 @@ debug.log
 *.swo
 *.swn
 
+unit-coverage.xml
