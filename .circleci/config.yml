@@ -32,7 +32,7 @@ jobs:
           name: Run Static Analysis
           command: |
             mypy src tests
-            ruff check .
+            ruff check . --config pyproject.toml
             
       # Run all unit tests first with coverage
       - run:
