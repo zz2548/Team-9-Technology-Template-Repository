@@ -38,19 +38,24 @@ jobs:
       - run:
           name: Run Unit Tests
           command: |
-            pytest src/calculator/test src/logger/test src/notifier/test --cov=src --cov-report=xml --junitxml=test-results/unit.xml
+            nose2 --with-coverage --coverage-report xml --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/unit.xml discover src/calculator/test src/logger/test src/notifier/test
 
       # Run integration tests and append coverage
       - run:
           name: Run Integration Tests
           command: |
-            pytest tests/integration --cov=src --cov-append --junitxml=test-results/integration.xml
+            COVERAGE_FILE=.coverage.integration nose2 --with-coverage --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/integration.xml discover tests/integration
+            coverage combine .coverage .coverage.integration
 
       # Run e2e tests and generate final coverage report
       - run:
           name: Run End-to-End Tests and Check Coverage
           command: |
-            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-report=html --cov-fail-under=70 --junitxml=test-results/e2e.xml
+            COVERAGE_FILE=.coverage.e2e nose2 --with-coverage --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/e2e.xml discover tests/e2e
+            coverage combine .coverage .coverage.integration .coverage.e2e
+            coverage report --fail-under=70
+            coverage xml
+            coverage html
 
       - store_test_results:
           path: test-results
