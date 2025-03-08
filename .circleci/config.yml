@@ -33,29 +33,38 @@ jobs:
           command: |
             mypy src tests
             ruff check . --config pyproject.toml
-            
-      # Run all unit tests first with coverage
+      # Run unit tests
       - run:
           name: Run Unit Tests
           command: |
-            nose2 --with-coverage --coverage-report xml --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/unit.xml discover src/calculator/test src/logger/test src/notifier/test
+            nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/unit.xml discover src/calculator/test src/logger/test src/notifier/test
+            mv coverage.xml unit-coverage.xml
+            mv htmlcov unit-htmlcov
+            coverage report --fail-under=70
 
       # Run integration tests and append coverage
       - run:
           name: Run Integration Tests
           command: |
-            COVERAGE_FILE=.coverage.integration nose2 --with-coverage --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/integration.xml discover tests/integration
-            coverage combine .coverage .coverage.integration
+            COVERAGE_FILE=.coverage.integration nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/integration.xml discover tests/integration
+            mv coverage.xml integration-coverage.xml
+            mv htmlcov integration-htmlcov
+            coverage report --fail-under=70
 
       # Run e2e tests and generate final coverage report
       - run:
           name: Run End-to-End Tests and Check Coverage
           command: |
-            COVERAGE_FILE=.coverage.e2e nose2 --with-coverage --coverage=src --plugin nose2.plugins.junitxml --junit-xml=test-results/e2e.xml discover tests/e2e
+            COVERAGE_FILE=.coverage.e2e nose2 --with-coverage --coverage-report xml --coverage-report html --junit-xml-path=test-results/e2e.xml discover tests/e2e
+            mv coverage.xml e2e-coverage.xml
+            mv htmlcov e2e-htmlcov
+            coverage report --fail-under=70
+            
+          # Generate combined report (optional)
             coverage combine .coverage .coverage.integration .coverage.e2e
             coverage report --fail-under=70
-            coverage xml
-            coverage html
+            coverage xml -o combined-coverage.xml
+            coverage html -d combined-htmlcov
 
       - store_test_results:
           path: test-results
