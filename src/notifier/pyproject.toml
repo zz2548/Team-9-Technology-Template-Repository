@@ -53,13 +53,6 @@ ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR20
 # PLR2004: Allow magic value in comparison for our tests
 # D100, D101, D102, D103, D107: Docstring rules we will adhere to later
 
-[tool.nose2]
-testpaths = ["tests"]
-verbosity = 2
-plugins = [
-    "nose2.plugins.junitxml",
-    "nose2.plugins.coverage"
-]
 
 [tool.mypy]
 python_version = "3.10"

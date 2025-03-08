@@ -61,14 +61,6 @@ warn_unreachable = true
 strict_optional = true
 exclude = ['.venv', 'build', 'dist']
 
-[tool.nose2]
-testpaths = ["tests"]
-verbosity = 2
-plugins = [
-    "nose2.plugins.junitxml",
-    "nose2.plugins.coverage"
-]
-
 [tool.coverage.run]
 branch = true
 source = ["src"]
