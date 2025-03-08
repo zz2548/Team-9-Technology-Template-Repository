@@ -42,7 +42,7 @@ line-ending = "lf"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101",
-    "D212", "FIX002", "TD002", "TD003"]
+    "D212", "FIX002", "TD002", "TD003", "PT009", "PT027"]   # PT009 and PT027 is for the nose2
 
 [tool.mypy]
 python_version = "3.10"

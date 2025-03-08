@@ -1,65 +1,67 @@
-import pytest
+import unittest
 
-from src.calculator import Calculator, default_calculator, add, subtract, multiply, divide
-
-
-@pytest.fixture
-def calculator() -> Calculator:
-    return Calculator()
-
-
-def test_add(calculator: Calculator) -> None:
-    assert calculator.add(2, 3) == 5
-    assert calculator.add(-1, 1) == 0
-    assert calculator.add(0, 0) == 0
-    assert calculator.add(2.5, 3.5) == 6.0
+from src.calculator import (
+    Calculator,
+    add,
+    default_calculator,
+    divide,
+    multiply,
+    subtract,
+)
 
 
-def test_subtract(calculator: Calculator) -> None:
-    assert calculator.subtract(5, 3) == 2
-    assert calculator.subtract(3, 5) == -2
-    assert calculator.subtract(0, 0) == 0
-    assert calculator.subtract(10.5, 5.5) == 5.0
+class TestCalculator(unittest.TestCase):
+    def setUp(self)-> None:
+        self.calculator = Calculator()
 
+    def test_add(self)-> None:
+        self.assertEqual(self.calculator.add(2, 3), 5)
+        self.assertEqual(self.calculator.add(-1, 1), 0)
+        self.assertEqual(self.calculator.add(0, 0), 0)
+        self.assertEqual(self.calculator.add(2.5, 3.5), 6.0)
 
-def test_multiply(calculator: Calculator) -> None:
-    assert calculator.multiply(2, 3) == 6
-    assert calculator.multiply(0, 5) == 0
-    assert calculator.multiply(-2, 3) == -6
-    assert calculator.multiply(2.5, 2) == 5.0
+    def test_subtract(self)-> None:
+        self.assertEqual(self.calculator.subtract(5, 3), 2)
+        self.assertEqual(self.calculator.subtract(3, 5), -2)
+        self.assertEqual(self.calculator.subtract(0, 0), 0)
+        self.assertEqual(self.calculator.subtract(10.5, 5.5), 5.0)
 
+    def test_multiply(self)-> None:
+        self.assertEqual(self.calculator.multiply(2, 3), 6)
+        self.assertEqual(self.calculator.multiply(0, 5), 0)
+        self.assertEqual(self.calculator.multiply(-2, 3), -6)
+        self.assertEqual(self.calculator.multiply(2.5, 2), 5.0)
 
-def test_divide(calculator: Calculator) -> None:
-    assert calculator.divide(6, 3) == 2
-    assert calculator.divide(5, 2) == 2.5
-    assert calculator.divide(0, 5) == 0
-    assert calculator.divide(-6, 2) == -3
+    def test_divide(self)-> None:
+        self.assertEqual(self.calculator.divide(6, 3), 2)
+        self.assertEqual(self.calculator.divide(5, 2), 2.5)
+        self.assertEqual(self.calculator.divide(0, 5), 0)
+        self.assertEqual(self.calculator.divide(-6, 2), -3)
 
+    def test_divide_by_zero(self)-> None:
+        with self.assertRaises(ValueError) as context:
+            self.calculator.divide(5, 0)
+        self.assertEqual(str(context.exception), "Cannot divide by zero")
 
-def test_divide_by_zero(calculator: Calculator) -> None:
-    with pytest.raises(ValueError, match="Cannot divide by zero"):
-        calculator.divide(5, 0)
+    def test_calculator_api(self)-> None:
+        # Test direct class usage
+        calc = Calculator()
+        self.assertEqual(calc.add(3, 4), 7)
+        self.assertEqual(calc.subtract(10, 3), 7)
 
+        # Test default instance
+        self.assertEqual(default_calculator.multiply(4, 4), 16)
 
-# API Tests
-def test_calculator_api() -> None:
-    # Test that the Calculator class is properly exposed
+        # Test function exports
+        self.assertEqual(add(7, 8), 15)
+        self.assertEqual(subtract(25, 10), 15)
+        self.assertEqual(multiply(5, 5), 25)
+        self.assertEqual(divide(20, 4), 5)
 
+        # Test error handling
+        with self.assertRaises(ValueError) as context:
+            divide(10, 0)
+        self.assertEqual(str(context.exception), "Cannot divide by zero")
 
-    # Test direct class usage
-    calc = Calculator()
-    assert calc.add(3, 4) == 7
-    assert calc.subtract(10, 3) == 7
-
-    # Test default instance
-    assert default_calculator.multiply(4, 4) == 16
-
-    # Test function exports
-    assert add(7, 8) == 15
-    assert subtract(25, 10) == 15
-    assert multiply(5, 5) == 25
-    assert divide(20, 4) == 5
-
-    # Test error handling
-    with pytest.raises(ValueError, match="Cannot divide by zero"):
-        divide(10, 0)
+if __name__ == "__main__":
+    unittest.main()
