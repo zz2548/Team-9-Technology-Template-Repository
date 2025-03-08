@@ -60,7 +60,7 @@ jobs:
             mv htmlcov e2e-htmlcov
             coverage report --fail-under=70
             
-          # Generate combined report (optional)
+            # Generate combined report (optional)
             coverage combine .coverage .coverage.integration .coverage.e2e
             coverage report --fail-under=70
             coverage xml -o combined-coverage.xml
