@@ -11,7 +11,7 @@ log = default_logger.log
 __all__ = [
     "Logger",
     "default_logger",
-    "log"
+    "log",
 ]
 
 # Package metadata
@@ -20,5 +20,5 @@ __authors__ = [
     {"name": "Jerry Zou", "email": "zz2548@nyu.edu"},
     {"name": "Keshav Rajput", "email": "kr3412@nyu.edu"},
     {"name": "Terry Xu", "email": "xm2204@nyu.edu"},
-    {"name": "Jinglin Tao", "email": "jt4296@nyu.edu"}
+    {"name": "Jinglin Tao", "email": "jt4296@nyu.edu"},
 ]

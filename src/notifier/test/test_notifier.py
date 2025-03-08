@@ -12,7 +12,7 @@ def test_notifier(capsys: CaptureFixture[str]) -> None:
 
 def test_notifier_metadata() -> None:
     # Test that metadata is correctly exposed
-    from src.notifier import __version__, __authors__
+    from src.notifier import __authors__, __version__
 
     # Test version
     assert __version__ == "0.1.0"

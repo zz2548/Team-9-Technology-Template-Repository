@@ -1,5 +1,5 @@
-import unittest
 import io
+import unittest
 from unittest.mock import patch
 
 from src.calculator.calculator import Calculator
@@ -15,7 +15,7 @@ class TestEndToEndFlow(unittest.TestCase):
 
     def test_end_to_end_flow(self) -> None:
         """Test the full end-to-end flow."""
-        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
             # Step 1: Perform a calculation using the Calculator
             result = self.calculator.add(5, 10)
 
