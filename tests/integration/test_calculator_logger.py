@@ -19,8 +19,9 @@ class TestCalculatorLogger(unittest.TestCase):
 
             captured_output = mock_stdout.getvalue()
             self.assertEqual(result, 8, f"Expected 8, got {result}")
-            self.assertIn("LOG: Adding 5 + 3 = 8",
-                          captured_output, "Incorrect log output")
+            self.assertIn(
+                "LOG: Adding 5 + 3 = 8", captured_output, "Incorrect log output",
+            )
 
     def test_calculator_logger_subtraction(self) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
@@ -29,8 +30,9 @@ class TestCalculatorLogger(unittest.TestCase):
 
             captured_output = mock_stdout.getvalue()
             self.assertEqual(result, 6, f"Expected 6, got {result}")
-            self.assertIn("LOG: Subtracting 10 - 4 = 6",
-                          captured_output, "Incorrect log output")
+            self.assertIn(
+                "LOG: Subtracting 10 - 4 = 6", captured_output, "Incorrect log output",
+            )
 
     def test_calculator_logger_multiplication(self) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
@@ -39,8 +41,9 @@ class TestCalculatorLogger(unittest.TestCase):
 
             captured_output = mock_stdout.getvalue()
             self.assertEqual(result, 42, f"Expected 42, got {result}")
-            self.assertIn("LOG: Multiplying 6 * 7 = 42",
-                          captured_output, "Incorrect log output")
+            self.assertIn(
+                "LOG: Multiplying 6 * 7 = 42", captured_output, "Incorrect log output",
+            )
 
     def test_calculator_logger_division(self) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
@@ -49,8 +52,9 @@ class TestCalculatorLogger(unittest.TestCase):
 
             captured_output = mock_stdout.getvalue()
             self.assertEqual(result, 5, f"Expected 5, got {result}")
-            self.assertIn("LOG: Dividing 10 / 2 = 5.0",
-                          captured_output, "Incorrect log output")
+            self.assertIn(
+                "LOG: Dividing 10 / 2 = 5.0", captured_output, "Incorrect log output",
+            )
 
     def test_calculator_logger_divide_by_zero(self) -> None:
         """Ensure dividing by zero raises an error and is logged."""
@@ -61,8 +65,11 @@ class TestCalculatorLogger(unittest.TestCase):
             self.logger.log("Attempted to divide by zero")
 
             captured_output = mock_stdout.getvalue()
-            self.assertIn("LOG: Attempted to divide by zero",
-                          captured_output, "Incorrect log output")
+            self.assertIn(
+                "LOG: Attempted to divide by zero",
+                captured_output,
+                "Incorrect log output",
+            )
 
 
 if __name__ == "__main__":

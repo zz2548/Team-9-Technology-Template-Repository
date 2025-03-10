@@ -54,7 +54,7 @@ The project includes unit, integration, and end-to-end tests:
 nose2 -v -s src/calculator/test/
 nose2 -v -s src/logger/test/
 nose2 -v -s src/notifier/test/
-
+```
 # Running all unit tests with coverage
 ```bash
 nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
@@ -66,7 +66,7 @@ COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage 
 coverage combine .coverage .coverage.logger .coverage.notifier
 
 coverage report --fail-under=70
-coverage xml -o unit-coverage.xml 
+coverage xml -o unit-coverage.xml
 coverage html -d unit-htmlcov
 ```
 Note : The above command works in bash environment, you might need to change the command slightly depending on your terminal.

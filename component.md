@@ -58,7 +58,7 @@ Each component must include:
    - component_name.py (main implementation)
    - __init__.py
    - component/test/test_component_name.py
-   - tests/integration/test_component1_component2.py 
+   - tests/integration/test_component1_component2.py
 
 2. Documentation Requirements
    - Usage examples

@@ -33,10 +33,16 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, 15, f"Expected 15, got {result}")
-            self.assertIn("LOG: Result of 5 + 10 = 15", captured_output,
-                          "Logging output is incorrect")
-            self.assertIn("ALERT: Value 15 exceeded threshold 10", captured_output,
-                          "Notifier output is incorrect")
+            self.assertIn(
+                "LOG: Result of 5 + 10 = 15",
+                captured_output,
+                "Logging output is incorrect",
+            )
+            self.assertIn(
+                "ALERT: Value 15 exceeded threshold 10",
+                captured_output,
+                "Notifier output is incorrect",
+            )
 
     def test_subtraction_flow(self) -> None:
         """Test the end-to-end flow with subtraction operation."""
@@ -55,10 +61,16 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, 15, f"Expected 15, got {result}")
-            self.assertIn("LOG: Result of 20 - 5 = 15", captured_output,
-                          "Logging output is incorrect")
-            self.assertIn("ALERT: Value 15 exceeded threshold 10", captured_output,
-                          "Notifier output is incorrect")
+            self.assertIn(
+                "LOG: Result of 20 - 5 = 15",
+                captured_output,
+                "Logging output is incorrect",
+            )
+            self.assertIn(
+                "ALERT: Value 15 exceeded threshold 10",
+                captured_output,
+                "Notifier output is incorrect",
+            )
 
     def test_multiplication_flow(self) -> None:
         """Test the end-to-end flow with multiplication operation."""
@@ -77,10 +89,16 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, 20, f"Expected 20, got {result}")
-            self.assertIn("LOG: Result of 4 * 5 = 20", captured_output,
-                          "Logging output is incorrect")
-            self.assertIn("ALERT: Value 20 exceeded threshold 10", captured_output,
-                          "Notifier output is incorrect")
+            self.assertIn(
+                "LOG: Result of 4 * 5 = 20",
+                captured_output,
+                "Logging output is incorrect",
+            )
+            self.assertIn(
+                "ALERT: Value 20 exceeded threshold 10",
+                captured_output,
+                "Notifier output is incorrect",
+            )
 
     def test_division_flow(self) -> None:
         """Test the end-to-end flow with division operation."""
@@ -99,13 +117,18 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, 10, f"Expected 10, got {result}")
-            self.assertIn("LOG: Result of 30 / 3 = 10", captured_output,
-                          "Logging output is incorrect")
+            self.assertIn(
+                "LOG: Result of 30 / 3 = 10",
+                captured_output,
+                "Logging output is incorrect",
+            )
 
             if "ALERT" in captured_output:
-                self.assertIn("ALERT: Value 10 exceeded threshold 10", captured_output,
-                              "Notifier output is incorrect")
-
+                self.assertIn(
+                    "ALERT: Value 10 exceeded threshold 10",
+                    captured_output,
+                    "Notifier output is incorrect",
+                )
 
     def test_below_threshold_notification(self) -> None:
         """Test notification when value is below threshold."""
@@ -123,8 +146,11 @@ class TestEndToEndFlow(unittest.TestCase):
             captured_output = mock_stdout.getvalue()
 
             # Assertion - there should be no alert in the output
-            self.assertNotIn("ALERT:", captured_output,
-                             "Notifier incorrectly triggered for value below threshold")
+            self.assertNotIn(
+                "ALERT:",
+                captured_output,
+                "Notifier incorrectly triggered for value below threshold",
+            )
 
     def test_decimal_operations(self) -> None:
         """Test operations with decimal numbers."""
@@ -143,8 +169,11 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, 10.0, f"Expected 10.0, got {result}")
-            self.assertIn("LOG: Result of 5.5 + 4.5 = 10.0", captured_output,
-                          "Logging output is incorrect for decimal operations")
+            self.assertIn(
+                "LOG: Result of 5.5 + 4.5 = 10.0",
+                captured_output,
+                "Logging output is incorrect for decimal operations",
+            )
 
     def test_negative_numbers(self) -> None:
         """Test operations with negative numbers."""
@@ -163,8 +192,11 @@ class TestEndToEndFlow(unittest.TestCase):
 
             # Assertions
             self.assertEqual(result, -10, f"Expected -10, got {result}")
-            self.assertIn("LOG: Result of -15 + 5 = -10", captured_output,
-                          "Logging output is incorrect for negative numbers")
+            self.assertIn(
+                "LOG: Result of -15 + 5 = -10",
+                captured_output,
+                "Logging output is incorrect for negative numbers",
+            )
 
             # Modify assertion based on actual implementation
 
