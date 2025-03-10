@@ -33,24 +33,39 @@ jobs:
           command: |
             mypy src tests
             ruff check . --config pyproject.toml
-            
-      # Run all unit tests first with coverage
+      # Run unit tests
       - run:
           name: Run Unit Tests
           command: |
-            pytest src/calculator/test src/logger/test src/notifier/test --cov=src --cov-report=xml --junitxml=test-results/unit.xml
+            nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
+
+            COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
+
+            COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
+
+            coverage combine .coverage .coverage.logger .coverage.notifier
+
+            coverage report --fail-under=70
+            coverage xml -o unit-coverage.xml 
+            coverage html -d unit-htmlcov
 
       # Run integration tests and append coverage
       - run:
           name: Run Integration Tests
           command: |
-            pytest tests/integration --cov=src --cov-append --junitxml=test-results/integration.xml
+            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
+            coverage report --fail-under=70
+            coverage xml -o integration-coverage.xml
+            coverage html -d integration-htmlcov
 
       # Run e2e tests and generate final coverage report
       - run:
           name: Run End-to-End Tests and Check Coverage
           command: |
-            pytest tests/e2e --cov=src --cov-append --cov-report=xml --cov-report=html --cov-fail-under=70 --junitxml=test-results/e2e.xml
+            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
+            coverage report --fail-under=70
+            coverage xml -o e2e-coverage.xml
+            coverage html -d e2e-htmlcov
 
       - store_test_results:
           path: test-results
