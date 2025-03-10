@@ -1,7 +1,7 @@
 [project]
 name = "notifier"
 version = "0.1.0"
-description = "A Python project template component. Sends an alert when the result exceeds a given threshold."
+description = "A Python project template component."
 authors = [
     {name = "Jerry Zou", email = "zz2548@nyu.edu"},
     {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
@@ -13,12 +13,13 @@ requires-python = ">=3.10.9, <3.11"
 
 [project.optional-dependencies]
 
+[project.optional-dependencies]
 dev = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
-    "pytest-cov>=3.0"
+    "pre-commit>=4.1.0"
 ]
 
 dependencies = [
@@ -26,7 +27,7 @@ dependencies = [
     "mypy>=1.15.0",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
-    "pytest-cov>=3.0"
+    "pre-commit>=4.1.0"
 ]
 
 [tool.ruff]
@@ -52,7 +53,6 @@ ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR20
 # EM101: Same as above
 # PLR2004: Allow magic value in comparison for our tests
 # D100, D101, D102, D103, D107: Docstring rules we will adhere to later
-
 
 [tool.mypy]
 python_version = "3.10"
