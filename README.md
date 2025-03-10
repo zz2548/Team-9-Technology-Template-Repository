@@ -26,6 +26,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv venv .venv
 source .venv/bin/activate
 ```
+Note : If on on windows do
+```bash
+uv venv .venv
+.venv\Scripts\activate
+```
 
 4. Install dependencies:
 ```bash
@@ -38,7 +43,7 @@ uv pip install ".[dev]"
 Run type checking and code linting:
 ```bash
 mypy src tests
-ruff check .
+ruff check . --config pyproject.toml
 ```
 
 ### Testing

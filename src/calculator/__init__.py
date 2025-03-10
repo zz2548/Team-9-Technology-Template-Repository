@@ -13,11 +13,11 @@ divide = default_calculator.divide
 # Define what gets imported with "from package import *"
 __all__ = [
     "Calculator",
-    "default_calculator",
     "add",
-    "subtract",
-    "multiply",
+    "default_calculator",
     "divide",
+    "multiply",
+    "subtract",
 ]
 
 # Package metadata
