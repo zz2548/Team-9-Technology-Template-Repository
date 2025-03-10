@@ -45,17 +45,24 @@ ruff check .
 The project includes unit, integration, and end-to-end tests:
 
 ```bash
-# Run unit tests with coverage
-pytest src/calculator/test src/logger/test src/notifier/test --cov=src --cov-report=html
+# Running a single unit test
+nose2 -v -s src/calculator/test/
+nose2 -v -s src/logger/test/
+nose2 -v -s src/notifier/test/
+
+# Running all unit tests with coverage
+nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator 
+&& COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger 
+&& COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
 
 # Run integration tests
-pytest tests/integration
+nose2 -v -s tests/integration
 
 # Run end-to-end tests
-pytest tests/e2e
+nose2 -v -s tests/e2e
 
 # Run all tests
-pytest
+nose2
 ```
 
 ### Coverage Reports
@@ -77,7 +84,7 @@ git checkout -b feature-name
 
 2. Make your changes and ensure all tests pass:
 ```bash
-pytest
+nose2
 ```
 
 3. Push your changes and create a pull request:
@@ -91,4 +98,4 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 ## Additional Resources
 - [UV Documentation](https://github.com/astral-sh/uv)
 - [CircleCI Documentation](https://circleci.com/docs/)
-- [pytest Documentation](https://docs.pytest.org/)
+- [nose2 Documentation](https://docs.nose2.io/en/latest/)
