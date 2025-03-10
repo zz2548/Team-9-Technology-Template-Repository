@@ -113,7 +113,7 @@ class TestEndToEndFlow(unittest.TestCase):
                 # Step 1: Try to divide by zero
                 result = self.calculator.divide(10, 0)
 
-                # We should never get here if calculator handles division by zero correctly
+                # Never get here if calculator handles division by zero correctly
                 self.fail("Division by zero did not raise an exception")
             except ZeroDivisionError:
                 # Step 2: Log the error
@@ -184,7 +184,7 @@ class TestEndToEndFlow(unittest.TestCase):
             self.assertEqual(result, -10, f"Expected -10, got {result}")
             self.assertIn("LOG: Result of -15 + 5 = -10", captured_output,
                           "Logging output is incorrect for negative numbers")
-            # Notifier might be programmed to only alert on positive values exceeding threshold
+
             # Modify assertion based on actual implementation
 
     def test_complex_flow(self) -> None:
