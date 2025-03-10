@@ -19,60 +19,67 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV  # Ensure src/ is recognized
+            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
           name: Install Dependencies
           command: |
             uv pip install ".[dev]"
-            uv pip install mypy ruff pytest pytest-cov  # Ensure all dependencies
+            uv pip install mypy ruff nose2 coverage
+
+      - run:
+          name: Cleanup old coverage data
+          command: |
+            coverage erase
+            rm -f .coverage*
 
       - run:
           name: Run Static Analysis
           command: |
             mypy src tests
             ruff check . --config pyproject.toml
-      # Run unit tests
+
       - run:
           name: Run Unit Tests
           command: |
-            nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
-
+            touch .coverage.calculator
+            COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
+            touch .coverage.logger
             COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
-
+            touch .coverage.notifier
             COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
 
-            coverage combine .coverage .coverage.logger .coverage.notifier
-
-            coverage report --fail-under=70
-            coverage xml -o unit-coverage.xml 
-            coverage html -d unit-htmlcov
-
-      # Run integration tests and append coverage
       - run:
           name: Run Integration Tests
           command: |
+            touch .coverage.integration
             COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
-            coverage report --fail-under=70
-            coverage xml -o integration-coverage.xml
-            coverage html -d integration-htmlcov
 
-      # Run e2e tests and generate final coverage report
       - run:
-          name: Run End-to-End Tests and Check Coverage
+          name: Run End-to-End Tests
           command: |
+            touch .coverage.e2e
             COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
+
+      - run:
+          name: Final Coverage Report
+          command: |
+            coverage combine .coverage.calculator .coverage.logger .coverage.notifier .coverage.integration .coverage.e2e
             coverage report --fail-under=70
-            coverage xml -o e2e-coverage.xml
-            coverage html -d e2e-htmlcov
+            coverage xml -o total-coverage.xml
+            coverage html -d total-htmlcov
 
       - store_test_results:
           path: test-results
 
       - store_artifacts:
-          path: htmlcov
-          destination: coverage-report
+          path: total-htmlcov
+          destination: total-coverage-report
+
+      - store_artifacts:
+          path: total-coverage.xml
+          destination: coverage-reports/total-coverage.xml
 
 workflows:
   main:
