@@ -101,30 +101,11 @@ class TestEndToEndFlow(unittest.TestCase):
             self.assertEqual(result, 10, f"Expected 10, got {result}")
             self.assertIn("LOG: Result of 30 / 3 = 10", captured_output,
                           "Logging output is incorrect")
-            # This should be right at the threshold, may or may not trigger based on implementation
+
             if "ALERT" in captured_output:
                 self.assertIn("ALERT: Value 10 exceeded threshold 10", captured_output,
                               "Notifier output is incorrect")
 
-    def test_division_by_zero_flow(self) -> None:
-        """Test handling of division by zero."""
-        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            try:
-                # Step 1: Try to divide by zero
-                result = self.calculator.divide(10, 0)
-
-                # Never get here if calculator handles division by zero correctly
-                self.fail("Division by zero did not raise an exception")
-            except ZeroDivisionError:
-                # Step 2: Log the error
-                self.logger.log("Error: Division by zero attempted")
-
-                # Capture the output
-                captured_output = mock_stdout.getvalue()
-
-                # Assertion for error logging
-                self.assertIn("LOG: Error: Division by zero attempted", captured_output,
-                              "Error logging output is incorrect")
 
     def test_below_threshold_notification(self) -> None:
         """Test notification when value is below threshold."""

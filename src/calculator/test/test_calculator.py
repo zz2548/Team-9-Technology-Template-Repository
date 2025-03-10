@@ -1,6 +1,5 @@
 import unittest
 
-
 from src.calculator import (
     Calculator,
     add,
