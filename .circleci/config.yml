@@ -26,27 +26,24 @@ jobs:
           name: Install Dependencies
           command: |
             uv pip install ".[dev]"
-            uv pip install mypy ruff pytest pytest-cov  # Ensure all dependencies
+            uv pip install mypy ruff nose2 coverage
 
       - run:
           name: Run Static Analysis
           command: |
             mypy src tests
             ruff check . --config pyproject.toml
+
       # Run unit tests
       - run:
           name: Run Unit Tests
           command: |
-            nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
-
+            COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
             COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
-
             COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
-
-            coverage combine .coverage .coverage.logger .coverage.notifier
-
+            coverage combine .coverage.calculator .coverage.logger .coverage.notifier
             coverage report --fail-under=70
-            coverage xml -o unit-coverage.xml 
+            coverage xml -o unit-coverage.xml
             coverage html -d unit-htmlcov
 
       # Run integration tests and append coverage
@@ -54,6 +51,7 @@ jobs:
           name: Run Integration Tests
           command: |
             COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
+            coverage combine .coverage.integration
             coverage report --fail-under=70
             coverage xml -o integration-coverage.xml
             coverage html -d integration-htmlcov
@@ -63,6 +61,7 @@ jobs:
           name: Run End-to-End Tests and Check Coverage
           command: |
             COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
+            coverage combine .coverage.e2e
             coverage report --fail-under=70
             coverage xml -o e2e-coverage.xml
             coverage html -d e2e-htmlcov
@@ -70,9 +69,27 @@ jobs:
       - store_test_results:
           path: test-results
 
+      # Store all coverage reports as artifacts
       - store_artifacts:
-          path: htmlcov
-          destination: coverage-report
+          path: unit-htmlcov
+          destination: unit-coverage-report
+      - store_artifacts:
+          path: integration-htmlcov
+          destination: integration-coverage-report
+      - store_artifacts:
+          path: e2e-htmlcov
+          destination: e2e-coverage-report
+
+      # Store XML coverage reports as well
+      - store_artifacts:
+          path: unit-coverage.xml
+          destination: coverage-reports/unit-coverage.xml
+      - store_artifacts:
+          path: integration-coverage.xml
+          destination: coverage-reports/integration-coverage.xml
+      - store_artifacts:
+          path: e2e-coverage.xml
+          destination: coverage-reports/e2e-coverage.xml
 
 workflows:
   main:
