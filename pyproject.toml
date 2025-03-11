@@ -68,7 +68,7 @@ exclude = ['.venv', 'build', 'dist']
 branch = true
 source = ["src"]
 omit = [
-    "tests/*", ".venv/*", "build/*", "dist/*", "*/test/*"
+    "tests/*", ".venv/*", "build/*", "dist/*", "*/test/*", "*/pre_commit_test.py"
 ]
 
 [tool.coverage.report]
