@@ -19,7 +19,7 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src:$PWD/tests" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
@@ -43,29 +43,25 @@ jobs:
       - run:
           name: Run Unit Tests
           command: |
-            touch .coverage.calculator
-            COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
-            touch .coverage.logger
-            COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
-            touch .coverage.notifier
-            COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
+            touch .coverage.unit
+            COVERAGE_FILE=.coverage.unit nose2 -v -s tests/unit/ --with-coverage --coverage=src --coverage=tests
 
       - run:
           name: Run Integration Tests
           command: |
             touch .coverage.integration
-            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
+            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --with-coverage --coverage=src --coverage=tests
 
       - run:
           name: Run End-to-End Tests
           command: |
             touch .coverage.e2e
-            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
+            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --with-coverage --coverage=src --coverage=tests
 
       - run:
           name: Final Coverage Report
           command: |
-            coverage combine .coverage.calculator .coverage.logger .coverage.notifier .coverage.integration .coverage.e2e
+            coverage combine || echo "No coverage files found!"
             coverage report --fail-under=70
             coverage xml -o total-coverage.xml
             coverage html -d total-htmlcov
