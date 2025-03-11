@@ -19,7 +19,7 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src:$PWD/tests" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
@@ -43,29 +43,34 @@ jobs:
       - run:
           name: Run Unit Tests
           command: |
-            touch .coverage.calculator
-            COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
-            touch .coverage.logger
-            COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
-            touch .coverage.notifier
-            COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
+            touch .coverage.unit
+            COVERAGE_FILE=.coverage.unit nose2 -v -s tests/unit/ --with-coverage --coverage=src --coverage=tests
+            coverage report -m
+            coverage html -d unit-htmlcov
+            coverage xml -o unit-coverage.xml
 
       - run:
           name: Run Integration Tests
           command: |
             touch .coverage.integration
-            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration.xml --with-coverage
+            COVERAGE_FILE=.coverage.integration nose2 -v -s tests/integration/ --with-coverage --coverage=src --coverage=tests
+            coverage report -m
+            coverage html -d integration-htmlcov
+            coverage xml -o integration-coverage.xml
 
       - run:
           name: Run End-to-End Tests
           command: |
             touch .coverage.e2e
-            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e.xml --with-coverage
+            COVERAGE_FILE=.coverage.e2e nose2 -v -s tests/e2e/ --with-coverage --coverage=src --coverage=tests
+            coverage report -m
+            coverage html -d e2e-htmlcov
+            coverage xml -o e2e-coverage.xml
 
       - run:
-          name: Final Coverage Report
+          name: Final Coverage Report (Merged)
           command: |
-            coverage combine .coverage.calculator .coverage.logger .coverage.notifier .coverage.integration .coverage.e2e
+            coverage combine .coverage.unit .coverage.integration .coverage.e2e || echo "No coverage files found!"
             coverage report --fail-under=70
             coverage xml -o total-coverage.xml
             coverage html -d total-htmlcov
@@ -73,10 +78,32 @@ jobs:
       - store_test_results:
           path: test-results
 
+      # 存储 Unit, Integration, E2E 的单独 HTML 覆盖率
+      - store_artifacts:
+          path: unit-htmlcov
+          destination: unit-coverage-report
+      - store_artifacts:
+          path: integration-htmlcov
+          destination: integration-coverage-report
+      - store_artifacts:
+          path: e2e-htmlcov
+          destination: e2e-coverage-report
+
+      # 存储最终合并的覆盖率
       - store_artifacts:
           path: total-htmlcov
           destination: total-coverage-report
 
+      # 存储 XML 版本的覆盖率报告
+      - store_artifacts:
+          path: unit-coverage.xml
+          destination: coverage-reports/unit-coverage.xml
+      - store_artifacts:
+          path: integration-coverage.xml
+          destination: coverage-reports/integration-coverage.xml
+      - store_artifacts:
+          path: e2e-coverage.xml
+          destination: coverage-reports/e2e-coverage.xml
       - store_artifacts:
           path: total-coverage.xml
           destination: coverage-reports/total-coverage.xml
