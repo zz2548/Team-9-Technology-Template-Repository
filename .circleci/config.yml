@@ -70,6 +70,13 @@ jobs:
             coverage report --fail-under=70
             coverage xml -o coverage-reports/coverage.xml
             coverage html -d coverage-reports/html
+            
+            # Create an index.html file for easy navigation
+            echo "<html><head><title>Combined Coverage Reports</title></head><body>" > coverage-reports/index.html
+            echo "<h1>Combined Coverage Reports</h1>" >> coverage-reports/index.html
+            echo "<p><a href='html/index.html'>HTML Coverage Report</a></p>" >> coverage-reports/index.html
+            echo "<p><a href='coverage.xml'>XML Coverage Report</a></p>" >> coverage-reports/index.html
+            echo "</body></html>" >> coverage-reports/index.html
 
       - store_test_results:
           path: test-results
