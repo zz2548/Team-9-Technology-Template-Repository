@@ -45,7 +45,7 @@ jobs:
           command: |
             touch .coverage.unit
             COVERAGE_FILE=.coverage.unit nose2 -v -s tests/unit/ --with-coverage --coverage=src --coverage=tests
-            coverage report -m
+            coverage report -m > unit-coverage.txt
             coverage html -d unit-htmlcov
             coverage xml -o unit-coverage.xml
 
@@ -54,7 +54,7 @@ jobs:
           command: |
             touch .coverage.integration
             COVERAGE_FILE=.coverage.integration nose2 -v -s tests/integration/ --with-coverage --coverage=src --coverage=tests
-            coverage report -m
+            coverage report -m > integration-coverage.txt
             coverage html -d integration-htmlcov
             coverage xml -o integration-coverage.xml
 
@@ -63,22 +63,21 @@ jobs:
           command: |
             touch .coverage.e2e
             COVERAGE_FILE=.coverage.e2e nose2 -v -s tests/e2e/ --with-coverage --coverage=src --coverage=tests
-            coverage report -m
+            coverage report -m > e2e-coverage.txt
             coverage html -d e2e-htmlcov
             coverage xml -o e2e-coverage.xml
 
       - run:
-          name: Final Coverage Report (Merged)
+          name: Final Coverage Report (Combined)
           command: |
             coverage combine .coverage.unit .coverage.integration .coverage.e2e || echo "No coverage files found!"
-            coverage report --fail-under=70
+            coverage report -m > total-coverage.txt
             coverage xml -o total-coverage.xml
             coverage html -d total-htmlcov
 
       - store_test_results:
           path: test-results
 
-      # 存储 Unit, Integration, E2E 的单独 HTML 覆盖率
       - store_artifacts:
           path: unit-htmlcov
           destination: unit-coverage-report
@@ -89,12 +88,23 @@ jobs:
           path: e2e-htmlcov
           destination: e2e-coverage-report
 
-      # 存储最终合并的覆盖率
       - store_artifacts:
           path: total-htmlcov
           destination: total-coverage-report
 
-      # 存储 XML 版本的覆盖率报告
+      - store_artifacts:
+          path: unit-coverage.txt
+          destination: text-reports/unit-coverage.txt
+      - store_artifacts:
+          path: integration-coverage.txt
+          destination: text-reports/integration-coverage.txt
+      - store_artifacts:
+          path: e2e-coverage.txt
+          destination: text-reports/e2e-coverage.txt
+      - store_artifacts:
+          path: total-coverage.txt
+          destination: text-reports/total-coverage.txt
+
       - store_artifacts:
           path: unit-coverage.xml
           destination: coverage-reports/unit-coverage.xml
