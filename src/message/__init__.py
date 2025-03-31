@@ -21,5 +21,5 @@ class Message:
         raise NotImplementedError
 
     @staticmethod
-    def fetch_latest(channel_id: str, count: int) -> List['Message']:
+    def fetch_latest(channel_id: str, count: int) -> list['Message']:
         raise NotImplementedError

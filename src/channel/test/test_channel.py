@@ -11,7 +11,7 @@ class MockChannel(Channel):
     def get_name(self) -> str:
         return self.name
 
-    def list_users(self) -> List[str]:
+    def list_users(self) -> list[str]:
         return ["u1", "u2"]
 
     @staticmethod

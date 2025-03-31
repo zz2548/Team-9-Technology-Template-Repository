@@ -11,7 +11,7 @@ class MockUser(User):
     def get_username(self) -> str:
         return self.username
 
-    def list_channels(self) -> List[str]:
+    def list_channels(self) -> list[str]:
         return ["general", "random"]
 
     @staticmethod

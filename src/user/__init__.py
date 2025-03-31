@@ -9,7 +9,7 @@ class User:
     def get_username(self) -> str:
         raise NotImplementedError
 
-    def list_channels(self) -> List[str]:
+    def list_channels(self) -> list[str]:
         raise NotImplementedError
 
     @staticmethod

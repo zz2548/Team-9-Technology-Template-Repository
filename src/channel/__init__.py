@@ -9,7 +9,7 @@ class Channel:
     def get_name(self) -> str:
         raise NotImplementedError
 
-    def list_users(self) -> List[str]:
+    def list_users(self) -> list[str]:
         raise NotImplementedError
 
     @staticmethod
