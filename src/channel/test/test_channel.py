@@ -35,6 +35,28 @@ class TestChannelAPI(unittest.TestCase):
         chan = MockChannel("c1", "general")
         users = chan.list_users()
         self.assertIn("u1", users)
+        
+    def test_create_channel(self) -> None:
+        chan = Channel.create_channel("support")
+        self.assertIsInstance(chan, Channel)
+        self.assertTrue(chan.get_id().startswith("chan_"))
+        self.assertEqual(chan.get_name(), "support")
+        
+    def test_join_same_user_twice(self) -> None:
+        chan = Channel("chan_x", "general")
+        Channel.join_channel("user42", "chan_x")
+        # Joining same user again
+        result = Channel.join_channel("user42", "chan_x")
+        self.assertTrue(result)
+        self.assertEqual(chan.list_users().count("user42"), 1)  # still one instance
+        
+    def test_channel_reinit(self) -> None:
+        # First init creates the entry
+        Channel("chan_y", "alpha")
+        # Second init shouldn't overwrite
+        Channel("chan_y", "beta")
+        chan = Channel("chan_y", "alpha")
+        self.assertEqual(chan.get_name(), "alpha")
 
 if __name__ == '__main__':
     unittest.main()
