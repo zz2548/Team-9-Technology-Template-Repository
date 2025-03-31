@@ -1,6 +1,4 @@
-# Team-9-Technology-Template-Repository
-
-# Chat Client – Discord-Style
+# Team 9 - Chat Client – Discord
 
 This project is a modular chat client inspired by Discord, designed as part of a software engineering coursework assignment. It focuses on defining clean interfaces between components and writing robust tests for those interfaces.
 
@@ -38,7 +36,7 @@ This project is a modular chat client inspired by Discord, designed as part of a
 - Mockable methods for future implementation
 - Type-safe method signatures using Python type hints
 - Full test coverage across:
-  - Unit tests (via `nose2`)
+  - Unit tests
   - Integration tests
   - End-to-end user simulations
 
