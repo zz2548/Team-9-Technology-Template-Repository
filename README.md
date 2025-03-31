@@ -1,6 +1,6 @@
 # Team 9 - Chat Client - Discord
 
-This project is a modular chat client inspired by Discord, designed as part of a software engineering coursework assignment. It focuses on defining clean interfaces between components and writing robust tests for those interfaces.
+This project is a modular chat client.
 
 
 ## Interface Summary
