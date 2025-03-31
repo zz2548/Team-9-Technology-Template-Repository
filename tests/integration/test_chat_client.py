@@ -1,7 +1,7 @@
 import unittest
-from chat_client.user import User
-from chat_client.channel import Channel
-from chat_client.message import Message
+from src.user import User
+from src.channel import Channel
+from src.message import Message
 
 
 class TestChatClientIntegration(unittest.TestCase):
