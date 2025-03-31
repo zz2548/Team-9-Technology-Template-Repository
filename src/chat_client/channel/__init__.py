@@ -1,5 +1,7 @@
+from typing import List
+
 class Channel:
-    def __init__(self, channel_id: str, name: str):
+    def __init__(self, channel_id: str, name: str) -> None:
         self.channel_id = channel_id
         self.name = name
 
@@ -9,7 +11,7 @@ class Channel:
     def get_name(self) -> str:
         raise NotImplementedError
 
-    def list_users(self) -> list[str]:
+    def list_users(self) -> List[str]:
         raise NotImplementedError
 
     @staticmethod
@@ -17,5 +19,5 @@ class Channel:
         raise NotImplementedError
 
     @staticmethod
-    def join_channel(user_id: str, channel_id: str):
+    def join_channel(user_id: str, channel_id: str) -> bool:
         raise NotImplementedError
