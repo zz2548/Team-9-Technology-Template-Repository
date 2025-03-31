@@ -16,11 +16,11 @@ class MockUser(User):
         return ["general", "random"]
 
     @staticmethod
-    def register(username: str) -> 'MockUser':
+    def register(username: str) -> 'User':
         return MockUser("u123", username)
 
     @staticmethod
-    def login(username: str) -> 'MockUser':
+    def login(username: str) -> 'User':
         return MockUser("u123", username)
 
 class TestUserAPI(unittest.TestCase):

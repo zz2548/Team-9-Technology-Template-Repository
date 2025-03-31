@@ -18,11 +18,11 @@ class MockMessage(Message):
         return self.content
 
     @staticmethod
-    def send_message(sender_id: str, channel_id: str, content: str) -> 'MockMessage':
+    def send_message(sender_id: str, channel_id: str, content: str) -> 'Message':
         return MockMessage(sender_id, channel_id, content)
 
     @staticmethod
-    def fetch_latest(channel_id: str, count: int) -> List['MockMessage']:
+    def fetch_latest(channel_id: str, count: int) -> List['Message']:
         return [MockMessage("u1", channel_id, f"msg {i}") for i in range(count)]
 
 class TestMessageAPI(unittest.TestCase):

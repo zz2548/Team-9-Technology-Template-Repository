@@ -16,7 +16,7 @@ class MockChannel(Channel):
         return ["u1", "u2"]
 
     @staticmethod
-    def create_channel(name: str) -> 'MockChannel':
+    def create_channel(name: str) -> 'Channel':
         return MockChannel("c123", name)
 
     @staticmethod
