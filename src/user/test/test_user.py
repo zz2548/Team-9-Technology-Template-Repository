@@ -1,6 +1,6 @@
 import unittest
 from typing import List
-from chat_client.user import User
+from src.user import User
 
 class MockUser(User):  
     def __init__(self, user_id: str, username: str) -> None:

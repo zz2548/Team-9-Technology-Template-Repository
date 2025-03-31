@@ -1,6 +1,6 @@
 import unittest
 from typing import List
-from chat_client.message import Message
+from src.message import Message
 
 class MockMessage(Message):
     def __init__(self, sender_id: str, channel_id: str, content: str) -> None:

@@ -1,6 +1,6 @@
 import unittest
 from typing import List
-from chat_client.channel import Channel
+from src.channel import Channel
 
 class MockChannel(Channel):
     def __init__(self, channel_id: str, name: str) -> None:
