@@ -32,7 +32,13 @@ class TestChatClientE2E(unittest.TestCase):
         # Fetch latest messages
         messages = Message.fetch_latest(channel.get_id(), 1)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].get_content(), "Message 0" if messages[0].get_content().startswith("Message") else "Hello from E2E!")
+        expected_content = (
+            "Message 0"
+            if messages[0].get_content().startswith("Message")
+            else "Hello from E2E!"
+        )
+        self.assertEqual(messages[0].get_content(), expected_content)
+
 
 
 if __name__ == "__main__":
