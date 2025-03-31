@@ -35,5 +35,22 @@ class TestUserAPI(unittest.TestCase):
         channels = user.list_channels()
         self.assertIn("general", channels)
 
+    def test_register_user(self) -> None:
+        user = User.register("charlie")
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.get_username(), "charlie")
+        
+    def test_login_user(self) -> None:
+        user = User.login("charlie")
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.get_username(), "charlie")
+        
+    def test_user_getters(self) -> None:
+        user = User("u001", "charlie")
+        self.assertEqual(user.get_id(), "u001")
+        self.assertEqual(user.get_username(), "charlie")
+
+
+
 if __name__ == '__main__':
     unittest.main()
