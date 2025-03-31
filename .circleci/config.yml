@@ -62,7 +62,7 @@ jobs:
           name: Run End-to-End Tests
           command: |
             mkdir -p test-results/e2e
-            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e/results.xml
+            COVERAGE_FILE=.coverage.e2e PYTHONPATH=src python -m nose2 -s tests/e2e/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e/results.xml
 
       - run:
           name: Combine Coverage Reports
