@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 from src.channel import Channel
 
 class MockChannel(Channel):
@@ -20,7 +19,7 @@ class MockChannel(Channel):
         return MockChannel("c123", name)
 
     @staticmethod
-    def join_channel(user_id: str, channel_id: str) -> bool:
+    def join_channel(_user_id: str, _channel_id: str) -> bool:
         return True
 
 class TestChannelAPI(unittest.TestCase):

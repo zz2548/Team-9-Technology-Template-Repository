@@ -1,5 +1,3 @@
-from typing import List
-
 class Message:
     def __init__(self, sender_id: str, channel_id: str, content: str) -> None:
         self.sender_id = sender_id

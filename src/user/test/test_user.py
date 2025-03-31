@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 from src.user import User
 
 class MockUser(User):  

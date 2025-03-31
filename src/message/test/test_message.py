@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 from src.message import Message
 
 class MockMessage(Message):

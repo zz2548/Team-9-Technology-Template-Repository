@@ -1,5 +1,3 @@
-from typing import List
-
 class User:
     def __init__(self, user_id: str, username: str) -> None:
         self.user_id = user_id

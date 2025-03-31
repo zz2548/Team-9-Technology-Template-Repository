@@ -1,5 +1,3 @@
-from typing import List
-
 class Channel:
     def __init__(self, channel_id: str, name: str) -> None:
         self.channel_id = channel_id
