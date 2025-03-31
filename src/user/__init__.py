@@ -1,21 +1,22 @@
+# Example: user/__init__.py
 class User:
     def __init__(self, user_id: str, username: str) -> None:
         self.user_id = user_id
         self.username = username
 
     def get_id(self) -> str:
-        raise NotImplementedError
+        return self.user_id
 
     def get_username(self) -> str:
-        raise NotImplementedError
+        return self.username
 
     def list_channels(self) -> list[str]:
-        raise NotImplementedError
+        return ["general", "random"]
 
     @staticmethod
     def register(username: str) -> 'User':
-        raise NotImplementedError
+        return User("u001", username)
 
     @staticmethod
     def login(username: str) -> 'User':
-        raise NotImplementedError
+        return User("u001", username)

@@ -1,21 +1,30 @@
 class Channel:
+    _channels = {}  # mock in-memory store of users per channel
+
     def __init__(self, channel_id: str, name: str) -> None:
         self.channel_id = channel_id
         self.name = name
+        if channel_id not in Channel._channels:
+            Channel._channels[channel_id] = []
 
     def get_id(self) -> str:
-        raise NotImplementedError
+        return self.channel_id
 
     def get_name(self) -> str:
-        raise NotImplementedError
+        return self.name
 
     def list_users(self) -> list[str]:
-        raise NotImplementedError
+        return Channel._channels.get(self.channel_id, [])
 
     @staticmethod
     def create_channel(name: str) -> 'Channel':
-        raise NotImplementedError
+        new_id = f"chan_{len(Channel._channels) + 1}"
+        return Channel(new_id, name)
 
     @staticmethod
     def join_channel(user_id: str, channel_id: str) -> bool:
-        raise NotImplementedError
+        if channel_id not in Channel._channels:
+            Channel._channels[channel_id] = []
+        if user_id not in Channel._channels[channel_id]:
+            Channel._channels[channel_id].append(user_id)
+        return True
