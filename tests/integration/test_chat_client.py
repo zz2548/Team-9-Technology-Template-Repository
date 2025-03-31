@@ -37,4 +37,5 @@ class TestChatClientIntegration(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    print("✅ Running test_chat_client.py")
     unittest.main()

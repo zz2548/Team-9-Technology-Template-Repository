@@ -55,7 +55,8 @@ jobs:
           name: Run Integration Tests
           command: |
             mkdir -p test-results/integration
-            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration/results.xml
+            COVERAGE_FILE=.coverage.integration PYTHONPATH=src python -m nose2 -s tests/integration --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration/results.xml
+
 
       - run:
           name: Run End-to-End Tests
