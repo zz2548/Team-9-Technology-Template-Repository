@@ -1,5 +1,9 @@
+from typing import ClassVar
+
 class Channel:
-    _channels: dict[str, list[str]] = {}  # mock in-memory store of users per channel
+    
+     # mock in-memory store of users per channel
+    _channels: ClassVar[dict[str, list[str]]] = {}
 
     def __init__(self, channel_id: str, name: str) -> None:
         self.channel_id = channel_id

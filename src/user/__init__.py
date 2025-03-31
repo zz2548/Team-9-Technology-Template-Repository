@@ -1,4 +1,3 @@
-# Example: user/__init__.py
 class User:
     def __init__(self, user_id: str, username: str) -> None:
         self.user_id = user_id
