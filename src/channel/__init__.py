@@ -1,5 +1,5 @@
 class Channel:
-    _channels = {}  # mock in-memory store of users per channel
+    _channels: dict[str, list[str]] = {}  # mock in-memory store of users per channel
 
     def __init__(self, channel_id: str, name: str) -> None:
         self.channel_id = channel_id
@@ -14,7 +14,8 @@ class Channel:
         return self.name
 
     def list_users(self) -> list[str]:
-        return Channel._channels.get(self.channel_id, [])
+        return Channel._channels.get(self.channel_id, []) or []
+
 
     @staticmethod
     def create_channel(name: str) -> 'Channel':
