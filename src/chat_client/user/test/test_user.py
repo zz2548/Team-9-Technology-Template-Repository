@@ -2,7 +2,10 @@ import unittest
 from typing import List
 from chat_client.user import User
 
-class MockUser(User):
+class MockUser(User):  
+    def __init__(self, user_id: str, username: str) -> None:
+        super().__init__(user_id, username)
+        
     def get_id(self) -> str:
         return self.user_id
 

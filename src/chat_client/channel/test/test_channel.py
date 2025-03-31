@@ -3,6 +3,9 @@ from typing import List
 from chat_client.channel import Channel
 
 class MockChannel(Channel):
+    def __init__(self, channel_id: str, name: str) -> None:
+        super().__init__(channel_id, name)
+        
     def get_id(self) -> str:
         return self.channel_id
 

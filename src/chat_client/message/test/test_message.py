@@ -3,6 +3,8 @@ from typing import List
 from chat_client.message import Message
 
 class MockMessage(Message):
+    def __init__(self, sender_id: str, channel_id: str, content: str) -> None:
+        super().__init__(sender_id, channel_id, content)
     def get_id(self) -> str:
         return "msg001"
     
