@@ -34,59 +34,23 @@ jobs:
             ruff check . --config pyproject.toml
 
       - run:
-          name: Run Unit Tests with pytest
+          name: Run All Tests with pytest
           command: |
-            mkdir -p test-results/unit
-            COVERAGE_FILE=.coverage.calculator pytest src/calculator/test/ --cov=src.calculator --cov-report=xml:coverage-reports/calculator.xml --junitxml=test-results/unit/calculator.xml
-            COVERAGE_FILE=.coverage.logger pytest src/logger/test/ --cov=src.logger --cov-report=xml:coverage-reports/logger.xml --junitxml=test-results/unit/logger.xml
-            COVERAGE_FILE=.coverage.notifier pytest src/notifier/test/ --cov=src.notifier --cov-report=xml:coverage-reports/notifier.xml --junitxml=test-results/unit/notifier.xml
+            mkdir -p test-results
+            # Run all tests with coverage in one command
+            pytest \
+              src/ \
+              tests/ \
+              --cov=src \
+              --cov-report=xml:coverage-reports/coverage.xml \
+              --cov-report=html:coverage-reports/html \
+              --junitxml=test-results/junit.xml \
+              -v
 
       - run:
-          name: Run Integration Tests with pytest
+          name: Check Coverage Threshold
           command: |
-            mkdir -p test-results/integration
-            pytest tests/integration/ --cov=src --cov-report=xml:coverage-reports/pytest-integration.xml --junitxml=test-results/integration/pytest-results.xml
-
-      - run:
-          name: Run E2E Tests with pytest
-          command: |
-            mkdir -p test-results/e2e
-            pytest tests/e2e/ --cov=src --cov-report=xml:coverage-reports/pytest-e2e.xml --junitxml=test-results/e2e/pytest-results.xml
-
-      - run:
-          name: Run Unit Tests with Coverage
-          command: |
-            mkdir -p test-results/unit
-            COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/calculator.xml
-            COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/logger.xml
-            COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/notifier.xml
-
-      - run:
-          name: Run Integration Tests
-          command: |
-            mkdir -p test-results/integration
-            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration/results.xml
-
-      - run:
-          name: Run End-to-End Tests
-          command: |
-            mkdir -p test-results/e2e
-            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e/results.xml
-      - run:
-          name: Run Nose2 Test
-          command: |
-            nose2 -v src.calculator.test.test_calculator_nose2 --with-coverage --coverage=src.calculator --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/calculator_nose2.xml
-
-      - run:
-          name: Combine Coverage Reports
-          command: |
-            mkdir -p coverage-reports
-            coverage combine .coverage.calculator .coverage.logger .coverage.notifier .coverage.integration .coverage.e2e
-            # Store the combined raw coverage data file
-            cp .coverage coverage-reports/combined.coverage
             coverage report --fail-under=70
-            coverage xml -o coverage-reports/coverage.xml
-            coverage html -d coverage-reports/html
 
       - store_test_results:
           path: test-results
