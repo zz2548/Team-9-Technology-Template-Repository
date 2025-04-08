@@ -22,8 +22,9 @@ htmlcov/
 *.cover
 coverage.xml
 *.log
-test-results/unit.xml
+test-results/
 unit-coverage.xml
+
 
 # PyInstaller
 *.manifest

@@ -1,19 +1,21 @@
 import io
-import unittest
 from unittest.mock import patch
+
+import pytest
 
 from src.logger import Logger, default_logger, log
 
 
-class TestLogger(unittest.TestCase):
-    def setUp(self) -> None:
-        self.logger = Logger()
+class TestLogger:
+    @pytest.fixture
+    def logger(self) -> Logger:
+        return Logger()
 
-    def test_logger(self) -> None:
+    def test_logger(self, logger: Logger) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            self.logger.log("Test message")
+            logger.log("Test message")
             captured_output = mock_stdout.getvalue()
-            self.assertIn("LOG: Test message", captured_output)
+            assert "LOG: Test message" in captured_output
 
     def test_logger_api(self) -> None:
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
@@ -21,20 +23,20 @@ class TestLogger(unittest.TestCase):
             custom_logger = Logger()
             custom_logger.log("Custom logger test")
             captured_output = mock_stdout.getvalue()
-            self.assertIn("LOG: Custom logger test", captured_output)
+            assert "LOG: Custom logger test" in captured_output
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
             # Test default instance
             default_logger.log("Default logger test")
             captured_output = mock_stdout.getvalue()
-            self.assertIn("LOG: Default logger test", captured_output)
+            assert "LOG: Default logger test" in captured_output
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
             # Test direct function usage
             log("Direct log function")
             captured_output = mock_stdout.getvalue()
-            self.assertIn("LOG: Direct log function", captured_output)
+            assert "LOG: Direct log function" in captured_output
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

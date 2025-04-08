@@ -1,36 +1,60 @@
 import io
-import unittest
 from unittest.mock import patch
 
-from src.logger.logger import Logger
-from src.notifier.notifier import Notifier
+import pytest
+
+import logger
+import notifier
 
 
-class TestLoggerNotifier(unittest.TestCase):
-    def setUp(self) -> None:
-        self.logger = Logger()
-        self.notifier = Notifier(threshold=10)
+@pytest.fixture
+def log():
+    return logger.Logger()
 
-    def test_logger_notifier_no_alert(self) -> None:
-        """Test that notifier does not send an alert if value is below the threshold."""
-        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            self.logger.log("Performing a safe operation")
-            self.notifier.notify(5)  # Below threshold, should not trigger
 
-            captured_output = mock_stdout.getvalue()
-            assert "LOG: Performing a safe operation" in captured_output
-            assert "ALERT" not in captured_output, "Unexpected alert triggered"
+@pytest.fixture
+def notify():
+    return notifier.Notifier(threshold=10)
 
-    def test_logger_notifier_with_alert(self) -> None:
-        """Test that notifier sends an alert when value exceeds the threshold."""
-        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            self.logger.log("Checking if value exceeds threshold")
-            self.notifier.notify(15)  # Exceeds threshold
 
-            captured_output = mock_stdout.getvalue()
-            assert "LOG: Checking if value exceeds threshold" in captured_output
-            assert "ALERT: Value 15 exceeded threshold 10" in captured_output
+def test_logger_notifier_no_alert(log, notify) -> None:
+    """
+    Test that the notifier does not send an alert when a value is below the threshold.
+
+    This test verifies:
+    1. The logger correctly logs the operation message
+    2. The notifier correctly evaluates the value against its threshold
+    3. No alert is generated when the value (5) is below the threshold (10)
+    4. Only the expected log message appears in the output
+    """
+    with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+        log.log("Performing a safe operation")
+        notify.notify(5)  # Below threshold, should not trigger
+
+        captured_output = mock_stdout.getvalue()
+        assert "LOG: Performing a safe operation" in captured_output
+        assert "ALERT" not in captured_output, "Unexpected alert triggered"
+
+
+def test_logger_notifier_with_alert(log, notify) -> None:
+    """
+    Test that the notifier sends an alert when a value exceeds the threshold.
+
+    This test verifies:
+    1. The logger correctly logs the operation message
+    2. The notifier correctly evaluates the value against its threshold
+    3. An alert is generated when the value (15) exceeds the threshold (10)
+    4. Both the log message and alert message appear in the output
+    5. The alert message contains the correct value and threshold information
+    """
+    with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+        log.log("Checking if value exceeds threshold")
+        notify.notify(15)  # Exceeds threshold
+
+        captured_output = mock_stdout.getvalue()
+        assert "LOG: Checking if value exceeds threshold" in captured_output
+        assert "ALERT: Value 15 exceeded threshold 10" in captured_output
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

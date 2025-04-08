@@ -1,4 +1,4 @@
-import unittest
+import pytest
 
 from src.calculator import (
     Calculator,
@@ -10,47 +10,48 @@ from src.calculator import (
 )
 
 
-class TestCalculator(unittest.TestCase):
-    def setUp(self) -> None:
-        self.calc = Calculator()
+class TestCalculator:
+    @pytest.fixture
+    def calc(self) -> Calculator:  # Changed return type from None to Calculator
+        return Calculator()
 
-    def test_return(self) -> None:
-        self.assertIsNotNone(self.calc.add(2, 3))
-        self.assertIsNotNone(self.calc.subtract(6, 3))
-        self.assertIsNotNone(self.calc.multiply(2, 3))
-        self.assertIsNotNone(self.calc.divide(2, 3))
+    def test_return(self, calc: Calculator) -> None:
+        assert calc.add(2, 3) is not None
+        assert calc.subtract(6, 3) is not None
+        assert calc.multiply(2, 3) is not None
+        assert calc.divide(2, 3) is not None
 
-    def test_add(self) -> None:
-        self.assertEqual(self.calc.add(2, 3), 5)
+    def test_add(self, calc: Calculator) -> None:
+        assert calc.add(2, 3) == 5
 
-    def test_subtract(self) -> None:
-        self.assertEqual(self.calc.subtract(5, 3), 2)
+    def test_subtract(self, calc: Calculator) -> None:
+        assert calc.subtract(5, 3) == 2
 
-    def test_multiply(self) -> None:
-        self.assertEqual(self.calc.multiply(4, 2), 8)
+    def test_multiply(self, calc: Calculator) -> None:
+        assert calc.multiply(4, 2) == 8
 
-    def test_divide(self) -> None:
-        self.assertEqual(self.calc.divide(10, 2), 5)
+    def test_divide(self, calc: Calculator) -> None:
+        assert calc.divide(10, 2) == 5
 
-    def test_divide_by_zero(self) -> None:
-        with self.assertRaises(ValueError):
-            self.calc.divide(5, 0)
+    def test_divide_by_zero(self, calc: Calculator) -> None:
+        with pytest.raises(ValueError):
+            calc.divide(5, 0)
 
     def test_calculator_api(self) -> None:
         # Test direct class usage
         calc = Calculator()
-        self.assertEqual(calc.add(3, 4), 7)
-        self.assertEqual(calc.subtract(10, 3), 7)
+        assert calc.add(3, 4) == 7
+        assert calc.subtract(10, 3) == 7
 
         # Test default instance
-        self.assertEqual(default_calculator.multiply(4, 4), 16)
+        assert default_calculator.multiply(4, 4) == 16
 
         # Test function exports
-        self.assertEqual(add(7, 8), 15)
-        self.assertEqual(subtract(25, 10), 15)
-        self.assertEqual(multiply(5, 5), 25)
-        self.assertEqual(divide(20, 4), 5)
+        assert add(7, 8) == 15
+        assert subtract(25, 10) == 15
+        assert multiply(5, 5) == 25
+        assert divide(20, 4) == 5
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

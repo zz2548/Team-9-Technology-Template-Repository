@@ -46,7 +46,7 @@ A modern Python project template featuring comprehensive test coverage, continuo
 ### Static Analysis
 Run type checking and code linting:
 ```bash
-mypy src tests
+mypy src
 ruff check . --config pyproject.toml
 ```
 
@@ -55,44 +55,46 @@ The project includes unit, integration, and end-to-end tests:
 
 #### Running Individual Test Suites
 ```bash
-# Run calculator unit tests
-nose2 -v -s src/calculator/test/
+# Run calculator unit tests with pytest
+pytest src/calculator/test/ --cov=src.calculator
 
-# Run logger unit tests
-nose2 -v -s src/logger/test/
+# Run logger unit tests with pytest
+pytest src/logger/test/ --cov=src.logger
 
-# Run notifier unit tests
-nose2 -v -s src/notifier/test/
+# Run notifier unit tests with pytest
+pytest src/notifier/test/ --cov=src.notifier
+
+# Specific nose2 test for calculator
+nose2 -v src.calculator.test.test_calculator_nose2 --with-coverage --coverage=src.calculator
 ```
 
-#### Running Tests with Coverage
+#### Running Integration and E2E Tests
 ```bash
-# Running all unit tests with coverage
-nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
+# Run integration tests with pytest
+pytest tests/integration/ --cov=src
 
-COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
-
-COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
-
-coverage combine .coverage .coverage.logger .coverage.notifier
-
-coverage report --fail-under=70
-coverage xml -o unit-coverage.xml
-coverage html -d unit-htmlcov
+# Run end-to-end tests with pytest
+pytest tests/e2e/ --cov=src
 ```
+
+#### Running All Tests
+```bash
+# Run all tests
+pytest
+
+# Generate HTML report for detailed coverage visualization
+pytest --cov=src --cov-report=html
+```
+
+#### Running Sample Nose2 Test
+```bash
+# Run the nose2 calculator test
+nose2 -v src.calculator.test.test_calculator_nose2 --with-coverage --coverage=src.calculator
+```
+
 > **Note**: The above commands work in a bash environment. You might need to adjust commands for your specific terminal.
 
-#### Other Test Types
-```bash
-# Run integration tests
-nose2 -v -s tests/integration
 
-# Run end-to-end tests
-nose2 -v -s tests/e2e
-
-# Run all tests
-nose2
-```
 
 ### Coverage Reports
 Test coverage reports are generated in HTML format. View them by opening `htmlcov/index.html` in your browser.
