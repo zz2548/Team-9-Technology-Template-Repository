@@ -135,9 +135,8 @@ fail_under = 70
 [tool.uv.sources]
 technology-template-repository = { workspace = true }
 
-[tool.uv]
-dependency-groups = { 
-  dev = [
+[tool.uv.dependency-groups.dev]
+dependencies = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
     "pytest>=8.3.5",
@@ -146,5 +145,4 @@ dependency-groups = {
     "ruff>=0.9.6",
     "pre-commit>=4.1.0",
     "flask"
-  ]
-}
+]
