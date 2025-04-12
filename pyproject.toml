@@ -136,6 +136,15 @@ fail_under = 70
 technology-template-repository = { workspace = true }
 
 
-[tool.uv]
-dependency-groups = { dev = ["technology-template-repository[dev]"] }
+[dependency-groups]
+dev = [
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "nose2>=0.15.1",
+    "ruff>=0.9.6",
+    "pre-commit>=4.1.0",
+    "flask"
+]
 
