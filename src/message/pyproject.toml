@@ -1,20 +1,23 @@
 [project]
-name = "calculator"
+name = "technology-template-repository"
 version = "0.1.0"
-description = "A Python project template component. Performs basic arithmetic operations."
+description = "A Python project template."
 authors = [
-    {name = "Jerry Zou", email = "zz2548@nyu.edu"},
-    {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
-    {name = "Terry Xu", email = "xm2204@nyu.edu"},
-    {name = "Jinglin Tao", email = "jt4296@nyu.edu"}
+    { name = "Jerry Zou", email = "zz2548@nyu.edu" },
+    { name = "Keshav Rajput", email = "kr3412@nyu.edu" },
+    { name = "Terry Xu", email = "xm2204@nyu.edu" },
+    { name = "Jinglin Tao", email = "jt4296@nyu.edu" }
 ]
 license = { file = "LICENSE" }
 requires-python = ">=3.10.9, <3.11"
+
 
 [project.optional-dependencies]
 dev = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
     "pre-commit>=4.1.0"
@@ -23,6 +26,8 @@ dev = [
 dependencies = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
     "pre-commit>=4.1.0"
@@ -42,15 +47,41 @@ indent-style = "space"
 line-ending = "lf"
 
 [tool.ruff.lint]
-select = ["ALL"]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D107","D203", "T201", "S101", "PLR2004", "TRY003", "EM101",
-    "D212", "FIX002", "TD002", "TD003", "PT009", "PT027"]   # PT009 and PT027 is for the nose2
-# S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
-# D104: This is a smaller project, ignoring package docstring rule
-# TRY003: Allowing long messages for raising error in divide function of calculator
-# EM101: Same as above
-# PLR2004: Allow magic value in comparison for our tests
-# D100, D101, D102, D103, D107: Docstring rules we will adhere to later
+select = ["ALL"]  # Enable all available linting rules
+ignore = [
+    # Docstring-related rules
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D107", # Missing docstring in __init__
+    "D203", # One blank line required before class docstring
+    "D212", # Multi-line docstring summary should start at the first line
+
+    # Code quality rules
+    "T201", # Print statement found
+    "S101", # Use of assert detected, need this for test cases
+    "PLR2004", # Magic value used in comparison, need this for test cases
+    "TRY003", # Avoid specifying long messages outside exception class
+    "EM101", # Exception must not use a string literal, assign to variable first
+    "PLR0913", # Allow more than 5 arguments for functions
+
+
+    # TODO-related rules
+    "FIX002", # Line contains TODO, we will allow TODOs
+    "TD002", # Missing author in TODO
+    "TD003", # Missing issue link in TODO
+
+    # pytest with unittest related rules
+    "PT009", # Use of unittest.TestCase with pytest
+    "PT027", # Use pytest.raises instead of unittest-style assertRaises
+    "PT011", # Pytest.raises is too broad
+
+    # Type Annotation
+    "ANN001", # Missing type annotation for function argument
+    "ANN201", # Missing return type annotation for public function
+]
 
 [tool.mypy]
 python_version = "3.10"
@@ -67,20 +98,33 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_optional = true
-exclude = ['.venv', 'build', 'dist']
+explicit_package_bases = true
+exclude = [
+    '.venv',
+    'build',
+    'dist',
+    "src/__init__.py",
+    ".*test.*",
+    ".*/test/.*",
+    ".*/tests/.*",
+]
+
 
 [tool.pytest.ini_options]
-addopts = "-ra -q --cov=src --cov-report=html --cov-report=xml"
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
+addopts = "--ignore-glob='*nose2*.py'" # Ignore the nose2 files
+pythonpath = [
+    "src"
+]
+testpaths = [
+    "src",
+    "tests"
+]
 
 [tool.coverage.run]
 branch = true
 source = ["src"]
 omit = [
-    "tests/*", ".venv/*", "build/*", "dist/*", "*/test/*"
+    "tests/*", ".venv/*", "build/*", "dist/*", "*/test/*", "*/pre_commit_test.py"
 ]
 
 [tool.coverage.report]
@@ -95,3 +139,11 @@ exclude_lines = [
 ]
 ignore_errors = true
 fail_under = 70
+
+[tool.uv.sources]
+technology-template-repository = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "technology-template-repository[dev]",
+]
