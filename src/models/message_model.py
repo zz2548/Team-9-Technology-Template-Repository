@@ -1,3 +1,6 @@
+from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.model import Model 
+
 from src.models import db
 
 class MessageModel(db.Model):
