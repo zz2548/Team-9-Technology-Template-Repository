@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Channels - Flask Chat App{% endblock %}
+
+{% block content %}
+<div class="channels-container">
+    <div class="sidebar">
+        <div class="user-info">
+            <h3>{{ current_user.username }}</h3>
+            <span class="status-{{ current_user.status }}">{{ current_user.status }}</span>
+        </div>
+
+        <div class="channels-header">
+            <h3>Channels</h3>
+            <button id="new-channel-btn" class="btn btn-sm">+ New</button>
+        </div>
+
+        <ul class="channels-list">
+            {% for channel in channels %}
+            <li class="channel-item" data-channel-id="{{ channel.id }}">
+                <a href="{{ url_for('channels.view_channel', channel_id=channel.id) }}">
+                    {% if channel.is_direct %}
+                    <span class="channel-icon">👤</span>
+                    {% else %}
+                    <span class="channel-icon">#</span>
+                    {% endif %}
+                    <span class="channel-name">{{ channel.name }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="welcome-screen">
+        <h1>Welcome to Flask Chat</h1>
+        <p>Select a channel to start chatting or create a new one!</p>
+    </div>
+</div>
+
+<!-- New Channel Modal -->
+<div id="new-channel-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create New Channel</h2>
+        <form id="new-channel-form">
+            <div class="form-group">
+                <label for="channel-name">Channel Name</label>
+                <input type="text" id="channel-name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="channel-description">Description</label>
+                <textarea id="channel-description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="is-direct" name="is_direct">
+                    Direct Message
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Channel</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // JavaScript for handling new channel modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('new-channel-modal');
+        const btn = document.getElementById('new-channel-btn');
+        const closeBtn = modal.querySelector('.close');
+        const form = document.getElementById('new-channel-form');
+
+        // Open modal
+        btn.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Handle form submission
+        form.onsubmit = function(e) {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('channel-name').value,
+                description: document.getElementById('channel-description').value,
+                is_direct: document.getElementById('is-direct').checked
+            };
+
+            fetch('/api/channels', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.channel) {
+                    window.location.href = `/channels/${data.channel.id}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error creating channel:', error);
+            });
+        }
+    });
+</script>
+{% endblock %}
