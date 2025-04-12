@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
-from src.user import User
-from src.channel import Channel
-from src.message import Message
+from src.models import db
+from src.models.user_model import UserModel
+from src.models.channel_model import ChannelModel
+from src.models.message_model import MessageModel
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# In-memory user store
-users = {}  # username -> User instance
-messages_by_channel = {}  # channel_id -> list of Message instances
+db.init_app(app)
 
 @app.route('/')
 def home():
@@ -19,12 +20,15 @@ def register():
     data = request.get_json()
     username = data.get('username')
 
-    if username in users:
+    existing_user = UserModel.query.filter_by(username=username).first()
+    if existing_user:
         return jsonify({"error": "User already exists"}), 400
 
-    user = User.register(username)
-    users[username] = user
-    return jsonify({"user_id": user.get_id(), "username": user.get_username()})
+    new_user = UserModel(id=username, username=username)  # for now use username as id
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"user_id": new_user.id, "username": new_user.username})
 
 
 @app.route('/login', methods=['POST'])
@@ -32,12 +36,11 @@ def login():
     data = request.get_json()
     username = data.get('username')
 
-    if username not in users:
+    user = UserModel.query.filter_by(username=username).first()
+    if not user:
         return jsonify({"error": "User does not exist"}), 404
 
-    user = users[username]
-    return jsonify({"user_id": user.get_id(), "username": user.get_username()})
-
+    return jsonify({"user_id": user.id, "username": user.username})
 
 # Channel Endpoints
 @app.route('/channel', methods=['POST'])
@@ -45,25 +48,11 @@ def create_channel():
     data = request.get_json()
     name = data.get('name')
 
-    channel = Channel.create_channel(name)
-    return jsonify({"channel_id": channel.get_id(), "name": channel.get_name()})
+    new_channel = ChannelModel(id=name, name=name)  # for now use name as id
+    db.session.add(new_channel)
+    db.session.commit()
 
-
-@app.route('/channel/join', methods=['POST'])
-def join_channel():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    channel_id = data.get('channel_id')
-
-    success = Channel.join_channel(user_id, channel_id)
-    return jsonify({"joined": success})
-
-
-@app.route('/channel/<channel_id>/users', methods=['GET'])
-def list_channel_users(channel_id):
-    channel = Channel(channel_id, "dummy")  # only needs ID for accessing list
-    users_in_channel = channel.list_users()
-    return jsonify({"users": users_in_channel})
+    return jsonify({"channel_id": new_channel.id, "name": new_channel.name})
 
 
 # Message Endpoints
@@ -74,27 +63,33 @@ def send_message():
     channel_id = data.get('channel_id')
     content = data.get('content')
 
-    msg = Message.send_message(sender_id, channel_id, content)
-    messages_by_channel.setdefault(channel_id, []).append(msg)
+    new_message = MessageModel(
+        id=f"{sender_id}_{channel_id}_{content[:10]}",  # simple ID
+        sender_id=sender_id,
+        channel_id=channel_id,
+        content=content
+    )
+    db.session.add(new_message)
+    db.session.commit()
 
     return jsonify({
-        "message_id": msg.get_id(),
-        "sender_id": msg.get_sender(),
-        "channel_id": msg.get_channel(),
-        "content": msg.get_content()
+        "message_id": new_message.id,
+        "sender_id": new_message.sender_id,
+        "channel_id": new_message.channel_id,
+        "content": new_message.content
     })
 
 
 @app.route('/message/<channel_id>', methods=['GET'])
 def fetch_messages(channel_id):
-    messages = messages_by_channel.get(channel_id, [])
+    messages = MessageModel.query.filter_by(channel_id=channel_id).all()
     return jsonify([{
-        "message_id": m.get_id(),
-        "sender_id": m.get_sender(),
-        "content": m.get_content()
+        "message_id": m.id,
+        "sender_id": m.sender_id,
+        "content": m.content
     } for m in messages])
 
-# direct message between two user
+# Direct message between two users
 @app.route('/start_dm', methods=['POST'])
 def start_direct_message():
     data = request.get_json()
@@ -102,13 +97,15 @@ def start_direct_message():
     receiver_id = data['receiver_id']
     
     channel_name = f"dm_{sender_id}_{receiver_id}"
-    channel = Channel.create_channel(channel_name)
+    existing_channel = ChannelModel.query.filter_by(name=channel_name).first()
+    if not existing_channel:
+        channel = ChannelModel(id=channel_name, name=channel_name)
+        db.session.add(channel)
+        db.session.commit()
+    else:
+        channel = existing_channel
 
-    # auto join both users
-    Channel.join_channel(sender_id, channel.get_id())
-    Channel.join_channel(receiver_id, channel.get_id())
-    
-    return jsonify({"channel_id": channel.get_id()})
+    return jsonify({"channel_id": channel.id})
 
 
 if __name__ == "__main__":

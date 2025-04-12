@@ -21,7 +21,8 @@ dev = [
     "nose2>=0.15.1",
     "ruff>=0.9.6",
     "pre-commit>=4.1.0",
-    "flask"
+    "flask",
+    "flask-sqlalchemy" 
 ]
 
 
@@ -145,6 +146,7 @@ dev = [
     "nose2>=0.15.1",
     "ruff>=0.9.6",
     "pre-commit>=4.1.0",
-    "flask"
+    "flask",
+    "flask-sqlalchemy"
 ]
 
