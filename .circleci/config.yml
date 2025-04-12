@@ -1,0 +1,65 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+
+      - run:
+          name: Install uv
+          command: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - run:
+          name: Create and Activate Virtual Environment
+          command: |
+            uv venv .venv
+            echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV
+            source .venv/bin/activate
+
+      - run:
+          name: Install Dependencies
+          command: |
+            uv sync --group dev
+
+      - run:
+          name: Run Static Analysis
+          command: |
+            mypy src
+            ruff check . --config pyproject.toml
+
+      - run:
+          name: Run All Tests with pytest
+          command: |
+            mkdir -p test-results
+            # Run all tests with coverage in one command
+            pytest \
+              src/ \
+              tests/ \
+              --cov=src \
+              --cov-report=xml:coverage-reports/coverage.xml \
+              --cov-report=html:coverage-reports/html \
+              --junitxml=test-results/junit.xml \
+              -v
+
+      - run:
+          name: Check Coverage Threshold
+          command: |
+            coverage report --fail-under=70
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: coverage-reports
+          destination: coverage
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
