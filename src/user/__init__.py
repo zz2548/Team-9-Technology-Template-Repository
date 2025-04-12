@@ -14,8 +14,8 @@ class User:
 
     @staticmethod
     def register(username: str) -> 'User':
-        return User("u001", username)
+        return User(username, username)
 
     @staticmethod
     def login(username: str) -> 'User':
-        return User("u001", username)
+        return User(username, username)
