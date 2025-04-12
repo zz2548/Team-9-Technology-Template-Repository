@@ -38,7 +38,7 @@ A modern Python project template featuring comprehensive test coverage, continuo
 
 4. Install dependencies and pre-commit hooks:
     ```bash
-    uv pip install ".[dev]"
+    uv sync --group dev
     pre-commit install
     ```
 ## Development Tools
