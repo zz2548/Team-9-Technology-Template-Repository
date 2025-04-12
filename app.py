@@ -94,6 +94,22 @@ def fetch_messages(channel_id):
         "content": m.get_content()
     } for m in messages])
 
+# direct message between two user
+@app.route('/start_dm', methods=['POST'])
+def start_direct_message():
+    data = request.get_json()
+    sender_id = data['sender_id']
+    receiver_id = data['receiver_id']
+    
+    channel_name = f"dm_{sender_id}_{receiver_id}"
+    channel = Channel.create_channel(channel_name)
+
+    # auto join both users
+    Channel.join_channel(sender_id, channel.get_id())
+    Channel.join_channel(receiver_id, channel.get_id())
+    
+    return jsonify({"channel_id": channel.get_id()})
+
 
 if __name__ == "__main__":
     app.run()
