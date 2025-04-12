@@ -135,3 +135,7 @@ fail_under = 70
 [tool.uv.sources]
 technology-template-repository = { workspace = true }
 
+
+[tool.uv]
+dependency-groups = { dev = ["technology-template-repository[dev]"] }
+
