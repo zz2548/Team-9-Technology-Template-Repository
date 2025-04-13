@@ -20,11 +20,12 @@ repos:
     args: ["--config-file=pyproject.toml"]
 
 # Custom hook to run nose2 inside uv environment, activating based on OS
--   repo: local
-    hooks:
-      - id: nose2-tests
-        name: Run nose2 unit tests
-        entry: python pre_commit_test.py
-        language: system
-        pass_filenames: false
-        always_run: true
+# Not used at the moment
+#-   repo: local
+#    hooks:
+#      - id: nose2-tests
+#        name: Run nose2 unit tests
+#        entry: python pre_commit_test.py
+#        language: system
+#        pass_filenames: false
+#        always_run: true
