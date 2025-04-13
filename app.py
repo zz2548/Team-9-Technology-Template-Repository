@@ -54,6 +54,35 @@ def create_channel():
 
     return jsonify({"channel_id": new_channel.id, "name": new_channel.name})
 
+@app.route('/channel/join', methods=['POST'])
+def join_channel():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    channel_id = data.get('channel_id')
+
+    # Validate user exists
+    user = UserModel.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Validate channel exists
+    channel = ChannelModel.query.get(channel_id)
+    if not channel:
+        return jsonify({"error": "Channel not found"}), 404
+
+    # TODO: relationship table
+    return jsonify({"joined": True})
+
+@app.route('/channel/<channel_id>/users', methods=['GET'])
+def list_channel_users(channel_id):
+    # Find all messages sent in this channel
+    messages = MessageModel.query.filter_by(channel_id=channel_id).all()
+
+    # Extract unique sender_ids
+    user_ids = list({msg.sender_id for msg in messages})
+
+    return jsonify({"users": user_ids})
+
 
 # Message Endpoints
 @app.route('/message', methods=['POST'])
