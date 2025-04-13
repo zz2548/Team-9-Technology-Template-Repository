@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy.model import Model 
 
-from src.models import db
+db = SQLAlchemy()
 
-class MessageModel(db.Model):  # type: ignore[attr-defined]
+Base = db.Model 
+
+class MessageModel(Base):  # type: ignore[attr-defined]
     __tablename__ = 'messages'
     id = db.Column(db.String, primary_key=True)
     sender_id = db.Column(db.String, db.ForeignKey('users.id'))

@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy.model import Model 
 
-from src.models import db
+db = SQLAlchemy()
 
-class UserModel(db.Model): # type: ignore[attr-defined]
+Base = db.Model
+
+class UserModel(Base): # type: ignore[attr-defined]
     __tablename__ = 'users'
     id = db.Column(db.String, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
