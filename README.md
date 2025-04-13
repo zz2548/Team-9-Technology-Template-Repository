@@ -46,7 +46,7 @@ Then start the Flask server:
 python app.py
 ```
 
-👉️ Server will run at: `http://127.0.0.1:5000/`
+Server will run at: `http://127.0.0.1:5000/`
 
 ---
 
@@ -182,77 +182,22 @@ python app.py
 }
 ```
 
----
-
-# 🛠️ CI/CD Pipeline (CircleCI)
-
-CircleCI pipeline automatically runs:
-
-- Static analysis (`mypy`, `ruff`)
-- Unit and Integration tests (`pytest`, `nose2`)
-- Code coverage check (`coverage --fail-under=70`)
-
-👉️ See `.circleci/config.yml` for full setup.
-
----
-
-# 📦 Project Structure
-
-```
-.
-├── app.py
-├── src/
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── user_model.py
-│   │   ├── channel_model.py
-│   │   └── message_model.py
-│   ├── user/
-│   ├── channel/
-│   ├── message/
-├── tests/
-│   ├── integration/
-│   ├── e2e/
-├── .circleci/
-│   └── config.yml
-├── pyproject.toml
-├── README.md
-└── chat.db
-```
-
----
-
-# 📖 Future Improvements
+# Future Improvements
 
 - Add timestamps (`created_at`) for messages.
 - Allow editing and deleting messages.
+- Add password for user login
 - Add authentication tokens for user sessions.
 - Improve models with relational links.
 - Add Docker support for easier deployment.
 
 ---
 
-# 📉 Quick Commands Cheat Sheet
-
-| Purpose | Command |
-|:---|:---|
-| Install dependencies | `uv sync --group dev` |
-| Initialize database | `flask shell` ➞ `db.create_all()` |
-| Start server | `python app.py` |
-| Run tests locally | `pytest` |
-| Run static analysis | `mypy src/` and `ruff check .` |
-| See coverage report | `coverage report -m` |
-
----
-
-# 🚀 Authors
+# Authors
 
 - Jerry Zou
 - Keshav Rajput
 - Terry Xu
 - Jinglin Tao
 
----
-
-# 🎉 Happy Chatting!
 
