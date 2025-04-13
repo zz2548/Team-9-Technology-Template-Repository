@@ -12,13 +12,12 @@ license = { file = "LICENSE" }
 requires-python = ">=3.10.9, <3.11"
 
 [project.optional-dependencies]
-
 dev = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
-    "pytest-cov>=3.0"
+    "pre-commit>=4.1.0"
 ]
 
 dependencies = [
@@ -26,7 +25,7 @@ dependencies = [
     "mypy>=1.15.0",
     "nose2>=0.15.1",
     "ruff>=0.9.6",
-    "pytest-cov>=3.0"
+    "pre-commit>=4.1.0"
 ]
 
 [tool.ruff]
@@ -44,8 +43,8 @@ line-ending = "lf"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "T201", "S101", "PLR2004", "TRY003", "EM101",
-    "D212", "FIX002", "TD002", "TD003"]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107","D203", "T201", "S101", "PLR2004", "TRY003", "EM101",
+    "D212", "FIX002", "TD002", "TD003", "PT009", "PT027"]   # PT009 and PT027 is for the nose2
 # S101: Use of assert detected (security warnings about assert statements) Allowing assert for tests.
 # D104: This is a smaller project, ignoring package docstring rule
 # TRY003: Allowing long messages for raising error in divide function of calculator

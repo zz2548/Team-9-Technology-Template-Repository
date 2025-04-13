@@ -1,101 +1,49 @@
-# Team-9-Technology-Template-Repository
-# Python Project Template with UV
+# Team 9 - Chat Client - Discord
 
-## Description
-A modern Python project template featuring comprehensive test coverage, continuous integration with CircleCI, and dependency management using UV. This template includes configurations for static type checking, code formatting, and automated testing.
-
-## Prerequisites
-* Python 3.10 or higher
-* UV for Python dependency management
-
-## Project Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd <repository-name>
-```
-
-2. Install UV:
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-3. Create a virtual environment:
-```bash
-uv venv .venv
-source .venv/bin/activate
-```
-
-4. Install dependencies:
-```bash
-uv pip install ".[dev]"
-```
-
-## Development Tools
-
-### Static Analysis
-Run type checking and code linting:
-```bash
-mypy src tests
-ruff check .
-```
-
-### Testing
-The project includes unit, integration, and end-to-end tests:
-
-```bash
-# Running a single unit test
-nose2 -v -s src/calculator/test/
-nose2 -v -s src/logger/test/
-nose2 -v -s src/notifier/test/
-
-# Running all unit tests with coverage
-nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator 
-&& COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger 
-&& COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
-
-# Run integration tests
-nose2 -v -s tests/integration
-
-# Run end-to-end tests
-nose2 -v -s tests/e2e
-
-# Run all tests
-nose2
-```
-
-### Coverage Reports
-Test coverage reports are generated in HTML format. View them by opening `htmlcov/index.html` in your browser.
-
-## Continuous Integration
-This project uses CircleCI for continuous integration, which:
-- Runs static analysis (mypy and ruff)
-- Executes all test suites
-- Generates and stores test reports
-- Enforces minimum test coverage requirements
+This project is a modular chat client.
 
 
-## Contributing
-1. Create a new branch for your feature:
-```bash
-git checkout -b feature-name
-```
+## Interface Summary
 
-2. Make your changes and ensure all tests pass:
-```bash
-nose2
-```
+### `User`
+- `register(username: str) -> User`
+- `login(username: str) -> User`
+- `get_id() -> str`
+- `get_username() -> str`
+- `list_channels() -> list[str]`
 
-3. Push your changes and create a pull request:
-```bash
-git push origin feature-name
-```
+### `Channel`
+- `create_channel(name: str) -> Channel`
+- `join_channel(user_id: str, channel_id: str) -> bool`
+- `get_id() -> str`
+- `get_name() -> str`
+- `list_users() -> list[str]`
 
-## License
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+### `Message`
+- `send_message(sender_id: str, channel_id: str, content: str) -> Message`
+- `fetch_latest(channel_id: str, count: int) -> list[Message]`
+- `get_id() -> str`
+- `get_sender() -> str`
+- `get_channel() -> str`
+- `get_content() -> str`
 
-## Additional Resources
-- [UV Documentation](https://github.com/astral-sh/uv)
-- [CircleCI Documentation](https://circleci.com/docs/)
-- [nose2 Documentation](https://docs.nose2.io/en/latest/)
+> Each module is defined using class-based interfaces with static methods for construction or querying.
+
+## Scope of Work
+
+### In Scope
+- Basic interface definitions with trivial logic
+- Mockable methods for future implementation
+- Type-safe method signatures using Python type hints
+- Full test coverage across:
+  - Unit tests
+  - Integration tests
+  - End-to-end user simulations
+
+### Out of Scope
+- No actual networking or persistent storage
+- No authentication or encryption
+- No UI/Frontend
+
+
+

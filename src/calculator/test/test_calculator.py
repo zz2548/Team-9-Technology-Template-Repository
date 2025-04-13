@@ -1,6 +1,5 @@
 import unittest
 
-
 from src.calculator import (
     Calculator,
     add,
@@ -21,7 +20,7 @@ class TestCalculator(unittest.TestCase):
         self.assertIsNotNone(self.calc.multiply(2, 3))
         self.assertIsNotNone(self.calc.divide(2, 3))
 
-    def test_add(self)  -> None:
+    def test_add(self) -> None:
         self.assertEqual(self.calc.add(2, 3), 5)
 
     def test_subtract(self) -> None:
@@ -37,7 +36,7 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.calc.divide(5, 0)
 
-    def test_calculator_api(self)-> None:
+    def test_calculator_api(self) -> None:
         # Test direct class usage
         calc = Calculator()
         self.assertEqual(calc.add(3, 4), 7)
