@@ -1,7 +1,9 @@
-from src.models import db
-from flask_sqlalchemy.model import Model as ModelType
+from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.model import Model 
 
-class ChannelModel(db.Model, ModelType): # type: ignore[attr-defined]
+from src.models import db
+
+class ChannelModel(db.Model): 
     __tablename__ = 'channels'
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)

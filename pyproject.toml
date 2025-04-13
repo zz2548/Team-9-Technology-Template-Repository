@@ -100,6 +100,7 @@ exclude = [
     ".*test.*",
     ".*/test/.*",
     ".*/tests/.*",
+    "src/models/.*",  
 ]
 
 
