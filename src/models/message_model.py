@@ -3,7 +3,7 @@ from flask_sqlalchemy.model import Model
 
 from src.models import db
 
-class MessageModel(db.Model):
+class MessageModel(db.Model):  # type: ignore[attr-defined]
     __tablename__ = 'messages'
     id = db.Column(db.String, primary_key=True)
     sender_id = db.Column(db.String, db.ForeignKey('users.id'))
