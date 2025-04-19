@@ -1,3 +1,25 @@
+import uuid
+from typing import Protocol
+
+
+# Define the User Protocol interface
+class UserProtocol(Protocol):
+    """Protocol defining the interface for a user"""
+
+    def get_id(self) -> str:
+        """Return the user ID"""
+        ...
+
+    def get_username(self) -> str:
+        """Return the username"""
+        ...
+
+    def list_channels(self) -> list[str]:
+        """Return a list of channels the user has access to"""
+        ...
+
+
+# Concrete implementation of a regular user
 class User:
     def __init__(self, user_id: str, username: str) -> None:
         self.user_id = user_id
@@ -13,9 +35,29 @@ class User:
         return ["general", "random"]
 
     @staticmethod
-    def register(username: str) -> 'User':
-        return User("u001", username)
+    def register(username: str) -> "User":
+        return User(str(uuid.uuid4()), username)
 
     @staticmethod
-    def login(username: str) -> 'User':
-        return User("u001", username)
+    def login(username: str) -> "User":
+        return User(str(uuid.uuid4()), username)
+
+
+class AdminUser:
+    def __init__(self, admin_id: str, username: str) -> None:
+        self.admin_id = admin_id
+        self.username = username
+        self.admin_level = 1
+
+    def get_id(self) -> str:
+        return self.admin_id
+
+    def get_username(self) -> str:
+        return f"Admin: {self.username}"
+
+    def list_channels(self) -> list[str]:
+        # Admins have access to more channels
+        return ["general", "random", "admin", "moderation"]
+
+    def set_admin_level(self, level: int) -> None:
+        self.admin_level = level

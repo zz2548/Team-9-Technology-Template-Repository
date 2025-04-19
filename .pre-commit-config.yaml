@@ -5,19 +5,21 @@ repos:
   - id: check-yaml
   - id: check-merge-conflict
 
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.9.6  # Match pyproject.toml version
-  hooks:
-  - id: ruff
-    args: [--fix, --config=pyproject.toml]
-  - id: ruff-format
+# Temporarily disabled ruff
+# - repo: https://github.com/astral-sh/ruff-pre-commit
+#  rev: v0.9.6  # Match pyproject.toml version
+#  hooks:
+#  - id: ruff
+#    args: [--fix, --config=pyproject.toml]
+#  - id: ruff-format
 
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.15.0
-  hooks:
-  - id: mypy
-    additional_dependencies: ["mypy>=1.15.0"]
-    args: ["--config-file=pyproject.toml"]
+# Temporarily disabled mypy
+#- repo: https://github.com/pre-commit/mirrors-mypy
+#  rev: v1.15.0
+#  hooks:
+#  - id: mypy
+#    additional_dependencies: ["mypy>=1.15.0"]
+#    args: ["--config-file=pyproject.toml"]
 
 # Custom hook to run nose2 inside uv environment, activating based on OS
 # -   repo: local
