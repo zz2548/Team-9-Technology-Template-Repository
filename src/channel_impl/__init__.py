@@ -1,6 +1,5 @@
-from src import channel_api
+import src.channel_api as api
 
-from . import _impl
+from ._impl import InMemoryChannelService
 
-# Dependency Injection of this implementation into the API
-channel_api.get_service = lambda: _impl.InMemoryChannelService()
+api.get_service = lambda: InMemoryChannelService()   # 依赖注入
