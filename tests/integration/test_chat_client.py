@@ -1,5 +1,5 @@
 # No need to import pytest when only using assert statements
-from src.channel import Channel
+from src.channel_api import Channel
 from src.message import Message
 from src.user import User
 

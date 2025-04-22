@@ -18,11 +18,11 @@ class Message:
         return self.content
 
     @staticmethod
-    def send_message(sender_id: str, channel_id: str, content: str) -> 'Message':
+    def send_message(sender_id: str, channel_id: str, content: str) -> "Message":
         return Message(sender_id, channel_id, content)
 
     @staticmethod
-    def fetch_latest(channel_id: str, count: int) -> list['Message']:
+    def fetch_latest(channel_id: str, count: int) -> list["Message"]:
         return [
             Message(f"user{i}", channel_id, f"Message {i}")
             for i in range(count)

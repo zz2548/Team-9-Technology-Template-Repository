@@ -13,9 +13,9 @@ class User:
         return ["general", "random"]
 
     @staticmethod
-    def register(username: str) -> 'User':
+    def register(username: str) -> "User":
         return User(username, username)
 
     @staticmethod
-    def login(username: str) -> 'User':
+    def login(username: str) -> "User":
         return User(username, username)
