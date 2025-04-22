@@ -1,3 +1,6 @@
+# src/user_api/__init__.py
+from typing import TYPE_CHECKING
+
 from .interfaces import IUser, IUserService
 
 __all__ = [
@@ -17,11 +20,6 @@ def get_service() -> IUserService:
 
 User = _ImplUser
 
-def _register(username: str) -> IUser:
-    return _service.register(username)
-
-def _login(username: str) -> IUser:
-    return _service.login(username)
-
-User.register = staticmethod(_register)
-User.login = staticmethod(_login)
+if not TYPE_CHECKING:
+    User.register = staticmethod(lambda username: _service.register(username))  # type: ignore[attr-defined]
+    User.login    = staticmethod(lambda username: _service.login(username))     # type: ignore[attr-defined]
