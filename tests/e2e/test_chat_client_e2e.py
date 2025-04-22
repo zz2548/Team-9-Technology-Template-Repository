@@ -1,6 +1,6 @@
 # No need to import pytest when only using assert statements
 from src.channel_api import Channel
-from src.message import Message
+from src.message_api import Message
 from src.user import User
 
 
@@ -21,7 +21,7 @@ def test_full_chat_flow() -> None:
     # Check if user is in channel_api
     assert user.get_id() in channel.list_users()
 
-    # Send message
+    # Send message_api
     msg = Message.send_message(user.get_id(), channel.get_id(), "Hello from E2E!")
     assert msg.get_content() == "Hello from E2E!"
     assert msg.get_sender() == user.get_id()

@@ -119,7 +119,7 @@ def fetch_messages(channel_id):
         "content": m.content,
     } for m in messages])
 
-# Direct message between two users
+# Direct message_api between two users
 @app.route("/start_dm", methods=["POST"])
 def start_direct_message():
     data = request.get_json()
