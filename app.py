@@ -61,7 +61,7 @@ def join_channel():
     user_id = data.get("user_id")
     channel_id = data.get("channel_id")
 
-    # Validate user exists
+    # Validate user_api exists
     user = UserModel.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404

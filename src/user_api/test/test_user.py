@@ -1,5 +1,5 @@
 # No need to import pytest when only using assert statements
-from src.user import User
+from src.user_api import User
 
 
 class MockUser(User):

@@ -1,11 +1,11 @@
 # No need to import pytest when only using assert statements
 from src.channel_api import Channel
 from src.message_api import Message
-from src.user import User
+from src.user_api import User
 
 
 def test_full_chat_flow() -> None:
-    # Register user
+    # Register user_api
     user = User.register("charlie")
     assert user.get_username() == "charlie"
 
@@ -18,7 +18,7 @@ def test_full_chat_flow() -> None:
     joined = Channel.join_channel(user.get_id(), channel.get_id())
     assert joined is True
 
-    # Check if user is in channel_api
+    # Check if user_api is in channel_api
     assert user.get_id() in channel.list_users()
 
     # Send message_api

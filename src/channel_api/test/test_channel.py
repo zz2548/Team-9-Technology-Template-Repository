@@ -50,7 +50,7 @@ def test_create_channel() -> None:
 def test_join_same_user_twice() -> None:
     chan = Channel("chan_x", "general")
     Channel.join_channel("user42", "chan_x")
-    # Joining same user again
+    # Joining same user_api again
     result = Channel.join_channel("user42", "chan_x")
     assert result is True
     assert chan.list_users().count("user42") == 1  # still one instance
