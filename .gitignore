@@ -38,3 +38,4 @@ debug.log
 *.swp
 *.swo
 *.swn
+test-results/unit/calculator.xml

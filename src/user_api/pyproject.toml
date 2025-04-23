@@ -1,0 +1,12 @@
+[project]
+name = "chat-client-user"
+version = "0.1.0"
+description = "Chat client user for a discord-like chat client"
+authors = [
+    { name = "Jerry Zou", email = "zz2548@nyu.edu" },
+    { name = "Keshav Rajput", email = "kr3412@nyu.edu" },
+    { name = "Terry Xu", email = "xm2204@nyu.edu" },
+    { name = "Jinglin Tao", email = "jt4296@nyu.edu" }
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.10.9, <3.11"

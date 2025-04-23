@@ -1,145 +1,203 @@
-# Team-9-Technology-Template-Repository
-# Python Project Template with UV
+# Chat Client API 
 
-## Description
-A modern Python project template featuring comprehensive test coverage, continuous integration with CircleCI, and dependency management using UV. This template includes configurations for static type checking, code formatting, and automated testing.
+This project implements a basic **chat client server** in Python using **Flask** and **SQLite**.  
+It provides RESTful APIs for:
 
-## Prerequisites
-* Python 3.10 or higher
-* UV for Python dependency management
+- User registration and login
+- Creating and joining chat channels
+- Sending and fetching messages
+- Direct messaging between two users
 
-## Project Setup
+It also includes CI/CD integration with **CircleCI** and dependency management with **uv**.
 
-1. Clone the repository:
-    ```bash
-   git clone <repository-url>
-   cd <repository-name>
-   ```
+---
 
-2. Install UV:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
+# Features
 
-3. Create a virtual environment:
-   ```bash
-   uv venv .venv
-   ```
-   
-   Activate the virtual environment:
-   - On Unix/Linux/macOS:
-     ```bash
-     source .venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     .venv\Scripts\activate
-     ```
+- **Register** new users
+- **Login** existing users
+- **Create Channels**
+- **Join Channels**
+- **Send Messages** to channels
+- **Fetch Messages** from channels
+- **Start Direct Messages** between two users
+- **Persistent database** using SQLite
+- **Unit and Integration tests** using pytest, nose2
+- **Static analysis** using mypy and ruff
+- **CircleCI** pipeline for automated testing and linting
 
-4. Install dependencies and pre-commit hooks:
-    ```bash
-    uv pip install ".[dev]"
-    pre-commit install
-    ```
-## Development Tools
+---
 
-### Static Analysis
-Run type checking and code linting:
+# Running the Server
+
+First, initialize the database:
+
 ```bash
-mypy src tests
-ruff check . --config pyproject.toml
+$env:FLASK_APP = "app.py"     # (Windows PowerShell)
+flask shell
+>>> from src.models import db
+>>> db.create_all()
+>>> exit()
 ```
 
-### Testing
-The project includes unit, integration, and end-to-end tests:
+Then start the Flask server:
 
-#### Running Individual Test Suites
 ```bash
-# Run calculator unit tests
-nose2 -v -s src/calculator/test/
-
-# Run logger unit tests
-nose2 -v -s src/logger/test/
-
-# Run notifier unit tests
-nose2 -v -s src/notifier/test/
+python app.py
 ```
 
-#### Running Tests with Coverage
-```bash
-# Running all unit tests with coverage
-nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator
+Server will run at: `http://127.0.0.1:5000/`
 
-COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger
+---
 
-COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier
+# API Endpoints 
 
-coverage combine .coverage .coverage.logger .coverage.notifier
+## User Endpoints
 
-coverage report --fail-under=70
-coverage xml -o unit-coverage.xml
-coverage html -d unit-htmlcov
+### POST `/register`
+- Register a new user.
+- **Body:**
+```json
+{
+  "username": "john_doe"
+}
 ```
-> **Note**: The above commands work in a bash environment. You might need to adjust commands for your specific terminal.
-
-#### Other Test Types
-```bash
-# Run integration tests
-nose2 -v -s tests/integration
-
-# Run end-to-end tests
-nose2 -v -s tests/e2e
-
-# Run all tests
-nose2
+- **Success Response:**
+```json
+{
+  "user_id": "john_doe",
+  "username": "john_doe"
+}
 ```
 
-### Coverage Reports
-Test coverage reports are generated in HTML format. View them by opening `htmlcov/index.html` in your browser.
+### POST `/login`
+- Log in an existing user.
+- **Body:**
+```json
+{
+  "username": "john_doe"
+}
+```
+- **Success Response:**
+```json
+{
+  "user_id": "john_doe",
+  "username": "john_doe"
+}
+```
 
-## Continuous Integration
-This project uses CircleCI for continuous integration, which:
-- Runs static analysis (mypy and ruff)
-- Executes all test suites
-- Generates and stores test reports
-- Enforces minimum test coverage requirements
+## Channel Endpoints
 
-## Contributing
+### POST `/channel`
+- Create a new chat channel.
+- **Body:**
+```json
+{
+  "name": "general"
+}
+```
+- **Success Response:**
+```json
+{
+  "channel_id": "general",
+  "name": "general"
+}
+```
 
-1. Create a new branch for your feature:
-   ```bash
-   git checkout -b feature-name
-   ```
+### POST `/channel/join`
+- Join an existing channel.
+- **Body:**
+```json
+{
+  "user_id": "john_doe",
+  "channel_id": "general"
+}
+```
+- **Success Response:**
+```json
+{
+  "joined": true
+}
+```
 
-2. Install pre-commit hooks:
-   ```bash
-   pip install pre-commit
-   pre-commit install
-   ```
+### GET `/channel/<channel_id>/users`
+- List users in a channel.
+- **Response:**
+```json
+{
+  "users": ["john_doe"]
+}
+```
 
-3. Make your changes and commit them:
-   ```bash
-   git add .
-   git commit -m "Your descriptive commit message"
-   ```
+## Message Endpoints
 
-   The pre-commit hooks will automatically:
-   - Format your code using ruff-format
-   - Check for linting issues with ruff
-   - Verify type annotations with mypy
-   - Run unit tests to ensure all tests pass
+### POST `/message`
+- Send a message to a channel.
+- **Body:**
+```json
+{
+  "sender_id": "john_doe",
+  "channel_id": "general",
+  "content": "Hello everyone!"
+}
+```
+- **Success Response:**
+```json
+{
+  "message_id": "generated_id",
+  "sender_id": "john_doe",
+  "channel_id": "general",
+  "content": "Hello everyone!"
+}
+```
 
-4. Push your changes and create a pull request:
-   ```bash
-   git push origin feature-name
-   ```
+### GET `/message/<channel_id>`
+- Fetch all messages from a channel.
+- **Response:**
+```json
+[
+  {
+    "message_id": "generated_id",
+    "sender_id": "john_doe",
+    "content": "Hello everyone!"
+  }
+]
+```
 
-If pre-commit identifies any issues, it will prevent the commit and display what needs to be fixed. Address the issues and try committing again.
+## Direct Message Endpoints
 
-## License
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+### POST `/start_dm`
+- Start a direct message chat between two users.
+- **Body:**
+```json
+{
+  "sender_id": "john_doe",
+  "receiver_id": "jane_smith"
+}
+```
+- **Success Response:**
+```json
+{
+  "channel_id": "dm_john_doe_jane_smith"
+}
+```
 
-## Additional Resources
-- [UV Documentation](https://github.com/astral-sh/uv)
-- [CircleCI Documentation](https://circleci.com/docs/)
-- [nose2 Documentation](https://docs.nose2.io/en/latest/)
+# Future Improvements
+
+- Add timestamps (`created_at`) for messages.
+- Allow editing and deleting messages.
+- Add password for user login
+- Add authentication tokens for user sessions.
+- Improve models with relational links.
+- Add Docker support for easier deployment.
+
+---
+
+# Authors
+
+- Jerry Zou
+- Keshav Rajput
+- Terry Xu
+- Jinglin Tao
+
+
