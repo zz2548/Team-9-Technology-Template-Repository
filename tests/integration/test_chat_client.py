@@ -1,7 +1,7 @@
 # No need to import pytest when only using assert statements
-from src.channel import Channel
-from src.message import Message
-from src.user import User
+from src.channel_api import Channel
+from src.message_api import Message
+from src.user_api import User
 
 
 def test_user_registration_and_login() -> None:
