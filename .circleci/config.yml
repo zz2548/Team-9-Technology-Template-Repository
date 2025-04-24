@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Run Static Analysis
           command: |
-            export MYPYPATH=$PWD/external/ai_convo_client
+            export MYPYPATH=$PWD/external
             mypy src
             ruff check . --config pyproject.toml
 
