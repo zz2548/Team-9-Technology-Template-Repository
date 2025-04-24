@@ -27,7 +27,6 @@ dev = [
 
 
 [tool.ruff]
-ignore = ["E402"]
 line-length = 88
 target-version = "py310"
 fix = true
@@ -43,6 +42,7 @@ line-ending = "lf"
 [tool.ruff.lint]
 select = ["ALL"]  # Enable all available linting rules
 ignore = [
+    "E402",
     # Docstring-related rules
     "D100", # Missing docstring in public module
     "D101", # Missing docstring in public class
