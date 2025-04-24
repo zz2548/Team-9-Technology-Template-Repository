@@ -3,11 +3,14 @@ import os
 import asyncio
 from typing import Optional
 from typing import cast
+from pathlib import Path
 
 # add submodule path to sys.path for local dev (not needed in CI since it's in PYTHONPATH there)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../external/ai_convo_client"))) 
+current_file = Path(__file__).resolve()
+submodule_path = current_file.parent.parent.parent / "external" / "ai_convo_client"
+sys.path.append(str(submodule_path))
 
-from ai_conversation_client.providers import OpenAIClient # type: ignore
+from ai_conversation_client.providers import OpenAIClient # type: ignore[import]
 
 class AiBotChannel:
     def __init__(self) -> None:

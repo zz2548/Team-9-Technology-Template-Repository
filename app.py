@@ -111,8 +111,6 @@ def send_message():
         ai_bot = AiBotChannel()
         ai_response = ai_bot.handle_message(content)
 
-        logging.info(f"[AI BOT RESPONSE] {ai_response}")
-
         bot_message = MessageModel(
             id=str(uuid.uuid4()),
             sender_id="ai_bot",
