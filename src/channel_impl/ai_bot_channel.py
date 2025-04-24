@@ -2,6 +2,7 @@ import sys
 import os
 import asyncio
 from typing import Optional
+from typing import cast
 
 # Add submodule path to sys.path for local dev (not needed in CI since it's in PYTHONPATH there)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../external/ai_convo_client")))
