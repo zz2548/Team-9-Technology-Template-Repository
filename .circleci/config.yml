@@ -15,6 +15,7 @@ jobs:
           name: Ensure ai_convo_client is ready
           command: |
             mkdir -p external/ai_convo_client/ai_conversation_client
+            touch external/ai_convo_client/ai_conversation_client/py.typed
 
       - run:
           name: Install uv
