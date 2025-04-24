@@ -9,7 +9,7 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout:
-          submodules: true  # ✅ this pulls the submodule repo
+          submodules: true  # pulls the submodule repo
 
       - run:
           name: Ensure ai_convo_client is ready
