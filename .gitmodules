@@ -1,0 +1,4 @@
+[submodule "external/ai_convo_client"]
+	path = external/ai_convo_client
+	url = https://github.com/amoghkr1shna/team2
+	branch = hw3

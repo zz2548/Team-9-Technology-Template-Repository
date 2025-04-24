@@ -1,21 +1,22 @@
 from flask import Flask, jsonify, request
-
 from src.models import db
 from src.models.channel_model import ChannelModel
 from src.models.message_model import MessageModel
 from src.models.user_model import UserModel
+import uuid
+import logging
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chat.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 db.init_app(app)
 
 @app.route("/")
 def home():
     return "Welcome to the Chat Client API!"
 
-# User Endpoints
+# --------------------- User Endpoints ---------------------
+
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -25,12 +26,11 @@ def register():
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
 
-    new_user = UserModel(id=username, username=username)  # for now use username as id
+    new_user = UserModel(id=str(uuid.uuid4()), username=username)
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({"user_id": new_user.id, "username": new_user.username})
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -43,13 +43,14 @@ def login():
 
     return jsonify({"user_id": user.id, "username": user.username})
 
-# Channel Endpoints
+# --------------------- Channel Endpoints ---------------------
+
 @app.route("/channel", methods=["POST"])
 def create_channel():
     data = request.get_json()
     name = data.get("name")
 
-    new_channel = ChannelModel(id=name, name=name)  # for now use name as id
+    new_channel = ChannelModel(id=str(uuid.uuid4()), name=name)
     db.session.add(new_channel)
     db.session.commit()
 
@@ -61,32 +62,26 @@ def join_channel():
     user_id = data.get("user_id")
     channel_id = data.get("channel_id")
 
-    # Validate user_api exists
     user = UserModel.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # Validate channel_api exists
     channel = ChannelModel.query.get(channel_id)
     if not channel:
         return jsonify({"error": "Channel not found"}), 404
 
-    # TODO: relationship table
+    # TODO: Implement join table
     return jsonify({"joined": True})
 
 @app.route("/channel/<channel_id>/users", methods=["GET"])
 def list_channel_users(channel_id):
-    # Find all messages sent in this channel_api
     messages = MessageModel.query.filter_by(channel_id=channel_id).all()
-
-    # Extract unique sender_ids
     user_ids = list({msg.sender_id for msg in messages})
-
     return jsonify({"users": user_ids})
 
+# --------------------- Message Endpoints ---------------------
 
-# Message Endpoints
-@app.route("/message", methods=["POST"])
+@app.route("/message", methods=["POST"]) 
 def send_message():
     data = request.get_json()
     sender_id = data.get("sender_id")
@@ -94,7 +89,7 @@ def send_message():
     content = data.get("content")
 
     new_message = MessageModel(
-        id=f"{sender_id}_{channel_id}_{content[:10]}",  # simple ID
+        id=str(uuid.uuid4()),
         sender_id=sender_id,
         channel_id=channel_id,
         content=content,
@@ -102,13 +97,39 @@ def send_message():
     db.session.add(new_message)
     db.session.commit()
 
-    return jsonify({
+    response_payload = [{
         "message_id": new_message.id,
         "sender_id": new_message.sender_id,
         "channel_id": new_message.channel_id,
         "content": new_message.content,
-    })
+    }]
+    
+    channel = ChannelModel.query.get(channel_id)
 
+    if channel and channel.name == "ai-helpdesk":
+        from src.channel_impl.ai_bot_channel import AiBotChannel
+        ai_bot = AiBotChannel()
+        ai_response = ai_bot.handle_message(content)
+
+        logging.info(f"[AI BOT RESPONSE] {ai_response}")
+
+        bot_message = MessageModel(
+            id=str(uuid.uuid4()),
+            sender_id="ai_bot",
+            channel_id=channel_id,
+            content=ai_response,
+        )
+        db.session.add(bot_message)
+        db.session.commit()
+
+        response_payload.append({
+            "message_id": bot_message.id,
+            "sender_id": bot_message.sender_id,
+            "channel_id": bot_message.channel_id,
+            "content": bot_message.content,
+        })
+
+    return jsonify(response_payload)
 
 @app.route("/message/<channel_id>", methods=["GET"])
 def fetch_messages(channel_id):
@@ -119,7 +140,8 @@ def fetch_messages(channel_id):
         "content": m.content,
     } for m in messages])
 
-# Direct message_api between two users
+# --------------------- Direct Messages ---------------------
+
 @app.route("/start_dm", methods=["POST"])
 def start_direct_message():
     data = request.get_json()
@@ -128,8 +150,9 @@ def start_direct_message():
 
     channel_name = f"dm_{sender_id}_{receiver_id}"
     existing_channel = ChannelModel.query.filter_by(name=channel_name).first()
+
     if not existing_channel:
-        channel = ChannelModel(id=channel_name, name=channel_name)
+        channel = ChannelModel(id=str(uuid.uuid4()), name=channel_name)
         db.session.add(channel)
         db.session.commit()
     else:
@@ -137,6 +160,16 @@ def start_direct_message():
 
     return jsonify({"channel_id": channel.id})
 
+# --------------------- AI Bot Setup ---------------------
+
+def ensure_ai_bot_user():
+    from src.models.user_model import UserModel
+    if not UserModel.query.get("ai_bot"):
+        bot_user = UserModel(id="ai_bot", username="ai_bot")
+        db.session.add(bot_user)
+        db.session.commit()
 
 if __name__ == "__main__":
+    with app.app_context():
+        ensure_ai_bot_user()
     app.run()
