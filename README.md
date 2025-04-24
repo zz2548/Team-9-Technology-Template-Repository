@@ -7,7 +7,7 @@ It provides RESTful APIs for:
 - Creating and joining chat channels
 - Sending and fetching messages
 - Direct messaging between two users
-- **AI chatbot integration** powered by the external `ai_convo_client` module
+- **AI chatbot integration** powered by the external `ai_convo_client` module using GIT Submodules
 
 
 # Features
@@ -21,9 +21,6 @@ It provides RESTful APIs for:
 - **Start Direct Messages** between two users
 - **Chat with AI bot** in dedicated `ai-helpdesk` channel
 - **Persistent database** using SQLite
-- **Unit and Integration tests** using pytest, nose2
-- **Static analysis** using mypy and ruff
-- **CircleCI** pipeline for automated testing and linting
 
 
 # Running the Server
