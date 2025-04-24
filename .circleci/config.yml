@@ -30,8 +30,9 @@ jobs:
       - run:
           name: Run Static Analysis
           command: |
-            mypy src
+            mypy src --python-path=$PWD/external/ai_convo_client
             ruff check . --config pyproject.toml
+
 
       - run:
           name: Run All Tests with pytest
