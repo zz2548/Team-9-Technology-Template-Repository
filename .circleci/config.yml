@@ -9,7 +9,7 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-
+        submodules: true
       - run:
           name: Install uv
           command: curl -LsSf https://astral.sh/uv/install.sh | sh
