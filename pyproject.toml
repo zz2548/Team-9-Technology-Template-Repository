@@ -27,6 +27,7 @@ dev = [
 
 
 [tool.ruff]
+ignore = ["E402"]
 line-length = 88
 target-version = "py310"
 fix = true

@@ -5,7 +5,7 @@ from typing import Optional
 from typing import cast
 from pathlib import Path
 
-# add submodule path to sys.path for local dev (not needed in CI since it's in PYTHONPATH there)
+# add submodule path to sys.path for local dev
 current_file = Path(__file__).resolve()
 submodule_path = current_file.parent.parent.parent / "external" / "ai_convo_client"
 sys.path.append(str(submodule_path))
