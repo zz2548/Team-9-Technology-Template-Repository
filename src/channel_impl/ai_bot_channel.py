@@ -5,9 +5,9 @@ from typing import Optional
 from typing import cast
 
 # add submodule path to sys.path for local dev (not needed in CI since it's in PYTHONPATH there)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../external/ai_convo_client"))) # type: ignore
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../external/ai_convo_client"))) 
 
-from ai_conversation_client.providers import OpenAIClient
+from ai_conversation_client.providers import OpenAIClient # type: ignore
 
 class AiBotChannel:
     def __init__(self) -> None:
