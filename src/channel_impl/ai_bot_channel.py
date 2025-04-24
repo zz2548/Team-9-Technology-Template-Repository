@@ -18,7 +18,7 @@ class AiBotChannel:
 
     async def _ask_ai(self, message: str) -> str:
         response = await self.client.send_message(self.conversation.id, message)
-        return response.content
+        return cast(str, response.content)
 
     def handle_message(self, message: str) -> str:
         return asyncio.run(self._ask_ai(message))
