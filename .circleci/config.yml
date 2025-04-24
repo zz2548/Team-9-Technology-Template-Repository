@@ -9,7 +9,14 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout:
-          submodules: true
+          submodules: true  # ✅ this pulls the submodule repo
+
+      - run:
+          name: Ensure ai_convo_client is ready
+          command: |
+            mkdir -p external/ai_convo_client/ai_conversation_client
+            touch external/ai_convo_client/ai_conversation_client/py.typed
+
       - run:
           name: Install uv
           command: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -20,6 +27,7 @@ jobs:
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
             echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client" >> $BASH_ENV
+            echo "export MYPYPATH=$PWD/external/ai_convo_client" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
@@ -30,8 +38,6 @@ jobs:
       - run:
           name: Run Static Analysis
           command: |
-            export MYPYPATH=$PWD/external/ai_convo_client
-            touch external/ai_convo_client/ai_conversation_client/py.typed
             mypy src
             ruff check . --config pyproject.toml
 
@@ -39,7 +45,6 @@ jobs:
           name: Run All Tests with pytest
           command: |
             mkdir -p test-results
-            # Run all tests with coverage in one command
             pytest \
               src/ \
               tests/ \
