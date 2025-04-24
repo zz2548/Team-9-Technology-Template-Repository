@@ -7,26 +7,24 @@ It provides RESTful APIs for:
 - Creating and joining chat channels
 - Sending and fetching messages
 - Direct messaging between two users
+- **AI chatbot integration** powered by the external `ai_convo_client` module
 
-It also includes CI/CD integration with **CircleCI** and dependency management with **uv**.
-
----
 
 # Features
 
-- **Register** new users
+- **Register** new users (UUID-based IDs)
 - **Login** existing users
 - **Create Channels**
 - **Join Channels**
 - **Send Messages** to channels
 - **Fetch Messages** from channels
 - **Start Direct Messages** between two users
+- **Chat with AI bot** in dedicated `ai-helpdesk` channel
 - **Persistent database** using SQLite
 - **Unit and Integration tests** using pytest, nose2
 - **Static analysis** using mypy and ruff
 - **CircleCI** pipeline for automated testing and linting
 
----
 
 # Running the Server
 
@@ -48,7 +46,6 @@ python app.py
 
 Server will run at: `http://127.0.0.1:5000/`
 
----
 
 # API Endpoints 
 
@@ -65,7 +62,7 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Success Response:**
 ```json
 {
-  "user_id": "john_doe",
+  "user_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
   "username": "john_doe"
 }
 ```
@@ -81,7 +78,7 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Success Response:**
 ```json
 {
-  "user_id": "john_doe",
+  "user_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
   "username": "john_doe"
 }
 ```
@@ -93,14 +90,14 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Body:**
 ```json
 {
-  "name": "general"
+  "name": "ai-helpdesk"
 }
 ```
 - **Success Response:**
 ```json
 {
-  "channel_id": "general",
-  "name": "general"
+  "channel_id": "55352752-b3c0-4c60-8dbe-ec02589448f9",
+  "name": "ai-helpdesk"
 }
 ```
 
@@ -109,8 +106,8 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Body:**
 ```json
 {
-  "user_id": "john_doe",
-  "channel_id": "general"
+  "user_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
+  "channel_id": "55352752-b3c0-4c60-8dbe-ec02589448f9"
 }
 ```
 - **Success Response:**
@@ -125,30 +122,38 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Response:**
 ```json
 {
-  "users": ["john_doe"]
+  "users": ["f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2"]
 }
 ```
 
 ## Message Endpoints
 
 ### POST `/message`
-- Send a message to a channel.
+- Send a message to a channel. If the channel name is `ai-helpdesk`, the message will trigger a response from the integrated AI bot via `ai_convo_client`.
 - **Body:**
 ```json
 {
-  "sender_id": "john_doe",
-  "channel_id": "general",
-  "content": "Hello everyone!"
+  "sender_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
+  "channel_id": "55352752-b3c0-4c60-8dbe-ec02589448f9",
+  "content": "Hello AI!"
 }
 ```
 - **Success Response:**
 ```json
-{
-  "message_id": "generated_id",
-  "sender_id": "john_doe",
-  "channel_id": "general",
-  "content": "Hello everyone!"
-}
+[
+  {
+    "message_id": "msg_id_1",
+    "sender_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
+    "channel_id": "55352752-b3c0-4c60-8dbe-ec02589448f9",
+    "content": "Hello AI!"
+  },
+  {
+    "message_id": "msg_id_2",
+    "sender_id": "ai_bot",
+    "channel_id": "55352752-b3c0-4c60-8dbe-ec02589448f9",
+    "content": "Hi! How can I assist you today?"
+  }
+]
 ```
 
 ### GET `/message/<channel_id>`
@@ -157,8 +162,8 @@ Server will run at: `http://127.0.0.1:5000/`
 ```json
 [
   {
-    "message_id": "generated_id",
-    "sender_id": "john_doe",
+    "message_id": "55352752-b3c0-4c60-8dbe-ec02589448f9",
+    "sender_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
     "content": "Hello everyone!"
   }
 ]
@@ -171,14 +176,14 @@ Server will run at: `http://127.0.0.1:5000/`
 - **Body:**
 ```json
 {
-  "sender_id": "john_doe",
-  "receiver_id": "jane_smith"
+  "sender_id": "f4c9a64a-6b02-4980-b29a-5dfd7e59f3c2",
+  "receiver_id": "another_user_uuid"
 }
 ```
 - **Success Response:**
 ```json
 {
-  "channel_id": "dm_john_doe_jane_smith"
+  "channel_id": "dm_f4c9a64a_another_user"
 }
 ```
 
@@ -190,6 +195,8 @@ Server will run at: `http://127.0.0.1:5000/`
 - Add authentication tokens for user sessions.
 - Improve models with relational links.
 - Add Docker support for easier deployment.
+- Persist conversation history for AI bot
+- Enhance AI response accuracy with additional context
 
 ---
 
@@ -199,5 +206,3 @@ Server will run at: `http://127.0.0.1:5000/`
 - Keshav Rajput
 - Terry Xu
 - Jinglin Tao
-
-
