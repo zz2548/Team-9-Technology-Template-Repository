@@ -10,7 +10,7 @@ current_file = Path(__file__).resolve()
 submodule_path = current_file.parent.parent.parent / "external" / "ai_convo_client"
 sys.path.append(str(submodule_path))
 
-from ai_conversation_client.providers import OpenAIClient # type: ignore[import]
+from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
 
 class AiBotChannel:
     def __init__(self) -> None:
