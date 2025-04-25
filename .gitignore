@@ -41,3 +41,4 @@ debug.log
 test-results/unit/calculator.xml
 
 .env
+test-results/calculator_unit.xml

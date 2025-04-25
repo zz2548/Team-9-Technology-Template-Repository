@@ -5,8 +5,10 @@ from src.models.message_model import MessageModel
 from src.models.user_model import UserModel
 import uuid
 import logging
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chat.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
