@@ -1,11 +1,13 @@
+import logging
+import uuid
+
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 from src.models import db
 from src.models.channel_model import ChannelModel
 from src.models.message_model import MessageModel
 from src.models.user_model import UserModel
-import uuid
-import logging
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
@@ -87,13 +89,13 @@ def list_channels():
     channels = ChannelModel.query.all()
     return jsonify([{
         "channel_id": channel.id,
-        "name": channel.name
+        "name": channel.name,
     } for channel in channels])
 
 
 # --------------------- Message Endpoints ---------------------
 
-@app.route("/message", methods=["POST"]) 
+@app.route("/message", methods=["POST"])
 def send_message():
     data = request.get_json()
     sender_id = data.get("sender_id")
@@ -115,7 +117,7 @@ def send_message():
         "channel_id": new_message.channel_id,
         "content": new_message.content,
     }]
-    
+
     channel = ChannelModel.query.get(channel_id)
 
     if channel and channel.name == "ai-helpdesk":
