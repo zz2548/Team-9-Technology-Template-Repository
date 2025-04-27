@@ -348,17 +348,21 @@
         }
 
         async function loadChannels() {
-            // Note: This API endpoint doesn't exist in your current API
-            // You would need to add a GET /channels endpoint to your server
-            // This is a placeholder for demonstration purposes
+            try {
+                const response = await fetch(`${API_URL}/channels`);
+                if (!response.ok) {
+                    throw new Error('Failed to load channels');
+                }
 
-            // For now, we'll create some default channels
-            channels = [
-                { channel_id: 'default-channel', name: 'general' },
-                { channel_id: 'ai-helpdesk', name: 'ai-helpdesk' }
-            ];
-            updateChannelList();
+                const data = await response.json();
+                channels = data;
+                updateChannelList();
+            } catch (error) {
+                showStatus('Error loading channels: ' + error.message, false);
+            }
         }
+
+
 
         function updateChannelList() {
             channelList.innerHTML = '';
@@ -568,15 +572,9 @@
 
         // Initialize
         function init() {
-            // Create default channels if needed
-            if (!channels.length) {
-                channels = [
-                    { channel_id: 'default-channel', name: 'general' },
-                    { channel_id: 'ai-helpdesk', name: 'ai-helpdesk' }
-                ];
-                updateChannelList();
-            }
+            loadChannels(); // fetch the real channels from backend
         }
+
 
         // Start the app
         init();

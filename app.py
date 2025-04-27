@@ -82,6 +82,15 @@ def list_channel_users(channel_id):
     user_ids = list({msg.sender_id for msg in messages})
     return jsonify({"users": user_ids})
 
+@app.route("/channels", methods=["GET"])
+def list_channels():
+    channels = ChannelModel.query.all()
+    return jsonify([{
+        "channel_id": channel.id,
+        "name": channel.name
+    } for channel in channels])
+
+
 # --------------------- Message Endpoints ---------------------
 
 @app.route("/message", methods=["POST"]) 
