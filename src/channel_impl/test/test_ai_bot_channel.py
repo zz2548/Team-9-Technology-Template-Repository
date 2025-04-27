@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001
+
 import pytest
 import asyncio
 from unittest.mock import patch
@@ -5,7 +7,7 @@ from src.channel_impl import IssueTrackerSingleton, AIBotChannel
 
 
 class MockIssueTracker:
-    def __init__(self):
+    def __init__(self) -> None:
         self.issues = []
         self.next_id = 1
 
@@ -20,11 +22,11 @@ class MockIssueTracker:
 
 
 class MockAIClient:
-    def __init__(self):
+    def __init__(self) -> None:
         self.messages_sent = []
         self.conversations = []
 
-    def create_conversation(self, title, system_prompt):
+    def create_conversation(self, _title, _system_prompt) -> object:
         convo = type('Conversation', (object,), {'id': 'mock-id'})()
         self.conversations.append(convo)
         return convo
@@ -42,7 +44,7 @@ def bot():
 
 
 @pytest.mark.asyncio
-async def test_ask_ai_task(bot): 
+async def test_ask_ai_task(bot):
     result = await bot._ask_ai('create a task Integration "Finish integration assignment"')
     assert bot.issue_tracker.issues != []
     assert bot.issue_tracker.issues[0].title == "Integration"
