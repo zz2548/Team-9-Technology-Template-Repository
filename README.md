@@ -201,5 +201,5 @@ Server will run at: `http://127.0.0.1:5000/`
 
 - Jerry Zou
 - Keshav Rajput
-- Terry Xu
+- Terry Mu
 - Jinglin Tao
