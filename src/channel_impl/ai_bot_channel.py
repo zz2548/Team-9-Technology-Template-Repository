@@ -1,9 +1,9 @@
-import sys
-import os
 import asyncio
 import re
+import sys
 from pathlib import Path
-from typing import cast, Optional, Tuple
+from typing import cast
+
 from flask import current_app
 
 # add submodule path to sys.path for local dev
@@ -14,24 +14,26 @@ sys.path.append(str(ai_module_path))
 sys.path.append(str(issue_tracker_path))
 
 
-from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
-from api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
+from ai_conversation_client.providers import OpenAIClient  # type: ignore[import-not-found]
+
+from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient  # type: ignore[import-not-found]
+
 
 # Create a singleton for the issue tracker
 class IssueTrackerSingleton:
-    _instance: Optional[MemoryIssueTrackerClient] = None
+    _instance: MemoryIssueTrackerClient | None = None
 
     @classmethod
-    def get_instance(cls) -> Optional[MemoryIssueTrackerClient]:
+    def get_instance(cls) -> MemoryIssueTrackerClient | None:
         if cls._instance is None:
-            from api.src.issue_tracker import MemoryIssueTrackerClient
+            from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient
             try:
                 cls._instance = MemoryIssueTrackerClient()
                 from flask import current_app
                 current_app.logger.info("Successfully initialized MemoryIssueTrackerClient")
             except Exception as e:
                 from flask import current_app
-                current_app.logger.error(f"Failed to initialize issue tracker: {str(e)}")
+                current_app.logger.error(f"Failed to initialize issue tracker: {e!s}")
                 cls._instance = None
         return cls._instance
 
@@ -44,7 +46,7 @@ class AiBotChannel:
                "You are an assistant for homework and learning. "
                "You can also create tasks in the issue tracker when requested. "
                "If a user asks to create a task, respond confirming the task was created."
-                )
+                ),
         )
         # Get the singleton instance
         self.issue_tracker = IssueTrackerSingleton.get_instance()
@@ -54,8 +56,6 @@ class AiBotChannel:
         Process a message, extract task info if present, and append task list to response.
         Verbose version with detailed logging for Flask.
         """
-
-
         # Log the incoming message
         current_app.logger.info(f"Processing message: {message[:50]}...")
 
@@ -82,7 +82,7 @@ class AiBotChannel:
                 else:
                     current_app.logger.error("Issue tracker is not initialized. Cannot create task.")
             except Exception as e:
-                current_app.logger.error(f"Failed to create task: {str(e)}")
+                current_app.logger.error(f"Failed to create task: {e!s}")
                 # Continue with original message if task creation fails
         else:
             current_app.logger.info("No task creation request found in message")
@@ -100,8 +100,8 @@ class AiBotChannel:
                 response_content) > 50 else response_content
             current_app.logger.info(f"Response content preview: {content_preview}")
         except Exception as e:
-            current_app.logger.error(f"Error getting response from AI: {str(e)}")
-            return f"Error communicating with AI assistant: {str(e)}"
+            current_app.logger.error(f"Error getting response from AI: {e!s}")
+            return f"Error communicating with AI assistant: {e!s}"
 
         # Get current tasks and append them to the response
         current_app.logger.info("Retrieving current tasks from issue tracker")
@@ -127,15 +127,14 @@ class AiBotChannel:
                     f"Final response length: {len(final_response)} characters")
 
                 return final_response
-            else:
-                current_app.logger.info("No tasks found, returning original response")
-                return response_content
+            current_app.logger.info("No tasks found, returning original response")
+            return response_content
         except Exception as e:
-            current_app.logger.error(f"Error retrieving or formatting tasks: {str(e)}")
+            current_app.logger.error(f"Error retrieving or formatting tasks: {e!s}")
             # Return just the AI response if there's an error with tasks
             return response_content
 
-    def _extract_task_info(self, message: str) -> Optional[Tuple[str, str]]:
+    def _extract_task_info(self, message: str) -> tuple[str, str] | None:
         """Extract task title and description from message."""
         # More flexible pattern to handle your format
         if "create a task" not in message.lower():
