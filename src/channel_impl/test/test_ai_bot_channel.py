@@ -2,6 +2,8 @@
 
 import pytest
 import asyncio
+import sys
+from unittest.mock import MagicMock
 from unittest.mock import patch
 sys.modules['ai_conversation_client'] = MagicMock()
 sys.modules['ai_conversation_client.providers'] = MagicMock()
