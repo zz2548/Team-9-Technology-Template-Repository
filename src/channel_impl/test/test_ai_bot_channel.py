@@ -3,6 +3,8 @@
 import pytest
 import asyncio
 from unittest.mock import patch
+sys.modules['ai_conversation_client'] = MagicMock()
+sys.modules['ai_conversation_client.providers'] = MagicMock()
 from src.channel_impl.ai_bot_channel import IssueTrackerSingleton, AIBotChannel
 
 
