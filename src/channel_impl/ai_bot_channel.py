@@ -163,10 +163,16 @@ class AiBotChannel:
             title = match.group(1).strip()
             description = match.group(2).strip() if match.group(2) else ""
             current_app.logger.info(
-                f"Extracted task info (alt pattern) - Title: {title}, Description: {description}")
+                "Extracted task info (alt pattern) - Title: %s, Description: %s",
+                title,
+                description,
+            )
             return title, description
 
-        current_app.logger.warning(f"Failed to extract task info from: {message}")
+        current_app.logger.warning(
+            "Failed to extract task info from: %s",
+            message,
+        )
         return None
 
     def handle_message(self, message: str) -> str:
