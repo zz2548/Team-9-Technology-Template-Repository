@@ -68,16 +68,19 @@ class AiBotChannel:
                 f"Creating task with title: '{title}' and description: '{description}'")
 
             try:
-                issue = self.issue_tracker.create_issue(title=title,
+                if self.issue_tracker is not None:
+                    issue = self.issue_tracker.create_issue(title=title,
                                                         description=description)
-                current_app.logger.info(
-                    f"Task created successfully with ID: {issue.id}")
+                    current_app.logger.info(
+                        f"Task created successfully with ID: {issue.id}")
 
-                # Modify the message to inform AI about task creation
-                task_creation_note = f"\n[System: Task '{title}' has been created with ID: {issue.id}]"
-                message += task_creation_note
-                current_app.logger.info(
-                    f"Added task creation note to message: {task_creation_note}")
+                    # Modify the message to inform AI about task creation
+                    task_creation_note = f"\n[System: Task '{title}' has been created with ID: {issue.id}]"
+                    message += task_creation_note
+                    current_app.logger.info(
+                        f"Added task creation note to message: {task_creation_note}")
+                else:
+                    current_app.logger.error("Issue tracker is not initialized. Cannot create task.")
             except Exception as e:
                 current_app.logger.error(f"Failed to create task: {str(e)}")
                 # Continue with original message if task creation fails
@@ -103,8 +106,12 @@ class AiBotChannel:
         # Get current tasks and append them to the response
         current_app.logger.info("Retrieving current tasks from issue tracker")
         try:
-            tasks = list(self.issue_tracker.get_issues())
-            current_app.logger.info(f"Retrieved {len(tasks)} tasks from issue tracker")
+            if self.issue_tracker is not None:
+                tasks = list(self.issue_tracker.get_issues())
+                current_app.logger.info(f"Retrieved {len(tasks)} tasks from issue tracker")
+            else:
+                current_app.logger.error("Issue tracker is not initialized. Cannot retrieve tasks.")
+                tasks = []
 
             if tasks:
                 tasks_info = "\n\nCurrent Tasks:\n"
