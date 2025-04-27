@@ -2,3 +2,7 @@
 	path = external/ai_convo_client
 	url = https://github.com/amoghkr1shna/team2
 	branch = hw3
+[submodule "external/issue_tracker"]
+	path = external/issue_tracker
+	url = https://github.com/ml378/Python_Template
+	branch = hw3-revision
