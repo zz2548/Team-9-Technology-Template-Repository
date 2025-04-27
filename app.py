@@ -12,18 +12,8 @@ CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chat.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
+app.logger.setLevel(logging.INFO)
 
-if __name__ != '__main__':
-    # When running with a WSGI server
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
-else:
-    # When running directly
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
 @app.route("/")
 def home():
     return "Welcome to the Chat Client API!"

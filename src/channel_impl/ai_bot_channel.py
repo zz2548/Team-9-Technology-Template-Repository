@@ -4,6 +4,7 @@ import asyncio
 import re
 from pathlib import Path
 from typing import cast, Optional, Tuple
+from flask import current_app
 
 # add submodule path to sys.path for local dev
 current_file = Path(__file__).resolve()
@@ -16,10 +17,27 @@ sys.path.append(str(issue_tracker_path))
 from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
 from api.src.issue_tracker import MemoryIssueTrackerClient
 
+# Create a singleton for the issue tracker
+class IssueTrackerSingleton:
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            from api.src.issue_tracker import MemoryIssueTrackerClient
+            try:
+                cls._instance = MemoryIssueTrackerClient()
+                from flask import current_app
+                current_app.logger.info("Successfully initialized MemoryIssueTrackerClient")
+            except Exception as e:
+                from flask import current_app
+                current_app.logger.error(f"Failed to initialize issue tracker: {str(e)}")
+                cls._instance = None
+        return cls._instance
+
 class AiBotChannel:
     def __init__(self) -> None:
         self.client = OpenAIClient()
-        self.issue_tracker = MemoryIssueTrackerClient()
         self.conversation = self.client.create_conversation(
             title="AI Helpdesk",
             system_prompt=(
@@ -28,13 +46,15 @@ class AiBotChannel:
                "If a user asks to create a task, respond confirming the task was created."
                 )
         )
+        # Get the singleton instance
+        self.issue_tracker = IssueTrackerSingleton.get_instance()
 
     async def _ask_ai(self, message: str) -> str:
         """
         Process a message, extract task info if present, and append task list to response.
         Verbose version with detailed logging for Flask.
         """
-        from flask import current_app
+
 
         # Log the incoming message
         current_app.logger.info(f"Processing message: {message[:50]}...")
@@ -108,23 +128,39 @@ class AiBotChannel:
             # Return just the AI response if there's an error with tasks
             return response_content
 
-
-
     def _extract_task_info(self, message: str) -> Optional[Tuple[str, str]]:
         """Extract task title and description from message."""
-        # Check if message contains task creation request
+        # More flexible pattern to handle your format
         if "create a task" not in message.lower():
             return None
 
-        # Basic regex pattern to extract task details
-        # Format expected: create a task "title" "description"
-        pattern = r'create a task\s+"([^"]+)"\s+"([^"]*)"'
+        current_app.logger.info(f"Found 'create a task' in message: {message}")
+
+        # Try to match your specific format: create a task Title "Description"
+        pattern = r'create a task\s+(\S+)\s+"([^"]*)"'
         match = re.search(pattern, message, re.IGNORECASE)
 
         if match:
             title = match.group(1).strip()
             description = match.group(2).strip()
+            current_app.logger.info(
+                f"Extracted task info - Title: {title}, Description: {description}")
             return title, description
+
+        # If that doesn't match, try a more flexible pattern
+        current_app.logger.info("First pattern didn't match, trying alternative")
+        pattern = r'create a task\s+([^"\s]+)(?:\s+(.*))?'
+        match = re.search(pattern, message, re.IGNORECASE)
+
+        if match:
+            title = match.group(1).strip()
+            description = match.group(2).strip() if match.group(2) else ""
+            current_app.logger.info(
+                f"Extracted task info (alt pattern) - Title: {title}, Description: {description}")
+            return title, description
+
+        current_app.logger.warning(f"Failed to extract task info from: {message}")
+        return None
 
     def handle_message(self, message: str) -> str:
         return asyncio.run(self._ask_ai(message))
