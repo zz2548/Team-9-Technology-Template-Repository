@@ -15,7 +15,7 @@ sys.path.append(str(issue_tracker_path))
 
 
 from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
-from api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
+from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
 
 # Create a singleton for the issue tracker
 class IssueTrackerSingleton:
@@ -24,7 +24,7 @@ class IssueTrackerSingleton:
     @classmethod
     def get_instance(cls) -> Optional[MemoryIssueTrackerClient]:
         if cls._instance is None:
-            from api.src.issue_tracker import MemoryIssueTrackerClient
+            from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient
             try:
                 cls._instance = MemoryIssueTrackerClient()
                 from flask import current_app
