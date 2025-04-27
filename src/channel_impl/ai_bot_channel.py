@@ -15,7 +15,7 @@ sys.path.append(str(issue_tracker_path))
 
 
 from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
-from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
+from issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
 
 # Create a singleton for the issue tracker
 class IssueTrackerSingleton:
