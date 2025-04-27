@@ -59,7 +59,7 @@ def test_fetch_messages(test_client, setup_users_and_channel):
     assert "content" in data[0]
     assert "sender_id" in data[0]
 
-'''
+
 @pytest.fixture(scope="module")
 def setup_ai_helpdesk_channel(test_client):
     """Create a special 'ai-helpdesk' channel."""
@@ -88,7 +88,6 @@ def test_send_message_to_ai_bot(test_client, setup_users_and_channel, setup_ai_h
     assert data[0]["sender_id"] == sender_id
     assert data[1]["sender_id"] == "ai_bot"
     assert "content" in data[1]
-'''
 
 def test_start_direct_message(test_client, setup_users_and_channel):
     """Test starting a direct message (DM) channel between two users."""
