@@ -3,7 +3,7 @@
 import pytest
 import asyncio
 from unittest.mock import patch
-from src.channel_impl import IssueTrackerSingleton, AIBotChannel
+from src.channel_impl.ai_bot_channel import IssueTrackerSingleton, AIBotChannel
 
 
 class MockIssueTracker:
