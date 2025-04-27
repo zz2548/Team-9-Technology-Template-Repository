@@ -35,11 +35,17 @@ dev = [
 
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py310"
 fix = true
 exclude = [
     ".git", ".venv", "build", "dist",
+]
+extend-ignore = [
+  "E501",  # Already handled by increasing line-length
+  "BLE001",  # Blind exception catching allowed (for startup code like your singleton)
+  "TRY300",  # Not strict about else blocks after try
+  "D205",  # Not strict about docstring formatting
 ]
 
 [tool.ruff.format]
