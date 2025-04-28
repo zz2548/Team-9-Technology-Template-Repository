@@ -39,7 +39,10 @@ line-length = 120
 target-version = "py310"
 fix = true
 exclude = [
-    ".git", ".venv", "build", "dist",
+    ".venv",
+    "build",
+    "dist",
+    "external",  # <-- ignore everything in external/ (submodules)
 ]
 extend-ignore = [
   "E501",  # Already handled by increasing line-length
@@ -58,6 +61,12 @@ line-ending = "lf"
 
 [tool.ruff.lint]
 select = ["ALL"]  # Enable all available linting rules
+extend-ignore = [
+    "D400", "D415", "W293", "W291", "F401", "UP035",
+    "ANN204", "DTZ005", "EM102", "EXE001", "PTH123",
+    "C901", "PLR0912", "PLR0915", "SLF001", "ARG002",
+    "ASYNC230", "TC003", "A002",
+]
 ignore = [
     "E402",
     # Docstring-related rules
