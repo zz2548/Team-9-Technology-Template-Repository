@@ -99,7 +99,7 @@ def test_empty_channel()  -> None:
 
 
 def test_channel_service_directly():
-    """Test the service directly instead of through static methods"""
+    """Test the service directly instead of through static methods."""
     from src.channel_api import get_service
 
     service = get_service()
@@ -113,7 +113,7 @@ def test_channel_service_directly():
 
 
 def test_nonexistent_channel():
-    """Test joining a nonexistent channel"""
+    """Test joining a nonexistent channel."""
     result = Channel.join_channel("user1", "nonexistent_channel")
     assert result is True  # Your implementation always returns True
 
@@ -122,7 +122,7 @@ def test_nonexistent_channel():
 
 
 def test_channel_id_generation():
-    """Test unique ID generation for channels"""
+    """Test unique ID generation for channels."""
     chan1 = Channel.create_channel("test1")
     chan2 = Channel.create_channel("test2")
     assert chan1.get_id() != chan2.get_id()
@@ -131,7 +131,7 @@ def test_channel_id_generation():
 
 
 def test_module_initialization() -> None:
-    """Test the module initialization directly"""
+    """Test the module initialization directly."""
     # Force reload the module to test initialization
     if "src.channel_api" in sys.modules:
         del sys.modules["src.channel_api"]
@@ -146,7 +146,7 @@ def test_module_initialization() -> None:
 
 
 def test_lazy_service_directly() -> None:
-    """Test the _lazy_service function directly"""
+    """Test the _lazy_service function directly."""
     # Import it directly
     from src.channel_api import _lazy_service
 
@@ -155,7 +155,7 @@ def test_lazy_service_directly() -> None:
 
 
 def test_static_method_assignment() -> None:
-    """Test the static method assignment directly"""
+    """Test the static method assignment directly."""
     # Force reload to test assignment
     if "src.channel_api" in sys.modules:
         del sys.modules["src.channel_api"]
@@ -171,7 +171,7 @@ def test_static_method_assignment() -> None:
 
 
 def test_type_checking_branch() -> None:
-    """Test the TYPE_CHECKING branch"""
+    """Test the TYPE_CHECKING branch."""
     # We can't directly test this, but we can verify the imports work
     from typing import TYPE_CHECKING
 
@@ -181,7 +181,7 @@ def test_type_checking_branch() -> None:
 
 
 def test_service_implementation_details() -> None:
-    """Test specific details of the service implementation"""
+    """Test specific details of the service implementation."""
     service = InMemoryChannelService()
 
     # Clear channels for clean test
@@ -200,7 +200,7 @@ def test_service_implementation_details() -> None:
 
 
 def test_join_handling_edge_cases() -> None:
-    """Test edge cases in join_channel"""
+    """Test edge cases in join_channel."""
     service = InMemoryChannelService()
 
     # Clear channels for clean test
@@ -223,7 +223,7 @@ def test_join_handling_edge_cases() -> None:
 
 
 def test_list_users_edge_cases() -> None:
-    """Test edge cases for list_users"""
+    """Test edge cases for list_users."""
     # Test with empty channel
     InMemoryChannel.channels_ = {"empty": []}
     chan = InMemoryChannel("empty", "Empty Channel")
@@ -236,7 +236,7 @@ def test_list_users_edge_cases() -> None:
 
 
 def test_channel_cast_in_init() -> None:
-    """Test the Channel type cast in __init__.py"""
+    """Test the Channel type cast in __init__.py."""
     from src.channel_api import Channel
 
     # Verify it's properly casting to the right type
