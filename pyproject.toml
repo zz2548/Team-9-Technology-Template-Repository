@@ -33,6 +33,9 @@ dev = [
     "python-dotenv==1.1.0",
 ]
 
+[tool.poetry.dependencies]  # if pyproject.toml
+httpx = "<0.27"
+
 
 [tool.ruff]
 line-length = 120
