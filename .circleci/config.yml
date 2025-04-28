@@ -9,21 +9,15 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout:
-          submodules: true  # pulls the submodule repo
+          submodules: true  # pulls the submodule repos
 
       - run:
-        name: Initialize and Fix Submodules
-        command: |
-          git submodule update --init --recursive
-          cd external/ai_convo_client && git checkout hw3
-          cd ../issue_tracker && git checkout hw3-revision
-          cd ../../  # back to project root
-
-      # - run:
-      #     name: Ensure ai_convo_client is ready
-      #     command: |
-      #       mkdir -p external/ai_convo_client/ai_conversation_client
-      #       touch external/ai_convo_client/ai_conversation_client/py.typed
+          name: Initialize and Fix Submodules
+          command: |
+            git submodule update --init --recursive
+            cd external/ai_convo_client && git checkout hw3
+            cd ../issue_tracker && git checkout hw3-revision
+            cd ../../  # back to project root
 
       - run:
           name: Install uv
