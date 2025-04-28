@@ -7,45 +7,21 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 sys.modules['ai_conversation_client'] = MagicMock()
 sys.modules['ai_conversation_client.providers'] = MagicMock()
-from src.channel_impl.ai_bot_channel import IssueTrackerSingleton, AIBotChannel
-
-
-class MockIssueTracker:
-    def __init__(self) -> None:
-        self.issues = []
-        self.next_id = 1
-
-    def create_issue(self, title, description):
-        issue = type('Issue', (object,), {'id': self.next_id, 'title': title, 'description': description})()
-        self.issues.append(issue)
-        self.next_id += 1
-        return issue
-
-    def get_issues(self):
-        return self.issues
-
-
-class MockAIClient:
-    def __init__(self) -> None:
-        self.messages_sent = []
-        self.conversations = []
-
-    def create_conversation(self, _title, _system_prompt) -> object:
-        convo = type('Conversation', (object,), {'id': 'mock-id'})()
-        self.conversations.append(convo)
-        return convo
-
-    async def send_message(self, conversation_id, message):
-        self.messages_sent.append((conversation_id, message))
-        return type('Response', (object,), {'content': 'mock response'})()
-
+from src.channel_impl.ai_bot_channel import IssueTrackerSingleton, AiBotChannel
+import pytest
+from flask import Flask, current_app
 
 @pytest.fixture
-def bot():
-    with patch('src.channel_impl.IssueTrackerSingleton.get_instance', return_value=MockIssueTracker()), \
-         patch('src.channel_impl.OpenAIClient', new=MockAIClient):
-        return AIBotChannel()
+def app_context():
+    app = Flask(__name__)
+    with app.app_context():
+        yield
 
+@pytest.fixture
+def bot(app_context):
+    with patch('src.channel_impl.ai_bot_channel.IssueTrackerSingleton.get_instance', return_value=MockIssueTracker()), \
+         patch('src.channel_impl.ai_bot_channel.OpenAIClient', new=MockAIClient):
+        yield AiBotChannel()
 
 @pytest.mark.asyncio
 async def test_ask_ai_task(bot):
@@ -62,6 +38,50 @@ async def test_ask_ai_no_task(bot):
     assert bot.issue_tracker.issues == []
     assert "mock response" in result
     assert "Task" not in result
+
+class MockIssueTracker:
+    def __init__(self):
+        self.issues = []
+
+    def create_issue(self, title, description):
+        # Create a mock issue with an id
+        issue_id = len(self.issues) + 1
+        mock_issue = type('MockIssue', (),
+                          {'id': issue_id, 'title': title, 'description': description})
+        self.issues.append(mock_issue)
+        return mock_issue
+
+    def get_issues(self):
+        return self.issues
+
+
+class MockAIClient:
+    def __init__(self):
+        self.messages = []
+
+    def create_conversation(self, title=None, system_prompt=None):
+        # Create a simple mock conversation object with an id
+        mock_conversation = type('MockConversation', (), {'id': '12345'})
+        return mock_conversation
+
+    async def send_message(self, conversation_id, message):
+        self.messages.append(message)
+        # Check if this is a task creation request
+        if "create a task" in message.lower():
+            # Extract task name from the message
+            import re
+            match = re.search(r'create a task\s+(\S+)', message, re.IGNORECASE)
+            task_name = match.group(1) if match else "Unknown"
+            # Return a response that includes the task creation confirmation
+            mock_response = type('MockResponse', (), {
+                'content': f"Task '{task_name}' has been created with mock response"
+            })
+        else:
+            # Return a default mock response
+            mock_response = type('MockResponse', (), {
+                'content': "mock response"
+            })
+        return mock_response
 
 
 def test_extract_task_info_match(bot):
