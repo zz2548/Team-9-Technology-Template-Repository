@@ -247,3 +247,83 @@ def test_channel_cast_in_init() -> None:
     chan = Channel("test_id", "test_name")
     assert chan.channel_id == "test_id"
     assert chan.name == "test_name"
+
+
+def test_init_functions_directly() -> None:
+    """Test the functions in __init__.py directly, without going through Channel class."""
+    from src.channel_api import _create, _join
+
+    # Clear existing channels for a clean test
+    InMemoryChannel.channels_ = {}
+
+    # Test _create directly
+    chan = _create("direct-function-test")
+    assert chan.get_name() == "direct-function-test"
+    assert chan.get_id().startswith("chan_")
+
+    # Test _join directly
+    result = _join("direct-user", chan.get_id())
+    assert result is True
+    assert "direct-user" in chan.list_users()
+
+
+def test_service_assignment() -> None:
+    """Test that the service assignment in __init__.py works correctly."""
+    # Store the original service
+    original_service = get_service()
+
+    # Create our own service instance to test with
+    custom_service = InMemoryChannelService()
+
+    # Patch the _service directly to test get_service()
+    import src.channel_api
+    original_instance = src.channel_api._service
+    try:
+        # Replace the service instance directly
+        src.channel_api._service = custom_service
+
+        # Verify get_service returns our instance
+        result = src.channel_api.get_service()
+        assert result is custom_service
+    finally:
+        # Restore the original
+        src.channel_api._service = original_instance
+
+
+def test_double_join_to_nonexistent_channel() -> None:
+    """Test joining multiple users to a non-existent channel."""
+    # Clear channels for a clean test
+    InMemoryChannel.channels_ = {}
+
+    # Join multiple users to a non-existent channel
+    Channel.join_channel("user1", "new_channel")
+    Channel.join_channel("user2", "new_channel")
+
+    # Verify channel was created and both users joined
+    assert "new_channel" in InMemoryChannel.channels_
+    assert "user1" in InMemoryChannel.channels_["new_channel"]
+    assert "user2" in InMemoryChannel.channels_["new_channel"]
+    assert len(InMemoryChannel.channels_["new_channel"]) == 2
+
+
+def test_full_api_flow() -> None:
+    """Test a complete flow using the API functions."""
+    # Clear channels for a clean test
+    InMemoryChannel.channels_ = {}
+
+    # Create channel
+    chan = Channel.create_channel("flow-test")
+    chan_id = chan.get_id()
+
+    # Join multiple users
+    Channel.join_channel("user1", chan_id)
+    Channel.join_channel("user2", chan_id)
+
+    # Retrieve channel and verify state
+    retrieved = Channel(chan_id, "flow-test")  # Use same name here
+    users = retrieved.list_users()
+
+    assert len(users) == 2
+    assert "user1" in users
+    assert "user2" in users
+    assert retrieved.get_name() == "flow-test"
