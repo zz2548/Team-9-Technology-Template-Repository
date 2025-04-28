@@ -8,6 +8,7 @@ It provides RESTful APIs for:
 - Sending and fetching messages
 - Direct messaging between two users
 - **AI chatbot integration** powered by the external `ai_convo_client` module using GIT Submodules
+- **Issuer tracker integration** powered by the external `issuer_tracker` module using GIT Submodules
 
 
 # Features
@@ -22,6 +23,13 @@ It provides RESTful APIs for:
 - **Chat with AI bot** in dedicated `ai-helpdesk` channel
 - **Persistent database** using SQLite
 
+# Cloning the project
+```bash
+git clone https://github.com/zz2548/Team-9-Technology-Template-Repository.git
+
+git submodule update --init --recursive
+
+```
 
 # Running the Server
 
@@ -43,6 +51,25 @@ python app.py
 
 Server will run at: `http://127.0.0.1:5000/`
 
+# Frontend UI
+The UI provides a user-friendly interface for:
+- Registering and logging in users
+- Creating and joining channels
+- Sending and receiving messages
+- Chatting with the AI bot in the ai-helpdesk channel
+
+## Screenshot
+![Image](https://github.com/user-attachments/assets/d8dc4713-30ad-4007-a9d7-2c03f3064cde)
+
+# Integration Tests
+Integration tests are located under the tests/integration/ directory.
+Tested scenarios include:
+
+- User registration and login flows
+- Channel creation and joining
+- Sending and receiving messages
+- AI bot interaction through ai-helpdesk channel
+- Direct messaging between two users
 
 # API Endpoints 
 
