@@ -24,7 +24,7 @@ class IssueTrackerSingleton:
     @classmethod
     def get_instance(cls) -> Optional[MemoryIssueTrackerClient]:
         if cls._instance is None:
-            from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient
+            from issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient
             try:
                 cls._instance = MemoryIssueTrackerClient()
                 from flask import current_app
