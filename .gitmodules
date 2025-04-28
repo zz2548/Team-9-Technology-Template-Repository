@@ -1,8 +1,8 @@
 [submodule "external/ai_convo_client"]
 	path = external/ai_convo_client
-	url = https://github.com/amoghkr1shna/team2
+	url = https://github.com/jinglinstella/team2.git
 	branch = hw3
 [submodule "external/issue_tracker"]
 	path = external/issue_tracker
-	url = https://github.com/ml378/Python_Template
-	branch = hw3-revision
+	url = https://github.com/jinglinstella/Python_Template.git
+	branch = hw4-jt3-fix-path
