@@ -47,7 +47,8 @@ extend-ignore = [
   "TRY300",  # Not strict about else blocks after try
   "D205",  # Not strict about docstring formatting
   "TRY400",
-  "G004"
+  "G004",
+  "RET504"
 ]
 
 [tool.ruff.format]
