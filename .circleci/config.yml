@@ -16,7 +16,7 @@ jobs:
           command: |
             git submodule update --init --recursive
             cd external/ai_convo_client && git checkout hw3
-            cd ../issue_tracker && git checkout hw3-revision
+            cd ../issue_tracker && git checkout hw4-jt3-fix-path
             cd ../../  # back to project root
 
       - run:
