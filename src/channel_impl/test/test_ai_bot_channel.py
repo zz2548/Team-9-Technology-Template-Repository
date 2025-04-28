@@ -1,4 +1,5 @@
-# ruff: noqa: SLF001
+# ruff: noqa: SLF001, ARG002
+# ARG 002 since the unused parameters are expected in a mock class
 
 import pytest
 import asyncio
@@ -40,7 +41,7 @@ async def test_ask_ai_no_task(bot):
     assert "Task" not in result
 
 class MockIssueTracker:
-    def __init__(self):
+    def __init__(self) -> None:
         self.issues = []
 
     def create_issue(self, title, description):
@@ -56,13 +57,12 @@ class MockIssueTracker:
 
 
 class MockAIClient:
-    def __init__(self):
+    def __init__(self) -> None:
         self.messages = []
 
     def create_conversation(self, title=None, system_prompt=None):
         # Create a simple mock conversation object with an id
-        mock_conversation = type('MockConversation', (), {'id': '12345'})
-        return mock_conversation
+        return type('MockConversation', (), {'id': '12345'})
 
     async def send_message(self, conversation_id, message):
         self.messages.append(message)
