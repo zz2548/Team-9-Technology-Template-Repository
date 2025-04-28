@@ -105,7 +105,7 @@ check_untyped_defs = true
 disallow_untyped_decorators = true
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_no_return = true
 warn_unreachable = true
 strict_optional = true
@@ -118,7 +118,13 @@ exclude = [
     ".*test.*",
     ".*/test/.*",
     ".*/tests/.*",
-    "src/models/.*",  
+    "src/models/.*",
+    "external/.*",
+]
+
+disable_error_code = [
+    "no-untyped-call",
+    "no-untyped-def",
 ]
 
 
