@@ -34,8 +34,8 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client" >> $BASH_ENV
-            echo "export MYPYPATH=$PWD/external/ai_convo_client" >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
+            echo "export MYPYPATH=$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
