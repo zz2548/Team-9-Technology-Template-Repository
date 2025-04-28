@@ -142,7 +142,8 @@ def test_module_initialization() -> None:
     # Verify the initialization worked
     assert isinstance(src.channel_api.Channel, type)
     assert issubclass(src.channel_api.Channel, ChannelEntity)
-    assert isinstance(src.channel_api._service, ChannelService)
+    # Use get_service() instead of accessing private _service
+    assert isinstance(get_service(), ChannelService)
 
 
 def test_lazy_service_directly() -> None:
@@ -160,14 +161,13 @@ def test_static_method_assignment() -> None:
     if "src.channel_api" in sys.modules:
         del sys.modules["src.channel_api"]
 
-    # Use patch to detect the assignment
-    with patch.object(Channel, 'create_channel', None) as mock_create:
-        with patch.object(Channel, 'join_channel', None) as mock_join:
-            import src.channel_api
+    # Use combined with statement without unused variables
+    with patch.object(Channel, 'create_channel', None), patch.object(Channel, 'join_channel', None):
+        import src.channel_api
 
-            # Verify the methods were assigned
-            assert Channel.create_channel is not None
-            assert Channel.join_channel is not None
+        # Verify the methods were assigned
+        assert Channel.create_channel is not None
+        assert Channel.join_channel is not None
 
 
 def test_type_checking_branch() -> None:
