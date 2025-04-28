@@ -1,5 +1,5 @@
-# ruff: noqa: SLF001, ARG002
-# ARG 002 since the unused parameters are expected in a mock class
+# ruff: noqa: SLF001, ARG001, ARG002
+# ARG001 and ARG002 since the unused parameters are expected in a mock class
 
 import pytest
 import asyncio
