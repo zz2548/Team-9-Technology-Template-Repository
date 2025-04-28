@@ -64,10 +64,7 @@ def test_fetch_messages(test_client, setup_users_and_channel):
 def setup_ai_helpdesk_channel(test_client):
     """Create a special 'ai-helpdesk' channel."""
     ai_channel_resp = test_client.post("/channel", json={"name": "ai-helpdesk"})
-    ai_channel_id = ai_channel_resp.get_json()["channel_id"]
-
-    return ai_channel_id
-
+    return ai_channel_resp.get_json()["channel_id"]
 
 def test_send_message_to_ai_bot(test_client, setup_users_and_channel, setup_ai_helpdesk_channel):
     """Test sending a message to 'ai-helpdesk' and receiving an AI bot reply."""
