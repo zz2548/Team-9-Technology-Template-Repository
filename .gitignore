@@ -39,3 +39,6 @@ debug.log
 *.swo
 *.swn
 test-results/unit/calculator.xml
+
+.env
+test-results/calculator_unit.xml

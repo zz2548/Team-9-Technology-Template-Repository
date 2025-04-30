@@ -8,7 +8,14 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
-      - checkout
+      - checkout:
+          submodules: true  # pulls the submodule repo
+
+      - run:
+          name: Ensure ai_convo_client is ready
+          command: |
+            mkdir -p external/ai_convo_client/ai_conversation_client
+            touch external/ai_convo_client/ai_conversation_client/py.typed
 
       - run:
           name: Install uv
@@ -19,7 +26,8 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src" >> $BASH_ENV
+            echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client" >> $BASH_ENV
+            echo "export MYPYPATH=$PWD/external/ai_convo_client" >> $BASH_ENV
             source .venv/bin/activate
 
       - run:
@@ -37,7 +45,6 @@ jobs:
           name: Run All Tests with pytest
           command: |
             mkdir -p test-results
-            # Run all tests with coverage in one command
             pytest \
               src/ \
               tests/ \
