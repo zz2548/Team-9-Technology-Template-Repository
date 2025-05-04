@@ -8,34 +8,31 @@ jobs:
     docker:
       - image: cimg/python:3.10
     environment:
-      OPENAI_API_KEY: "fake-key-for-testing"
-      FLASK_ENV: "testing"
-      PYTHONUNBUFFERED: "1"
+      OPENAI_API_KEY: "fake-key-for-testing"   # <--- ADD THIS
     steps:
       - checkout:
-          path: ~/project
+          submodules: true  # pulls the submodule repos
 
       - run:
-          name: Update Git Submodules
+          name: Initialize and Fix Submodules
           command: |
             git submodule update --init --recursive
             cd external/ai_convo_client && git checkout hw3
             cd ../issue_tracker && git checkout hw4-jt3-fix-path
-            cd ../../
+            cd ../../  # back to project root
 
       - run:
           name: Install uv
           command: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-      - python/setup:
-          pkg-manager: uv
-
       - run:
-          name: Set Environment Variables
+          name: Create and Activate Virtual Environment
           command: |
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
+            uv venv .venv
+            echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
             echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
             echo "export MYPYPATH=$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
+            source .venv/bin/activate
 
       - run:
           name: Install Dependencies
@@ -49,22 +46,10 @@ jobs:
             ruff check . --config pyproject.toml
 
       - run:
-          name: Initialize Test Database with Flask CLI
-          command: |
-            export FLASK_APP=app.py
-            export DB_TYPE=sqlite
-            export DB_PATH=test.db
-            
-            # Initialize database using app's CLI commands
-            echo y | flask drop-db
-            flask init-db
-            flask seed-ai-bot
-
-      - run:
           name: Run All Tests with pytest
           command: |
             mkdir -p test-results
-            python -m pytest \
+            pytest \
               src/ \
               tests/ \
               --cov=src \
