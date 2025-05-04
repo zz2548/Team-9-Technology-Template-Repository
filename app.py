@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from src.models import db
 from src.models.channel_model import ChannelModel
 from src.models.message_model import MessageModel
@@ -10,24 +10,29 @@ import click
 from flask.cli import with_appcontext
 from flask_cors import CORS
 from dotenv import load_dotenv
+from typing import Dict, List, Union, Optional, Any, Tuple, cast
 
 # Load environment variables from .env file
 load_dotenv()
 
 
-def create_app():
+def create_app() -> Flask:
     """
     Create and configure the Flask application.
 
+    This function sets up the Flask application with all necessary configurations
+    including database connection, CORS, environment variables, and feature flags.
+    It also registers CLI commands for database management.
+
     Returns:
-        Flask: The configured Flask application.
+        Flask: The configured Flask application ready for use.
     """
     app = Flask(__name__)
     CORS(app)
 
     # Database Configuration from environment variables
-    db_type = os.getenv("DB_TYPE", "sqlite")
-    db_path = os.getenv("DB_PATH", "chat.db")
+    db_type: str = os.getenv("DB_TYPE", "sqlite")
+    db_path: str = os.getenv("DB_PATH", "chat.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"{db_type}:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = os.getenv(
         'SQLALCHEMY_TRACK_MODIFICATIONS', 'False').lower() == 'true'
@@ -59,16 +64,26 @@ def create_app():
 
 @click.command('init-db')
 @with_appcontext
-def init_db_command():
-    """Initialize the database tables."""
+def init_db_command() -> None:
+    """
+    Initialize the database tables.
+
+    This command creates all tables defined in the models.
+    It's safe to run this command even if tables already exist.
+    """
     db.create_all()
     click.echo('Initialized the database.')
 
 
 @click.command('drop-db')
 @with_appcontext
-def drop_db_command():
-    """Drop all database tables."""
+def drop_db_command() -> None:
+    """
+    Drop all database tables.
+
+    This command removes all tables and data from the database.
+    It requires confirmation before proceeding to prevent accidental data loss.
+    """
     if click.confirm('Are you sure you want to drop all tables?'):
         db.drop_all()
         click.echo('Dropped all tables.')
@@ -76,8 +91,13 @@ def drop_db_command():
 
 @click.command('seed-ai-bot')
 @with_appcontext
-def seed_ai_bot_command():
-    """Create the AI bot user if it doesn't exist."""
+def seed_ai_bot_command() -> None:
+    """
+    Create the AI bot user if it doesn't exist.
+
+    This command checks if the AI bot user exists and creates it if not.
+    The AI bot user is used for automated responses in the AI helpdesk channel.
+    """
     if not db.session.get(UserModel, "ai_bot"):
         bot_user = UserModel(id="ai_bot", username="ai_bot")
         db.session.add(bot_user)
@@ -91,18 +111,36 @@ app = create_app()
 
 
 @app.route("/")
-def home():
+def home() -> str:
+    """
+    Serve the home page of the API.
+
+    Returns:
+        str: A welcome message for the API.
+    """
     return "Welcome to the Chat Client API!"
 
 
 # --------------------- User Endpoints ---------------------
 
 @app.route("/register", methods=["POST"])
-def register():
-    data = request.get_json()
-    username = data.get("username")
+def register() -> Tuple[Response, int]:
+    """
+    Register a new user in the system.
 
-    existing_user = UserModel.query.filter_by(username=username).first()
+    Expects a JSON payload with a 'username' field.
+    Checks if the username is already taken before creating a new user.
+
+    Returns:
+        tuple: A JSON response with user details and HTTP status code.
+               Success: ({"user_id": id, "username": username}, 200)
+               Error: ({"error": message}, error_code)
+    """
+    data: Dict[str, Any] = request.get_json()
+    username: str = data.get("username")
+
+    existing_user: Optional[UserModel] = UserModel.query.filter_by(
+        username=username).first()
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
 
@@ -110,63 +148,118 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"user_id": new_user.id, "username": new_user.username})
+    return jsonify({"user_id": new_user.id, "username": new_user.username}), 200
 
 
 @app.route("/login", methods=["POST"])
-def login():
-    data = request.get_json()
-    username = data.get("username")
+def login() -> Tuple[Response, int]:
+    """
+    Log in an existing user.
 
-    user = UserModel.query.filter_by(username=username).first()
+    Expects a JSON payload with a 'username' field.
+    Verifies the user exists in the system.
+
+    Returns:
+        tuple: A JSON response with user details and HTTP status code.
+               Success: ({"user_id": id, "username": username}, 200)
+               Error: ({"error": message}, error_code)
+    """
+    data: Dict[str, Any] = request.get_json()
+    username: str = data.get("username")
+
+    user: Optional[UserModel] = UserModel.query.filter_by(username=username).first()
     if not user:
         return jsonify({"error": "User does not exist"}), 404
 
-    return jsonify({"user_id": user.id, "username": user.username})
+    return jsonify({"user_id": user.id, "username": user.username}), 200
 
 
 # --------------------- Channel Endpoints ---------------------
 
 @app.route("/channel", methods=["POST"])
-def create_channel():
-    data = request.get_json()
-    name = data.get("name")
+def create_channel() -> Tuple[Response, int]:
+    """
+    Create a new chat channel.
+
+    Expects a JSON payload with a 'name' field for the channel name.
+
+    Returns:
+        tuple: A JSON response with channel details and HTTP status code.
+               Success: ({"channel_id": id, "name": name}, 200)
+    """
+    data: Dict[str, Any] = request.get_json()
+    name: str = data.get("name")
 
     new_channel = ChannelModel(id=str(uuid.uuid4()), name=name)
     db.session.add(new_channel)
     db.session.commit()
 
-    return jsonify({"channel_id": new_channel.id, "name": new_channel.name})
+    return jsonify({"channel_id": new_channel.id, "name": new_channel.name}), 200
 
 
 @app.route("/channel/join", methods=["POST"])
-def join_channel():
-    data = request.get_json()
-    user_id = data.get("user_id")
-    channel_id = data.get("channel_id")
+def join_channel() -> Tuple[Response, int]:
+    """
+    Join a user to a channel.
 
-    user = db.session.get(UserModel, user_id)
+    Expects a JSON payload with 'user_id' and 'channel_id' fields.
+    Validates that both the user and channel exist before joining.
+
+    Note: This is a placeholder implementation. The actual join functionality
+    needs to be implemented with a proper join table.
+
+    Returns:
+        tuple: A JSON response with join status and HTTP status code.
+               Success: ({"joined": True}, 200)
+               Error: ({"error": message}, error_code)
+    """
+    data: Dict[str, Any] = request.get_json()
+    user_id: str = data.get("user_id")
+    channel_id: str = data.get("channel_id")
+
+    user: Optional[UserModel] = db.session.get(UserModel, user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    channel = db.session.get(ChannelModel, channel_id)
+    channel: Optional[ChannelModel] = db.session.get(ChannelModel, channel_id)
     if not channel:
         return jsonify({"error": "Channel not found"}), 404
 
     # TODO: Implement join table
-    return jsonify({"joined": True})
+    return jsonify({"joined": True}), 200
 
 
 @app.route("/channel/<channel_id>/users", methods=["GET"])
-def list_channel_users(channel_id):
-    messages = MessageModel.query.filter_by(channel_id=channel_id).all()
-    user_ids = list({msg.sender_id for msg in messages})
+def list_channel_users(channel_id: str) -> Response:
+    """
+    List all users who have sent messages in a channel.
+
+    Note: This implementation only returns users who have sent messages.
+    A complete implementation would return all users who have joined the channel.
+
+    Args:
+        channel_id (str): The ID of the channel to list users for.
+
+    Returns:
+        Response: A JSON response with a list of user IDs.
+                 Format: {"users": [user_id1, user_id2, ...]}
+    """
+    messages: List[MessageModel] = MessageModel.query.filter_by(
+        channel_id=channel_id).all()
+    user_ids: List[str] = list({msg.sender_id for msg in messages})
     return jsonify({"users": user_ids})
 
 
 @app.route("/channels", methods=["GET"])
-def list_channels():
-    channels = ChannelModel.query.all()
+def list_channels() -> Response:
+    """
+    List all available channels.
+
+    Returns:
+        Response: A JSON response with a list of channel details.
+                 Format: [{"channel_id": id1, "name": name1}, ...]
+    """
+    channels: List[ChannelModel] = ChannelModel.query.all()
     return jsonify([{
         "channel_id": channel.id,
         "name": channel.name
@@ -176,11 +269,22 @@ def list_channels():
 # --------------------- Message Endpoints ---------------------
 
 @app.route("/message", methods=["POST"])
-def send_message():
-    data = request.get_json()
-    sender_id = data.get("sender_id")
-    channel_id = data.get("channel_id")
-    content = data.get("content")
+def send_message() -> Response:
+    """
+    Send a message to a channel.
+
+    Expects a JSON payload with 'sender_id', 'channel_id', and 'content' fields.
+    If the channel is the AI helpdesk channel and AI bot is enabled,
+    it will also generate and return an AI response.
+
+    Returns:
+        Response: A JSON response with message details, and AI response if applicable.
+                 Format: [{"message_id": id, "sender_id": sender, ...}, ...]
+    """
+    data: Dict[str, Any] = request.get_json()
+    sender_id: str = data.get("sender_id")
+    channel_id: str = data.get("channel_id")
+    content: str = data.get("content")
 
     new_message = MessageModel(
         id=str(uuid.uuid4()),
@@ -191,22 +295,23 @@ def send_message():
     db.session.add(new_message)
     db.session.commit()
 
-    response_payload = [{
+    response_payload: List[Dict[str, str]] = [{
         "message_id": new_message.id,
         "sender_id": new_message.sender_id,
         "channel_id": new_message.channel_id,
         "content": new_message.content,
     }]
 
-    channel = db.session.get(ChannelModel, channel_id)
+    channel: Optional[ChannelModel] = db.session.get(ChannelModel, channel_id)
 
     if (channel and
             channel.name == app.config['AI_BOT_CHANNEL_NAME'] and
             app.config['ENABLE_AI_BOT']):
         try:
+            # Lazy import of AiBotChannel to handle potential missing dependency
             from src.channel_impl.ai_bot_channel import AiBotChannel
             ai_bot = AiBotChannel()
-            ai_response = ai_bot.handle_message(content)
+            ai_response: str = ai_bot.handle_message(content)
 
             bot_message = MessageModel(
                 id=str(uuid.uuid4()),
@@ -232,8 +337,19 @@ def send_message():
 
 
 @app.route("/message/<channel_id>", methods=["GET"])
-def fetch_messages(channel_id):
-    messages = MessageModel.query.filter_by(channel_id=channel_id).all()
+def fetch_messages(channel_id: str) -> Response:
+    """
+    Fetch all messages from a specific channel.
+
+    Args:
+        channel_id (str): The ID of the channel to fetch messages from.
+
+    Returns:
+        Response: A JSON response with a list of message details.
+                 Format: [{"message_id": id, "sender_id": sender, "content": text}, ...]
+    """
+    messages: List[MessageModel] = MessageModel.query.filter_by(
+        channel_id=channel_id).all()
     return jsonify([{
         "message_id": m.id,
         "sender_id": m.sender_id,
@@ -244,16 +360,30 @@ def fetch_messages(channel_id):
 # --------------------- Direct Messages ---------------------
 
 @app.route("/start_dm", methods=["POST"])
-def start_direct_message():
-    data = request.get_json()
-    sender_id = data["sender_id"]
-    receiver_id = data["receiver_id"]
+def start_direct_message() -> Response:
+    """
+    Start or retrieve a direct message channel between two users.
+
+    Expects a JSON payload with 'sender_id' and 'receiver_id' fields.
+    Creates a new DM channel if one doesn't exist, or returns the existing one.
+
+    The channel name is created by sorting the user IDs to ensure uniqueness
+    regardless of which user initiates the conversation.
+
+    Returns:
+        Response: A JSON response with the channel ID.
+                 Format: {"channel_id": id}
+    """
+    data: Dict[str, Any] = request.get_json()
+    sender_id: str = data["sender_id"]
+    receiver_id: str = data["receiver_id"]
 
     # Sort user IDs to ensure consistent channel naming
-    user_ids = sorted([sender_id, receiver_id])
-    channel_name = f"dm_{user_ids[0]}_{user_ids[1]}"
+    user_ids: List[str] = sorted([sender_id, receiver_id])
+    channel_name: str = f"dm_{user_ids[0]}_{user_ids[1]}"
 
-    existing_channel = ChannelModel.query.filter_by(name=channel_name).first()
+    existing_channel: Optional[ChannelModel] = ChannelModel.query.filter_by(
+        name=channel_name).first()
 
     if not existing_channel:
         channel = ChannelModel(id=str(uuid.uuid4()), name=channel_name)
