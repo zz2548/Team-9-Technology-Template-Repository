@@ -10,6 +10,7 @@ import uuid
 import logging
 import os
 import click
+import datetime
 from flask.cli import with_appcontext
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, logout_user, login_required, \
@@ -213,7 +214,7 @@ def home() -> str:
 # --------------------- User Endpoints ---------------------
 
 @app.route("/register", methods=["POST"])
-def register():
+def register() -> Tuple[Response, int]:
     """
     Register a new user with enhanced error logging.
     """
@@ -287,7 +288,7 @@ def register():
 
 
 @app.route("/login", methods=["POST"])
-def login():
+def login() -> Tuple[Response, int]:
     """
     Log in an existing user with detailed error logging.
     """
@@ -353,7 +354,7 @@ def login():
 
 
 @app.route("/logout", methods=["POST"])
-def logout():
+def logout() -> Tuple[Response, int]:
     """
     Log out the current user.
     Supports both session and token authentication.
@@ -435,7 +436,7 @@ def get_user_profile(current_user):
 # --------------------- Channel Endpoints ---------------------
 
 @app.route("/channel", methods=["POST"])
-def create_channel():
+def create_channel() -> Tuple[Response, int]:
     """
     Create a new chat channel.
     Supports both session and token authentication.
@@ -468,7 +469,7 @@ def create_channel():
 
 
 @app.route("/channel/join", methods=["POST"])
-def join_channel():
+def join_channel() -> Tuple[Response, int]:
     """
     Join a user to a channel.
     Supports both session and token authentication.
@@ -519,7 +520,7 @@ def join_channel():
 
 
 @app.route("/channel/<channel_id>/users", methods=["GET"])
-def list_channel_users(channel_id: str):
+def list_channel_users(channel_id: str) -> Tuple[Response, int]:
     """
     List all users who have joined a channel.
     Supports both session and token authentication.
@@ -579,7 +580,7 @@ def list_channels():
 # --------------------- Message Endpoints ---------------------
 
 @app.route("/message", methods=["POST"])
-def send_message():
+def send_message() -> Tuple[Response, int]:
     """
     Send a message to a channel.
     Supports both session and token authentication.
@@ -660,7 +661,7 @@ def send_message():
 
 
 @app.route("/message/<channel_id>", methods=["GET"])
-def fetch_messages(channel_id: str):
+def fetch_messages(channel_id: str) -> Tuple[Response, int]:
     """
     Fetch all messages from a specific channel.
     Supports both session and token authentication.
@@ -690,7 +691,7 @@ def fetch_messages(channel_id: str):
 # --------------------- Direct Messages ---------------------
 
 @app.route("/start_dm", methods=["POST"])
-def start_direct_message():
+def start_direct_message() -> Tuple[Response, int]:
     """
     Start or retrieve a direct message channel between two users.
     Supports both session and token authentication.
@@ -738,41 +739,41 @@ def start_direct_message():
 
 # ------------------ Flask Error Handlers ------------------
 @login_manager.unauthorized_handler
-def unauthorized():
+def unauthorized() -> Tuple[Response, int]:
     """Custom handler for unauthorized requests"""
     return jsonify({"error": "Authentication required"}), 401
 
 
 @app.errorhandler(400)
-def bad_request(error):
+def bad_request(error) -> Tuple[Response, int]:
     """Handles HTTP 400 Bad Request errors."""
     app.logger.warning(f"400 Bad Request: {str(error)}")
     return jsonify({"error": "Bad request", "message": str(error)}), 400
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error) -> Tuple[Response, int]:
     """Handles HTTP 404 Not Found errors."""
     app.logger.warning(f"404 Not Found: {str(error)}")
     return jsonify({"error": "Not found", "message": str(error)}), 404
 
 
 @app.errorhandler(500)
-def internal_server_error(error):
+def internal_server_error(error) -> Tuple[Response, int]:
     """Handles HTTP 500 Internal Server errors."""
     app.logger.error(f"500 Internal Server Error: {str(error)}")
     return jsonify({"error": "Internal server error"}), 500
 
 
 @app.errorhandler(Exception)
-def unhandled_exception(error):
+def unhandled_exception(error) -> Tuple[Response, int]:
     """Catches and handles uncaught exceptions."""
     app.logger.exception(f"Unhandled Exception: {str(error)}")
     return jsonify({"error": "An unexpected error occurred"}), 500
 
 
 @app.route("/test-auth", methods=["GET"])
-def test_auth():
+def test_auth() -> Tuple[Response, int]:
     """
     Simple endpoint to test if authentication is working.
     Returns different responses for authenticated and unauthenticated requests.

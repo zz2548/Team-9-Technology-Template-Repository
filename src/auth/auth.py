@@ -10,6 +10,7 @@ from functools import wraps
 from flask import request, jsonify, current_app
 from src.models.user_model import UserModel
 from src.models import db
+from typing import Callable, Any, TypeVar, cast
 
 # Secret key for JWT encoding/decoding - in production, store this in environment variables
 JWT_SECRET = os.getenv('JWT_SECRET', 'your-secret-key-should-be-stored-in-env-var')
@@ -17,7 +18,7 @@ JWT_SECRET = os.getenv('JWT_SECRET', 'your-secret-key-should-be-stored-in-env-va
 TOKEN_EXPIRATION = int(os.getenv('TOKEN_EXPIRATION', '1440'))  # Default 24 hours
 
 
-def generate_token(user_id):
+def generate_token(user_id) -> str:
     """
     Generate a JWT token for user authentication.
 
@@ -30,9 +31,9 @@ def generate_token(user_id):
     try:
         # Create the token payload
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(
+            'exp': datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(
                 minutes=TOKEN_EXPIRATION),
-            'iat': datetime.datetime.utcnow(),
+            'iat': datetime.datetime.now(tz=datetime.timezone.utc),
             'sub': user_id
         }
 
@@ -46,7 +47,7 @@ def generate_token(user_id):
         return str(e)
 
 
-def decode_token(token):
+def decode_token(token) -> dict | None:
     """
     Decode and validate a JWT token.
 
@@ -54,7 +55,7 @@ def decode_token(token):
         token (str): The JWT token to decode
 
     Returns:
-        dict: The decoded token payload, or None if invalid
+        dict | None: The decoded token payload, or None if invalid
     """
     try:
         payload = jwt.decode(
@@ -69,7 +70,10 @@ def decode_token(token):
         return None
 
 
-def token_required(f):
+# Define a TypeVar for the return type of the decorated function
+F = TypeVar('F', bound=Callable[..., Any])
+
+def token_required(f: F) -> F:
     """
     Decorator for routes that require token authentication.
 
@@ -84,7 +88,7 @@ def token_required(f):
     """
 
     @wraps(f)
-    def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs) -> Any:
         token = None
         auth_header = request.headers.get('Authorization')
 
@@ -125,4 +129,4 @@ def token_required(f):
 
         return f(current_user, *args, **kwargs)
 
-    return decorated
+    return cast(F, decorated)

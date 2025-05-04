@@ -80,6 +80,7 @@ ignore = [
     "D103", # Missing docstring in public function
     "D104", # Missing docstring in public package
     "D107", # Missing docstring in __init__
+    "D200", # Allow longer docstrings
     "D203", # One blank line required before class docstring
     "D212", # Multi-line docstring summary should start at the first line
 
@@ -90,6 +91,7 @@ ignore = [
     "TRY003", # Avoid specifying long messages outside exception class
     "EM101", # Exception must not use a string literal, assign to variable first
     "PLR0913", # Allow more than 5 arguments for functions
+    "PLR0911", # Allow more return statements
 
 
     # TODO-related rules

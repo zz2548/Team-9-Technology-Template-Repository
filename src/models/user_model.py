@@ -25,19 +25,19 @@ class UserModel(db.Model, UserMixin):
         if password:
             self.set_password(password)
 
-    def set_password(self, password):
+    def set_password(self, password) -> None:
         """Hash and store the user's password."""
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password) -> bool:
         """Verify the provided password matches the stored hash."""
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
 
-    def get_id(self):
+    def get_id(self) -> str:
         """Required by Flask-Login, returns the user's ID as a string."""
         return self.id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<User {self.username}>"
