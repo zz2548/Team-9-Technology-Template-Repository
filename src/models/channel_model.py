@@ -6,3 +6,8 @@ class ChannelModel(db.Model):
     __tablename__ = "channels"
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    users = db.relationship(
+        "UserModel",
+        secondary="channel_users",
+        back_populates="channels"
+    )

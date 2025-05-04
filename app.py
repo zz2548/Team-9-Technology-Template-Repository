@@ -3,6 +3,7 @@ from src.models import db
 from src.models.channel_model import ChannelModel
 from src.models.message_model import MessageModel
 from src.models.user_model import UserModel
+from src.models.channel_user_model import ChannelUserModel
 import uuid
 import logging
 import os
@@ -197,6 +198,11 @@ def create_channel() -> Tuple[Response, int]:
     return jsonify({"channel_id": new_channel.id, "name": new_channel.name}), 200
 
 
+"""
+Replace the existing join_channel function with this implementation.
+"""
+
+
 @app.route("/channel/join", methods=["POST"])
 def join_channel() -> Tuple[Response, int]:
     """
@@ -204,9 +210,7 @@ def join_channel() -> Tuple[Response, int]:
 
     Expects a JSON payload with 'user_id' and 'channel_id' fields.
     Validates that both the user and channel exist before joining.
-
-    Note: This is a placeholder implementation. The actual join functionality
-    needs to be implemented with a proper join table.
+    Creates a record in the channel_users table to represent the membership.
 
     Returns:
         tuple: A JSON response with join status and HTTP status code.
@@ -217,25 +221,47 @@ def join_channel() -> Tuple[Response, int]:
     user_id: str = data.get("user_id")
     channel_id: str = data.get("channel_id")
 
+    # Validate user exists
     user: Optional[UserModel] = db.session.get(UserModel, user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
+    # Validate channel exists
     channel: Optional[ChannelModel] = db.session.get(ChannelModel, channel_id)
     if not channel:
         return jsonify({"error": "Channel not found"}), 404
 
-    # TODO: Implement join table
-    return jsonify({"joined": True}), 200
+    # Check if user is already a member
+    existing_membership = ChannelUserModel.query.filter_by(
+        user_id=user_id,
+        channel_id=channel_id
+    ).first()
+
+    if existing_membership:
+        return jsonify(
+            {"joined": True, "message": "User already joined this channel"}), 200
+
+    # Create new membership
+    membership = ChannelUserModel(user_id=user_id, channel_id=channel_id)
+    db.session.add(membership)
+
+    try:
+        db.session.commit()
+        return jsonify({"joined": True}), 200
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error joining channel: {str(e)}")
+        return jsonify({"error": "Failed to join channel due to a server error"}), 500
 
 
 @app.route("/channel/<channel_id>/users", methods=["GET"])
 def list_channel_users(channel_id: str) -> Response:
     """
-    List all users who have sent messages in a channel.
+    List all users who have joined a channel.
 
-    Note: This implementation only returns users who have sent messages.
-    A complete implementation would return all users who have joined the channel.
+    This implementation returns all users who have explicitly joined the channel
+    through the join_channel endpoint, addressing the incomplete feature noted
+    in the PR feedback.
 
     Args:
         channel_id (str): The ID of the channel to list users for.
@@ -244,9 +270,15 @@ def list_channel_users(channel_id: str) -> Response:
         Response: A JSON response with a list of user IDs.
                  Format: {"users": [user_id1, user_id2, ...]}
     """
-    messages: List[MessageModel] = MessageModel.query.filter_by(
-        channel_id=channel_id).all()
-    user_ids: List[str] = list({msg.sender_id for msg in messages})
+    # Check if channel exists
+    channel: Optional[ChannelModel] = db.session.get(ChannelModel, channel_id)
+    if not channel:
+        return jsonify({"error": "Channel not found"}), 404
+
+    # Get all user IDs from the channel_users table
+    memberships = ChannelUserModel.query.filter_by(channel_id=channel_id).all()
+    user_ids: List[str] = [membership.user_id for membership in memberships]
+
     return jsonify({"users": user_ids})
 
 
