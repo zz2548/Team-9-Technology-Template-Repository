@@ -220,11 +220,6 @@ def create_channel() -> Tuple[Response, int]:
     return jsonify({"channel_id": new_channel.id, "name": new_channel.name}), 200
 
 
-"""
-Replace the existing join_channel function with this implementation.
-"""
-
-
 @app.route("/channel/join", methods=["POST"])
 def join_channel() -> Tuple[Response, int]:
     """
