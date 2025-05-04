@@ -454,5 +454,35 @@ def start_direct_message() -> Response:
     return jsonify({"channel_id": channel.id})
 
 
+# ------------------ Flask Error Handlers ------------------
+
+@app.errorhandler(400)
+def bad_request(error):
+    """Handles HTTP 400 Bad Request errors."""
+    app.logger.warning(f"400 Bad Request: {str(error)}")
+    return jsonify({"error": "Bad request", "message": str(error)}), 400
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handles HTTP 404 Not Found errors.""" 
+    app.logger.warning(f"404 Not Found: {str(error)}")
+    return jsonify({"error": "Not found", "message": str(error)}), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    """Handles HTTP 500 Internal Server errors."""
+    app.logger.error(f"500 Internal Server Error: {str(error)}")
+    return jsonify({"error": "Internal server error"}), 500
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(error):
+    """Catches and handles uncaught exceptions.""" 
+    app.logger.exception(f"Unhandled Exception: {str(error)}")
+    return jsonify({"error": "An unexpected error occurred"}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=app.config['DEBUG'])
