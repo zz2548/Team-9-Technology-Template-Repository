@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat Client</title>
+    <title>Chat Client</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,6 +95,11 @@
             background-color: #0056b3;
         }
 
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
         input, select {
             padding: 8px;
             margin-bottom: 10px;
@@ -157,28 +162,65 @@
         .success-message {
             color: #28a745;
         }
+
+        .debug-panel {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .debug-log {
+            height: 100px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            background-color: #000;
+            color: #0f0;
+            padding: 8px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
-<h1>Simple Chat Client</h1>
+<h1>Chat Client</h1>
 
 <div class="container">
     <!-- User Panel -->
     <div class="panel">
         <h2>User</h2>
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" placeholder="Enter username">
-        </div>
-        <div class="form-group">
-            <button id="register-btn">Register</button>
-            <button id="login-btn">Login</button>
+        <div id="login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+                <button id="register-btn">Register</button>
+                <button id="login-btn">Login</button>
+                <button id="test-connection-btn">Test Connection</button>
+            </div>
         </div>
         <div id="user-info" style="display: none;">
             <p>Logged in as: <span id="logged-user"></span></p>
             <p>User ID: <span id="user-id"></span></p>
+            <button id="logout-btn">Logout</button>
+            <button id="test-token-btn">Test Token</button>
         </div>
         <div id="status-message"></div>
+
+        <!-- Debug Panel (hidden by default) -->
+        <div class="debug-panel" id="debug-panel" style="display: none;">
+            <h3>Debug Information</h3>
+            <div class="debug-log" id="debug-log"></div>
+            <button id="toggle-debug-btn">Hide Debug</button>
+            <button id="clear-log-btn">Clear Log</button>
+        </div>
     </div>
 
     <!-- Channel Panel -->
@@ -224,7 +266,8 @@
     // Store user and channel information
     let currentUser = {
         id: null,
-        username: null
+        username: null,
+        token: null
     };
 
     let currentChannel = {
@@ -235,14 +278,51 @@
     let channels = [];
     let channelUsers = [];
 
+    // Debug utilities
+    const debugLog = document.getElementById('debug-log');
+    const debugPanel = document.getElementById('debug-panel');
+
+    function logDebug(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.textContent = `[${timestamp}] ${message}`;
+
+        if (type === 'error') {
+            logEntry.style.color = '#ff4444';
+        } else if (type === 'success') {
+            logEntry.style.color = '#44ff44';
+        } else if (type === 'warning') {
+            logEntry.style.color = '#ffff44';
+        }
+
+        debugLog.appendChild(logEntry);
+        debugLog.scrollTop = debugLog.scrollHeight;
+
+        // Also log to console
+        if (type === 'error') {
+            console.error(message);
+        } else if (type === 'warning') {
+            console.warn(message);
+        } else {
+            console.log(message);
+        }
+    }
+
     // DOM Elements
     const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginForm = document.getElementById('login-form');
     const registerBtn = document.getElementById('register-btn');
     const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
     const userInfo = document.getElementById('user-info');
     const loggedUser = document.getElementById('logged-user');
     const userId = document.getElementById('user-id');
     const statusMessage = document.getElementById('status-message');
+    const testConnectionBtn = document.getElementById('test-connection-btn');
+    const testTokenBtn = document.getElementById('test-token-btn');
+    const toggleDebugBtn = document.getElementById('toggle-debug-btn');
+    const clearLogBtn = document.getElementById('clear-log-btn');
 
     const channelNameInput = document.getElementById('channel-name');
     const createChannelBtn = document.getElementById('create-channel-btn');
@@ -258,107 +338,402 @@
     // Event Listeners
     registerBtn.addEventListener('click', registerUser);
     loginBtn.addEventListener('click', loginUser);
+    logoutBtn.addEventListener('click', logoutUser);
     createChannelBtn.addEventListener('click', createChannel);
     sendBtn.addEventListener('click', sendMessage);
+    testConnectionBtn.addEventListener('click', testConnection);
+    testTokenBtn.addEventListener('click', testToken);
+    toggleDebugBtn.addEventListener('click', toggleDebugPanel);
+    clearLogBtn.addEventListener('click', clearDebugLog);
+
     messageInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             sendMessage();
         }
     });
 
+    // Authentication helpers
+    function isLoggedIn() {
+        return currentUser.id !== null && currentUser.token !== null;
+    }
+
+    function getAuthHeader() {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (currentUser.token) {
+            headers['Authorization'] = `Bearer ${currentUser.token}`;
+            logDebug(`Added Authorization header: Bearer ${currentUser.token.substring(0, 10)}...`);
+        } else {
+            logDebug('No token available for Authorization header', 'warning');
+        }
+
+        return headers;
+    }
+
+    function saveAuthToLocalStorage() {
+        localStorage.setItem('user_id', currentUser.id);
+        localStorage.setItem('username', currentUser.username);
+        localStorage.setItem('auth_token', currentUser.token);
+        logDebug('Auth info saved to localStorage');
+    }
+
+    function loadAuthFromLocalStorage() {
+        const userId = localStorage.getItem('user_id');
+        const username = localStorage.getItem('username');
+        const token = localStorage.getItem('auth_token');
+
+        if (userId && username && token) {
+            currentUser.id = userId;
+            currentUser.username = username;
+            currentUser.token = token;
+            logDebug(`Auth loaded from localStorage: ${username} (${userId.substring(0, 8)}...)`);
+            return true;
+        }
+        logDebug('No auth found in localStorage', 'warning');
+        return false;
+    }
+
+    function clearAuth() {
+        currentUser.id = null;
+        currentUser.username = null;
+        currentUser.token = null;
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        localStorage.removeItem('auth_token');
+        logDebug('Auth info cleared');
+    }
+
+    // Debug Panel Functions
+    function toggleDebugPanel() {
+        if (debugPanel.style.display === 'none') {
+            debugPanel.style.display = 'block';
+            toggleDebugBtn.textContent = 'Hide Debug';
+        } else {
+            debugPanel.style.display = 'none';
+            toggleDebugBtn.textContent = 'Show Debug';
+        }
+    }
+
+    function clearDebugLog() {
+        debugLog.innerHTML = '';
+        logDebug('Debug log cleared');
+    }
+
+    // Connection Testing Functions
+    async function testConnection() {
+        showStatus('Testing connection...', true);
+        logDebug('Testing server connection...');
+
+        try {
+            const response = await fetch(`${API_URL}/`, {
+                method: 'GET'
+            });
+
+            logDebug(`Server response status: ${response.status}`);
+
+            if (response.ok) {
+                const text = await response.text();
+                logDebug(`Server response: ${text}`, 'success');
+                showStatus('Server connection successful!', true);
+            } else {
+                logDebug(`Server returned error: ${response.status}`, 'error');
+                showStatus(`Server error: ${response.status}`, false);
+            }
+        } catch (error) {
+            logDebug(`Connection error: ${error.message}`, 'error');
+            showStatus(`Cannot connect to server: ${error.message}`, false);
+        }
+    }
+
+    async function testToken() {
+        if (!currentUser.token) {
+            showStatus('No token available to test', false);
+            logDebug('No token available to test', 'warning');
+            return;
+        }
+
+        showStatus('Testing token...', true);
+        logDebug(`Testing token: ${currentUser.token.substring(0, 10)}...`);
+
+        try {
+            const response = await fetch(`${API_URL}/api/me`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${currentUser.token}`
+                }
+            });
+
+            logDebug(`Token test response status: ${response.status}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                logDebug(`Token valid, user data: ${JSON.stringify(data)}`, 'success');
+                showStatus('Token is valid!', true);
+            } else {
+                logDebug(`Token test failed with status: ${response.status}`, 'error');
+                showStatus('Token is invalid or expired', false);
+            }
+        } catch (error) {
+            logDebug(`Token test error: ${error.message}`, 'error');
+            showStatus(`Token test error: ${error.message}`, false);
+        }
+    }
+
     // User Functions
     async function registerUser() {
         const username = usernameInput.value.trim();
-        if (!username) {
-            showStatus('Please enter a username', false);
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+            showStatus('Please enter both username and password', false);
+            logDebug('Registration attempt with missing username or password', 'warning');
             return;
         }
 
         try {
+            logDebug(`Attempting to register user: ${username}`);
+            showStatus('Registering...', true);
+
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({username})
+                body: JSON.stringify({username, password})
             });
 
-            if (!response.ok) {
-                throw new Error('Registration failed');
-            }
+            logDebug(`Registration response status: ${response.status}`);
 
             const data = await response.json();
+
+            if (!response.ok) {
+                logDebug(`Registration failed: ${data.error || 'Unknown error'}`, 'error');
+                throw new Error(data.error || 'Registration failed');
+            }
+
+            logDebug(`Registration successful for user: ${username}`, 'success');
+            logDebug(`User ID: ${data.user_id}`);
+            logDebug(`Token received: ${data.token ? data.token.substring(0, 10) + '...' : 'None'}`);
+
+            if (!data.token) {
+                logDebug('No token received from server', 'error');
+                throw new Error('No authentication token received');
+            }
+
             currentUser.id = data.user_id;
             currentUser.username = data.username;
+            currentUser.token = data.token;
+
+            // Save auth info to local storage
+            saveAuthToLocalStorage();
 
             showUserInfo();
             showStatus('Registration successful!', true);
 
-            // Load channels after registration
+            // Show debug panel after successful registration
+            debugPanel.style.display = 'block';
+
+            // Load channels
             loadChannels();
 
         } catch (error) {
+            logDebug(`Registration error: ${error.message}`, 'error');
             showStatus('Error: ' + error.message, false);
         }
     }
 
     async function loginUser() {
         const username = usernameInput.value.trim();
-        if (!username) {
-            showStatus('Please enter a username', false);
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+            showStatus('Please enter both username and password', false);
+            logDebug('Login attempt with missing username or password', 'warning');
             return;
         }
 
         try {
+            logDebug(`Attempting to login user: ${username}`);
+            showStatus('Logging in...', true);
+
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({username})
+                body: JSON.stringify({username, password}),
+                credentials: 'include'
             });
 
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
+            logDebug(`Login response status: ${response.status}`);
 
             const data = await response.json();
+
+            if (!response.ok) {
+                logDebug(`Login failed: ${data.error || 'Unknown error'}`, 'error');
+                throw new Error(data.error || 'Login failed');
+            }
+
+            logDebug(`Login successful for user: ${username}`, 'success');
+            logDebug(`User ID: ${data.user_id}`);
+            logDebug(`Token received: ${data.token ? data.token.substring(0, 10) + '...' : 'None'}`);
+
+            if (!data.token) {
+                logDebug('No token received from server', 'error');
+                throw new Error('No authentication token received');
+            }
+
             currentUser.id = data.user_id;
             currentUser.username = data.username;
+            currentUser.token = data.token;
+
+            // Debug token details
+            debugAuthToken();
+
+            // Save auth info to local storage
+            saveAuthToLocalStorage();
 
             showUserInfo();
             showStatus('Login successful!', true);
 
-            // Load channels after login
+            // Show debug panel after successful login
+            debugPanel.style.display = 'block';
+
+            // Load channels
             loadChannels();
 
         } catch (error) {
+            logDebug(`Login error: ${error.message}`, 'error');
             showStatus('Error: ' + error.message, false);
+        }
+    }
+
+    // Enhanced debugging function
+    function debugAuthToken() {
+        logDebug("===== TOKEN DEBUG =====");
+        logDebug(`User ID: ${currentUser.id || 'null'}`);
+        logDebug(`Username: ${currentUser.username || 'null'}`);
+
+        if (currentUser.token) {
+            logDebug(`Token available: Yes`);
+            logDebug(`Token starts with: ${currentUser.token.substring(0, 10)}...`);
+            logDebug(`Token length: ${currentUser.token.length} characters`);
+
+            // Try to decode the JWT payload (base64)
+            try {
+                const payload = JSON.parse(atob(currentUser.token.split('.')[1]));
+                logDebug(`Token payload: ${JSON.stringify(payload)}`);
+
+                // Check expiration
+                if (payload.exp) {
+                    const expDate = new Date(payload.exp * 1000);
+                    const now = new Date();
+                    const timeLeft = expDate - now;
+
+                    if (timeLeft > 0) {
+                        logDebug(`Token expires in: ${Math.floor(timeLeft / 60000)} minutes`);
+                    } else {
+                        logDebug(`Token expired: ${Math.abs(Math.floor(timeLeft / 60000))} minutes ago`, 'error');
+                    }
+                }
+            } catch (e) {
+                logDebug(`Failed to decode token: ${e.message}`, 'warning');
+            }
+        } else {
+            logDebug(`Token available: No`, 'error');
+        }
+
+        logDebug("=====================");
+    }
+
+    async function logoutUser() {
+        logDebug('Attempting to logout user');
+
+        try {
+            // Call server-side logout (for cookie-based auth if still needed)
+            if (currentUser.token) {
+                logDebug('Sending logout request to server');
+
+                await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    headers: getAuthHeader()
+                });
+
+                logDebug('Server logout successful');
+            }
+
+            // Clear local auth data
+            clearAuth();
+
+            // Reset UI
+            userInfo.style.display = 'none';
+            loginForm.style.display = 'block';
+            channelList.innerHTML = '';
+            messages.innerHTML = '';
+            currentChannelSpan.textContent = 'No Channel Selected';
+            messageInput.disabled = true;
+            sendBtn.disabled = true;
+            channelUsersSection.style.display = 'none';
+
+            showStatus('Logged out successfully', true);
+            logDebug('Logout complete', 'success');
+
+        } catch (error) {
+            logDebug(`Error during logout: ${error.message}`, 'error');
+            showStatus('Error logging out: ' + error.message, false);
+
+            // Still clear local data even if server logout fails
+            clearAuth();
+            userInfo.style.display = 'none';
+            loginForm.style.display = 'block';
         }
     }
 
     // Channel Functions
     async function createChannel() {
+        if (!isLoggedIn()) {
+            showStatus('Please log in first', false);
+            logDebug('Channel creation attempted without login', 'warning');
+            return;
+        }
+
         const channelName = channelNameInput.value.trim();
         if (!channelName) {
             showStatus('Please enter a channel name', false);
+            logDebug('Channel creation attempted without name', 'warning');
             return;
         }
 
         try {
+            logDebug(`Creating channel: ${channelName}`);
+            showStatus('Creating channel...', true);
+
             const response = await fetch(`${API_URL}/channel`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: getAuthHeader(),
                 body: JSON.stringify({name: channelName})
             });
 
+            logDebug(`Channel creation response status: ${response.status}`);
+
+            if (response.status === 401) {
+                logDebug('Authentication failed when creating channel', 'error');
+                handleAuthError();
+                return;
+            }
+
             if (!response.ok) {
-                throw new Error('Failed to create channel');
+                const errorData = await response.json();
+                logDebug(`Channel creation failed: ${errorData.error || 'Unknown error'}`, 'error');
+                throw new Error(errorData.error || 'Failed to create channel');
             }
 
             const data = await response.json();
+            logDebug(`Channel created successfully: ${channelName}`, 'success');
+            logDebug(`Channel ID: ${data.channel_id}`);
+
             showStatus(`Channel ${channelName} created successfully!`, true);
             channelNameInput.value = '';
 
@@ -367,28 +742,84 @@
             updateChannelList();
 
         } catch (error) {
+            logDebug(`Channel creation error: ${error.message}`, 'error');
             showStatus('Error: ' + error.message, false);
         }
     }
 
+    // Channel Functions
     async function loadChannels() {
+        if (!isLoggedIn()) {
+            logDebug("Not logged in, aborting loadChannels", 'warning');
+            return;
+        }
+
+        // Debug token before request
+        debugAuthToken();
+
         try {
-            const response = await fetch(`${API_URL}/channels`);
+            // Check if we have a token before making the request
+            if (!currentUser.token) {
+                logDebug('No authentication token available', 'error');
+                showStatus('No authentication token available', false);
+                return;
+            }
+
+            logDebug("Loading channels...");
+            showStatus('Loading channels...', true);
+
+            const headers = getAuthHeader();
+
+            const response = await fetch(`${API_URL}/channels`, {
+                method: 'GET',
+                headers: headers,
+                credentials: 'include'
+            });
+
+            logDebug(`Channels response status: ${response.status}`);
+
+            // Handle authentication errors
+            if (response.status === 401 || response.status === 302) {
+                logDebug('Authentication failed when loading channels', 'error');
+                showStatus('Authentication failed. Please log in again.', false);
+                clearAuth();
+                userInfo.style.display = 'none';
+                loginForm.style.display = 'block';
+                return;
+            }
+
             if (!response.ok) {
+                logDebug(`Failed to load channels: ${response.status}`, 'error');
                 throw new Error('Failed to load channels');
             }
 
             const data = await response.json();
+            logDebug(`Channels loaded: ${data.length} channels found`, 'success');
+
             channels = data;
             updateChannelList();
+
+            showStatus(`Loaded ${data.length} channels`, true);
+            return channels;
+
         } catch (error) {
+            logDebug(`Error loading channels: ${error.message}`, 'error');
             showStatus('Error loading channels: ' + error.message, false);
         }
     }
 
-
     function updateChannelList() {
         channelList.innerHTML = '';
+        logDebug(`Updating channel list with ${channels.length} channels`);
+
+        if (channels.length === 0) {
+            const emptyNotice = document.createElement('li');
+            emptyNotice.textContent = 'No channels available. Create one to get started!';
+            emptyNotice.style.fontStyle = 'italic';
+            emptyNotice.style.color = '#666';
+            channelList.appendChild(emptyNotice);
+            return;
+        }
 
         channels.forEach(channel => {
             const li = document.createElement('li');
@@ -399,9 +830,13 @@
 
             channelList.appendChild(li);
         });
+
+        logDebug('Channel list updated successfully');
     }
 
     async function selectChannel(channel) {
+        logDebug(`Selecting channel: ${channel.name} (${channel.channel_id})`);
+
         // Highlight the selected channel
         const items = channelList.querySelectorAll('li');
         items.forEach(item => item.classList.remove('active'));
@@ -412,20 +847,34 @@
 
         // Join the channel if not already joined
         try {
+            logDebug(`Joining channel: ${channel.name}`);
+            showStatus(`Joining ${channel.name}...`, true);
+
             const response = await fetch(`${API_URL}/channel/join`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: getAuthHeader(),
                 body: JSON.stringify({
                     user_id: currentUser.id,
                     channel_id: channel.channel_id
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to join channel');
+            logDebug(`Join channel response status: ${response.status}`);
+
+            if (response.status === 401) {
+                logDebug('Authentication failed when joining channel', 'error');
+                handleAuthError();
+                return;
             }
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                logDebug(`Failed to join channel: ${errorData.error || 'Unknown error'}`, 'error');
+                throw new Error(errorData.error || 'Failed to join channel');
+            }
+
+            const data = await response.json();
+            logDebug(`Joined channel successfully: ${channel.name}`, 'success');
 
             // Set current channel
             currentChannel.id = channel.channel_id;
@@ -436,35 +885,61 @@
             messageInput.disabled = false;
             sendBtn.disabled = false;
 
-            // Load channel messages
-            loadMessages();
+            // Load channel data
+            await loadChannelUsers();
+            await loadMessages();
 
-            // Load channel users
-            await loadChannelUsers(); // Load users first to build cache
-            loadMessages();
+            showStatus(`Joined ${channel.name}`, true);
 
         } catch (error) {
+            logDebug(`Error joining channel: ${error.message}`, 'error');
             showStatus('Error: ' + error.message, false);
         }
     }
 
+    // Store a map of user IDs to usernames for message display
+    let userCache = {};
+
     async function loadChannelUsers() {
+        logDebug(`Loading users for channel: ${currentChannel.name}`);
+
         try {
-            const response = await fetch(`${API_URL}/channel/${currentChannel.id}/users`);
+            const response = await fetch(`${API_URL}/channel/${currentChannel.id}/users`, {
+                headers: getAuthHeader()
+            });
+
+            logDebug(`Channel users response status: ${response.status}`);
+
+            if (response.status === 401) {
+                logDebug('Authentication failed when loading channel users', 'error');
+                handleAuthError();
+                return;
+            }
 
             if (!response.ok) {
+                logDebug(`Failed to load channel users: ${response.status}`, 'error');
                 throw new Error('Failed to load channel users');
             }
 
             const data = await response.json();
-
-            // The API now returns objects with id and username properties
             const users = data.users;
+
+            logDebug(`Loaded ${users.length} channel users`, 'success');
+
+            if (users.length === 0) {
+                channelUsersList.innerHTML = '<li style="font-style: italic; color: #666;">No users in this channel</li>';
+                channelUsersSection.style.display = 'block';
+                return;
+            }
 
             // Update users list
             channelUsersList.innerHTML = '';
             users.forEach(user => {
                 const li = document.createElement('li');
+                // Cache user info for message display
+                userCache[user.id] = user.username;
+                logDebug(`Cached user: ${user.username} (${user.id.substring(0, 8)}...)`);
+
                 // Check if this user is the current user
                 if (user.id === currentUser.id) {
                     li.textContent = `${user.username} (You)`;
@@ -477,39 +952,47 @@
             channelUsersSection.style.display = 'block';
 
         } catch (error) {
+            logDebug(`Error loading channel users: ${error.message}`, 'error');
             console.error('Error loading channel users:', error);
         }
-    }
-
-    // Store a map of user IDs to usernames for message display
-    let userCache = {};
-
-    // Function to ensure we have user details
-    function cacheUserDetails(users) {
-        users.forEach(user => {
-            userCache[user.id] = user.username;
-        });
-        // Always make sure current user is in cache
-        userCache[currentUser.id] = currentUser.username;
-        // Add AI bot to cache
-        userCache['ai_bot'] = 'AI Assistant';
     }
 
     // Message Functions
     async function loadMessages() {
         messages.innerHTML = '';
+        logDebug(`Loading messages for channel: ${currentChannel.name}`);
 
         try {
-            const response = await fetch(`${API_URL}/message/${currentChannel.id}`);
+            const response = await fetch(`${API_URL}/message/${currentChannel.id}`, {
+                headers: getAuthHeader()
+            });
+
+            logDebug(`Messages response status: ${response.status}`);
+
+            if (response.status === 401) {
+                logDebug('Authentication failed when loading messages', 'error');
+                handleAuthError();
+                return;
+            }
 
             if (!response.ok) {
+                logDebug(`Failed to load messages: ${response.status}`, 'error');
                 throw new Error('Failed to load messages');
             }
 
             const data = await response.json();
+            logDebug(`Loaded ${data.length} messages`, 'success');
 
-            // Load channel users to build username cache first
-            await loadChannelUsers();
+            if (data.length === 0) {
+                const emptyMessageDiv = document.createElement('div');
+                emptyMessageDiv.textContent = 'No messages yet. Start the conversation!';
+                emptyMessageDiv.style.textAlign = 'center';
+                emptyMessageDiv.style.color = '#666';
+                emptyMessageDiv.style.marginTop = '20px';
+                emptyMessageDiv.style.fontStyle = 'italic';
+                messages.appendChild(emptyMessageDiv);
+                return;
+            }
 
             // Display messages
             data.forEach(msg => {
@@ -520,6 +1003,7 @@
             messages.scrollTop = messages.scrollHeight;
 
         } catch (error) {
+            logDebug(`Error loading messages: ${error.message}`, 'error');
             console.error('Error loading messages:', error);
         }
     }
@@ -529,11 +1013,11 @@
         if (!content) return;
 
         try {
+            logDebug(`Sending message to channel: ${currentChannel.name}`);
+
             const response = await fetch(`${API_URL}/message`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: getAuthHeader(),
                 body: JSON.stringify({
                     sender_id: currentUser.id,
                     channel_id: currentChannel.id,
@@ -541,17 +1025,28 @@
                 })
             });
 
+            logDebug(`Send message response status: ${response.status}`);
+
+            if (response.status === 401) {
+                logDebug('Authentication failed when sending message', 'error');
+                handleAuthError();
+                return;
+            }
+
             if (!response.ok) {
+                logDebug(`Failed to send message: ${response.status}`, 'error');
                 throw new Error('Failed to send message');
             }
 
             const data = await response.json();
+            logDebug(`Message sent successfully`, 'success');
 
             // Clear input
             messageInput.value = '';
 
             // If the channel is ai-helpdesk, display both the user message and AI response
             if (currentChannel.name === 'ai-helpdesk' && Array.isArray(data)) {
+                logDebug(`Received ${data.length} messages including AI response`);
                 data.forEach(msg => {
                     displayMessage(msg);
                 });
@@ -565,6 +1060,7 @@
             messages.scrollTop = messages.scrollHeight;
 
         } catch (error) {
+            logDebug(`Error sending message: ${error.message}`, 'error');
             showStatus('Error: ' + error.message, false);
         }
     }
@@ -585,8 +1081,8 @@
         senderInfo.classList.add('sender-info');
 
         // Use username from cache or fallback to ID
-        const username = userCache[msg.sender_id] || `User ${msg.sender_id.substring(0, 8)}...`;
-        senderInfo.textContent = username;
+        const username = userCache[msg.sender_id] || (msg.sender_id === 'ai_bot' ? 'AI Assistant' : `User ${msg.sender_id.substring(0, 8)}...`);
+        senderInfo.textContent = msg.sender_id === currentUser.id ? currentUser.username : username;
 
         const messageContent = document.createElement('div');
         messageContent.textContent = msg.content;
@@ -600,19 +1096,25 @@
         messageDiv.appendChild(timeInfo);
 
         messages.appendChild(messageDiv);
+
+        logDebug(`Displayed message from ${username}`);
     }
 
 
     // Helper Functions
     function showUserInfo() {
+        loginForm.style.display = 'none';
         userInfo.style.display = 'block';
         loggedUser.textContent = currentUser.username;
         userId.textContent = currentUser.id;
+        logDebug(`Updated UI to show logged-in user: ${currentUser.username}`);
     }
 
     function showStatus(message, isSuccess = false) {
         statusMessage.textContent = message;
         statusMessage.className = isSuccess ? 'success-message' : '';
+
+        logDebug(`Status message: ${message}`, isSuccess ? 'success' : 'warning');
 
         // Clear status after 5 seconds
         setTimeout(() => {
@@ -620,11 +1122,33 @@
         }, 5000);
     }
 
-    // Initialize
-    function init() {
-        loadChannels(); // fetch the real channels from backend
+    function handleAuthError() {
+        logDebug('Authentication error detected, logging out user', 'error');
+        showStatus('Authentication expired or invalid. Please log in again.', false);
+        clearAuth();
+        userInfo.style.display = 'none';
+        loginForm.style.display = 'block';
+        channelUsersSection.style.display = 'none';
     }
 
+    // Auto-login from localStorage on page load
+    function init() {
+        // Show debug panel by default to help troubleshooting
+        debugPanel.style.display = 'block';
+        logDebug('Chat client initialized');
+
+        // Try to load auth from storage
+        if (loadAuthFromLocalStorage()) {
+            logDebug('Auto-login from localStorage');
+            showUserInfo();
+            loadChannels();
+        } else {
+            logDebug('No saved authentication found');
+        }
+
+        // Test connection on startup
+        testConnection();
+    }
 
     // Start the app
     init();
