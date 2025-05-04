@@ -6,33 +6,88 @@ from src.models.user_model import UserModel
 import uuid
 import logging
 import os
+import click
+from flask.cli import with_appcontext
 from flask_cors import CORS
 from dotenv import load_dotenv
-from src.channel_impl.ai_bot_channel import AiBotChannel
 
 # Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
-CORS(app)
 
-# Database Configuration from environment variables
-DB_TYPE = os.getenv('DB_TYPE', 'sqlite')
-DB_PATH = os.getenv('DB_PATH', 'chat.db')
-app.config["SQLALCHEMY_DATABASE_URI"] = f"{DB_TYPE}:///{DB_PATH}"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = os.getenv(
-    'SQLALCHEMY_TRACK_MODIFICATIONS', 'False').lower() == 'true'
+def create_app():
+    """
+    Create and configure the Flask application.
 
-# Server Configuration
-app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
-app.config['DEBUG'] = os.getenv('DEBUG', 'True').lower() == 'true'
+    Returns:
+        Flask: The configured Flask application.
+    """
+    app = Flask(__name__)
+    CORS(app)
 
-# Feature Flags
-app.config['ENABLE_AI_BOT'] = os.getenv('ENABLE_AI_BOT', 'True').lower() == 'true'
-app.config['AI_BOT_CHANNEL_NAME'] = os.getenv('AI_BOT_CHANNEL_NAME', 'ai-helpdesk')
+    # Database Configuration from environment variables
+    DB_TYPE = os.getenv('DB_TYPE', 'sqlite')
+    DB_PATH = os.getenv('DB_PATH', 'chat.db')
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"{DB_TYPE}:///{DB_PATH}"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = os.getenv(
+        'SQLALCHEMY_TRACK_MODIFICATIONS', 'False').lower() == 'true'
 
-db.init_app(app)
-app.logger.setLevel(logging.INFO)
+    # Server Configuration
+    app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
+    app.config['DEBUG'] = os.getenv('DEBUG', 'True').lower() == 'true'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+
+    # Feature Flags
+    app.config['ENABLE_AI_BOT'] = os.getenv('ENABLE_AI_BOT', 'True').lower() == 'true'
+    app.config['AI_BOT_CHANNEL_NAME'] = os.getenv('AI_BOT_CHANNEL_NAME', 'ai-helpdesk')
+
+    # Initialize extensions
+    db.init_app(app)
+
+    # Configure logging
+    app.logger.setLevel(logging.INFO)
+
+    # Register CLI commands
+    app.cli.add_command(init_db_command)
+    app.cli.add_command(drop_db_command)
+    app.cli.add_command(seed_ai_bot_command)
+
+    return app
+
+
+# --------------------- CLI Commands ---------------------
+
+@click.command('init-db')
+@with_appcontext
+def init_db_command():
+    """Initialize the database tables."""
+    db.create_all()
+    click.echo('Initialized the database.')
+
+
+@click.command('drop-db')
+@with_appcontext
+def drop_db_command():
+    """Drop all database tables."""
+    if click.confirm('Are you sure you want to drop all tables?'):
+        db.drop_all()
+        click.echo('Dropped all tables.')
+
+
+@click.command('seed-ai-bot')
+@with_appcontext
+def seed_ai_bot_command():
+    """Create the AI bot user if it doesn't exist."""
+    if not db.session.get(UserModel, "ai_bot"):
+        bot_user = UserModel(id="ai_bot", username="ai_bot")
+        db.session.add(bot_user)
+        db.session.commit()
+        click.echo('AI bot user created.')
+    else:
+        click.echo('AI bot user already exists.')
+
+
+app = create_app()
 
 
 @app.route("/")
@@ -98,6 +153,7 @@ def join_channel():
     if not channel:
         return jsonify({"error": "Channel not found"}), 404
 
+    # TODO: Implement join table
     return jsonify({"joined": True})
 
 
@@ -148,6 +204,7 @@ def send_message():
             channel.name == app.config['AI_BOT_CHANNEL_NAME'] and
             app.config['ENABLE_AI_BOT']):
         try:
+            from src.channel_impl.ai_bot_channel import AiBotChannel
             ai_bot = AiBotChannel()
             ai_response = ai_bot.handle_message(content)
 
@@ -208,17 +265,5 @@ def start_direct_message():
     return jsonify({"channel_id": channel.id})
 
 
-# --------------------- AI Bot Setup ---------------------
-
-def ensure_ai_bot_user():
-    from src.models.user_model import UserModel
-    if not db.session.get(UserModel, "ai_bot"):
-        bot_user = UserModel(id="ai_bot", username="ai_bot")
-        db.session.add(bot_user)
-        db.session.commit()
-
-
 if __name__ == "__main__":
-    with app.app_context():
-        ensure_ai_bot_user()
     app.run(debug=app.config['DEBUG'])
