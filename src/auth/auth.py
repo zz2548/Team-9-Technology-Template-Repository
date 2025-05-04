@@ -47,7 +47,7 @@ def generate_token(user_id) -> str:
         return str(e)
 
 
-def decode_token(token) -> dict | None:
+def decode_token(token) -> Any | None:
     """
     Decode and validate a JWT token.
 
