@@ -26,9 +26,9 @@ def create_app():
     CORS(app)
 
     # Database Configuration from environment variables
-    DB_TYPE = os.getenv('DB_TYPE', 'sqlite')
-    DB_PATH = os.getenv('DB_PATH', 'chat.db')
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"{DB_TYPE}:///{DB_PATH}"
+    db_type = os.getenv("DB_TYPE", "sqlite")
+    db_path = os.getenv("DB_PATH", "chat.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"{db_type}:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = os.getenv(
         'SQLALCHEMY_TRACK_MODIFICATIONS', 'False').lower() == 'true'
 
