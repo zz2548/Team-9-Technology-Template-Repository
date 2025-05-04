@@ -5,6 +5,8 @@ import re
 from pathlib import Path
 from typing import cast, Optional, Tuple
 from flask import current_app
+from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
+from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
 
 # add submodule path to sys.path for local dev
 current_file = Path(__file__).resolve()
@@ -14,23 +16,17 @@ sys.path.append(str(ai_module_path))
 sys.path.append(str(issue_tracker_path))
 
 
-from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
-from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
 
 # Create a singleton for the issue tracker
 class IssueTrackerSingleton:
     _instance: Optional[MemoryIssueTrackerClient] = None
-
     @classmethod
     def get_instance(cls) -> Optional[MemoryIssueTrackerClient]:
         if cls._instance is None:
-            from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient
             try:
                 cls._instance = MemoryIssueTrackerClient()
-                from flask import current_app
                 current_app.logger.info("Successfully initialized MemoryIssueTrackerClient")
             except Exception as e:
-                from flask import current_app
                 current_app.logger.error(f"Failed to initialize issue tracker: {str(e)}")
                 cls._instance = None
         return cls._instance
