@@ -7,10 +7,14 @@ to the Flask application using a test client and an in-memory database.
 """
 
 import pytest
-
+from flask import session
 from app import app, db
 
+# Test variables
 CREATED_CHANNEL_ID = None
+TEST_USER = {"username": "testuser", "password": "testpassword"}
+TEST_USER_ID = None
+AUTH_TOKEN = None
 
 @pytest.fixture(scope="module")
 def test_client():
@@ -21,65 +25,131 @@ def test_client():
     pushing the app context and creating the in-memory database tables before
     yielding the test client. After the tests finish, it tears down the context and drops the database.
     """
-    
+    # Configure app for testing
+    app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
+    app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
+
     testing_client = app.test_client()
     ctx = app.app_context()
     ctx.push()
 
     db.create_all()
 
+    # Register a test user that can be used for authentication
+    register_response = testing_client.post("/register", json=TEST_USER)
+    user_data = register_response.get_json()
+
+    global TEST_USER_ID, AUTH_TOKEN
+    TEST_USER_ID = user_data.get("user_id")
+    AUTH_TOKEN = user_data.get("token")
+
     yield testing_client
 
     db.drop_all()
     ctx.pop()
 
-def test_create_channel(test_client):
+@pytest.fixture(scope="function")
+def authenticated_client(test_client):
+    """
+    Returns a test client with an authenticated session.
+
+    This ensures the client has a valid session cookie for requests that
+    require authentication via Flask-Login.
+    """
+    # Log in the test user to get a session cookie
+    test_client.post("/login", json=TEST_USER)
+
+    return test_client
+
+def test_create_channel(authenticated_client):
     """Tests the creation of a new channel."""
-    
-    response = test_client.post("/channel", json={"name": "general"})
+    global CREATED_CHANNEL_ID
+
+    response = authenticated_client.post("/channel", json={"name": "general"})
     assert response.status_code == 200
 
     data = response.get_json()
     assert "channel_id" in data
     assert data["name"] == "general"
 
-    global created_channel_id                   # noqa: PLW0603
-    # only ignore this warning in this test file
-    created_channel_id = data["channel_id"]
+    CREATED_CHANNEL_ID = data["channel_id"]
 
-def test_list_channels(test_client):
+def test_list_channels(authenticated_client):
     """Tests whether all created channels are properly listed."""
-    
-    response = test_client.get("/channels")
+
+    response = authenticated_client.get("/channels")
     assert response.status_code == 200
 
     data = response.get_json()
     assert isinstance(data, list)
     assert any(channel["name"] == "general" for channel in data)
 
-def test_join_channel(test_client):
-    """Tests user registration and joining a channel."""
-    
-    register_resp = test_client.post("/register", json={"username": "charlie"})
-    assert register_resp.status_code == 200
-    user_data = register_resp.get_json()
-    user_id = user_data["user_id"]
+def test_join_channel(authenticated_client):
+    """Tests joining a channel using the authenticated user."""
+    global CREATED_CHANNEL_ID
 
-    response = test_client.post("/channel/join", json={
-        "user_id": user_id,
-        "channel_id": created_channel_id,
+    # Make sure we have a channel to join
+    if not CREATED_CHANNEL_ID:
+        # Create a channel if one wasn't created yet
+        response = authenticated_client.post("/channel", json={"name": "join-test-channel"})
+        data = response.get_json()
+        CREATED_CHANNEL_ID = data["channel_id"]
+
+    # No need to register a new user, use the already authenticated user
+    response = authenticated_client.post("/channel/join", json={
+        "channel_id": CREATED_CHANNEL_ID,
     })
     assert response.status_code == 200
 
     data = response.get_json()
     assert data["joined"] is True
 
-def test_list_channel_users(test_client):
+def test_list_channel_users(authenticated_client):
     """Tests the retrieval of users in a specific channel."""
-    
-    response = test_client.get(f"/channel/{created_channel_id}/users")
+    global CREATED_CHANNEL_ID
+
+    # Ensure CREATED_CHANNEL_ID is available
+    if not CREATED_CHANNEL_ID:
+        # Create a channel if one wasn't created yet
+        response = authenticated_client.post("/channel", json={"name": "test-channel"})
+        data = response.get_json()
+        CREATED_CHANNEL_ID = data["channel_id"]
+
+        # Join the channel
+        authenticated_client.post("/channel/join", json={
+            "channel_id": CREATED_CHANNEL_ID,
+        })
+
+    response = authenticated_client.get(f"/channel/{CREATED_CHANNEL_ID}/users")
     assert response.status_code == 200
 
     data = response.get_json()
     assert "users" in data
     assert isinstance(data["users"], list)
+
+    # Verify our test user is in the list
+    user_ids = [user.get("id") for user in data["users"]]
+    assert TEST_USER_ID in user_ids
+
+# Alternative approach using JWT token authentication
+def test_api_create_channel_with_token():
+    """Tests creating a channel using token authentication."""
+    global AUTH_TOKEN
+
+    # Create a new test client for this test
+    client = app.test_client()
+
+    # Use the token from the registered user
+    headers = {"Authorization": f"Bearer {AUTH_TOKEN}"}
+
+    response = client.post(
+        "/channel",
+        json={"name": "token-auth-channel"},
+        headers=headers
+    )
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert "channel_id" in data
+    assert data["name"] == "token-auth-channel"

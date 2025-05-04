@@ -4,12 +4,16 @@ from src.models.channel_model import ChannelModel
 from src.models.message_model import MessageModel
 from src.models.user_model import UserModel
 from src.models.channel_user_model import ChannelUserModel
+from src.auth import generate_token, token_required
+from src.channel_impl.ai_bot_channel import AiBotChannel
 import uuid
 import logging
 import os
 import click
 from flask.cli import with_appcontext
 from flask_cors import CORS
+from flask_login import LoginManager, login_user, logout_user, login_required, \
+    current_user
 from dotenv import load_dotenv
 from typing import Dict, List, Union, Optional, Any, Tuple, cast
 
@@ -110,6 +114,25 @@ def seed_ai_bot_command() -> None:
 
 app = create_app()
 
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"  # Specify the login view route name
+
+
+@login_manager.user_loader
+def load_user(user_id: str) -> Optional[UserModel]:
+    """
+    Load a user by ID for Flask-Login.
+
+    Args:
+        user_id (str): The ID of the user to load.
+
+    Returns:
+        Optional[UserModel]: The user object if found, None otherwise.
+    """
+    return db.session.get(UserModel, user_id)
+
 
 @app.route("/")
 def home() -> str:
@@ -129,30 +152,44 @@ def register() -> Tuple[Response, int]:
     """
     Register a new user in the system.
 
-    Expects a JSON payload with a 'username' field.
+    Expects a JSON payload with 'username' and 'password' fields.
     Checks if the username is already taken before creating a new user.
+    Logs the user in after successful registration.
 
     Returns:
         tuple: A JSON response with user details and HTTP status code.
-               Success: ({"user_id": id, "username": username}, 200)
+               Success: ({"user_id": id, "username": username, "token": token}, 200)
                Error: ({"error": message}, error_code)
     """
     data: Dict[str, Any] = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+
     username: str = data.get("username")
+    password: str = data.get("password")  # You now need to require a password
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
 
     existing_user: Optional[UserModel] = UserModel.query.filter_by(
         username=username).first()
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
 
-    new_user = UserModel(id=str(uuid.uuid4()), username=username)
+    new_user = UserModel(username=username, password=password)
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"user_id": new_user.id, "username": new_user.username}), 200
+    # Log the user in after registration
+    login_user(new_user)
+
+    token = generate_token(new_user.id)
+    response = {
+        "user_id": new_user.id,
+        "username": new_user.username,
+        "token": token
+    }
+    return jsonify(response), 200
 
 
 @app.route("/login", methods=["POST"])
@@ -160,30 +197,114 @@ def login() -> Tuple[Response, int]:
     """
     Log in an existing user.
 
-    Expects a JSON payload with a 'username' field.
-    Verifies the user exists in the system.
+    Expects a JSON payload with 'username' and 'password' fields.
+    Verifies the user exists in the system and the password is correct.
+    Uses Flask-Login to manage the user's session.
 
     Returns:
         tuple: A JSON response with user details and HTTP status code.
-               Success: ({"user_id": id, "username": username}, 200)
+               Success: ({"user_id": id, "username": username, "token": token}, 200)
                Error: ({"error": message}, error_code)
     """
     data: Dict[str, Any] = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+
     username: str = data.get("username")
+    password: str = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
 
     user: Optional[UserModel] = UserModel.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({"error": "User does not exist"}), 404
+    if not user or not user.check_password(password):
+        return jsonify({"error": "Invalid username or password"}), 401
 
-    return jsonify({"user_id": user.id, "username": user.username}), 200
+    # Log the user in using Flask-Login
+    login_user(user)
+
+    token = generate_token(user.id)
+    response = {
+        "user_id": user.id,
+        "username": user.username,
+        "token": token
+    }
+    return jsonify(response), 200
 
 
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout() -> Tuple[Response, int]:
+    """
+    Log out the current user.
+
+    Requires the user to be authenticated via Flask-Login.
+    Ends the user's session.
+
+    Returns:
+        tuple: A JSON response with logout status and HTTP status code.
+               Success: ({"message": "Logged out successfully"}, 200)
+    """
+    logout_user()
+    return jsonify({"message": "Logged out successfully"}), 200
+
+
+@app.route("/api/token", methods=["POST"])
+def get_token() -> Tuple[Response, int]:
+    """
+    Generate an API token for a user.
+
+    This endpoint allows clients to get a token without using session cookies.
+    Expects JSON with username and password fields.
+    Returns only the token for API usage.
+
+    Returns:
+        Tuple[Response, int]: A JSON response with the token and HTTP status code
+    """
+    data: Dict[str, Any] = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+
+    username: str = data.get("username")
+    password: str = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+
+    # Find and validate the user
+    user = UserModel.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    # Generate a token
+    token = generate_token(user.id)
+
+    return jsonify({"token": token}), 200
+
+
+@app.route("/api/me", methods=["GET"])
+@token_required
+def get_user_profile(current_user):
+    """
+    Get the current user's profile using token authentication.
+
+    This endpoint demonstrates using token authentication without sessions.
+    The @token_required decorator injects the current_user based on the token.
+
+    Args:
+        current_user: The authenticated user (injected by the decorator)
+
+    Returns:
+        Response: A JSON response with the user's profile information
+    """
+    return jsonify({
+        "id": current_user.id,
+        "username": current_user.username
+    })
 # --------------------- Channel Endpoints ---------------------
 
 @app.route("/channel", methods=["POST"])
+@login_required
 def create_channel() -> Tuple[Response, int]:
     """
     Create a new chat channel.
@@ -197,7 +318,7 @@ def create_channel() -> Tuple[Response, int]:
     data: Dict[str, Any] = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+
     name: str = data.get("name")
 
     new_channel = ChannelModel(id=str(uuid.uuid4()), name=name)
@@ -207,12 +328,8 @@ def create_channel() -> Tuple[Response, int]:
     return jsonify({"channel_id": new_channel.id, "name": new_channel.name}), 200
 
 
-"""
-Replace the existing join_channel function with this implementation.
-"""
-
-
 @app.route("/channel/join", methods=["POST"])
+@login_required
 def join_channel() -> Tuple[Response, int]:
     """
     Join a user to a channel.
@@ -226,20 +343,16 @@ def join_channel() -> Tuple[Response, int]:
                Success: ({"joined": True}, 200)
                Error: ({"error": message}, error_code)
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
-    user_id: str = data.get("user_id")
-    channel_id: str = data.get("channel_id")
 
-    # Validate user exists
-    user: Optional[UserModel] = db.session.get(UserModel, user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+    # Use current_user.id instead of data.get("user_id")
+    user_id = current_user.id
+    channel_id = data.get("channel_id")
 
     # Validate channel exists
-    channel: Optional[ChannelModel] = db.session.get(ChannelModel, channel_id)
+    channel = db.session.get(ChannelModel, channel_id)
     if not channel:
         return jsonify({"error": "Channel not found"}), 404
 
@@ -267,6 +380,7 @@ def join_channel() -> Tuple[Response, int]:
 
 
 @app.route("/channel/<channel_id>/users", methods=["GET"])
+@login_required
 def list_channel_users(channel_id: str) -> Response:
     """
     List all users who have joined a channel.
@@ -304,6 +418,7 @@ def list_channel_users(channel_id: str) -> Response:
 
 
 @app.route("/channels", methods=["GET"])
+@login_required
 def list_channels() -> Response:
     """
     List all available channels.
@@ -322,6 +437,7 @@ def list_channels() -> Response:
 # --------------------- Message Endpoints ---------------------
 
 @app.route("/message", methods=["POST"])
+@login_required
 def send_message() -> Response:
     """
     Send a message to a channel.
@@ -334,13 +450,14 @@ def send_message() -> Response:
         Response: A JSON response with message details, and AI response if applicable.
                  Format: [{"message_id": id, "sender_id": sender, ...}, ...]
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
-    sender_id: str = data.get("sender_id")
-    channel_id: str = data.get("channel_id")
-    content: str = data.get("content")
+
+    # Use current_user.id instead of data.get("sender_id")
+    sender_id = current_user.id
+    channel_id = data.get("channel_id")
+    content = data.get("content")
 
     new_message = MessageModel(
         id=str(uuid.uuid4()),
@@ -364,8 +481,7 @@ def send_message() -> Response:
             channel.name == app.config['AI_BOT_CHANNEL_NAME'] and
             app.config['ENABLE_AI_BOT']):
         try:
-            # Lazy import of AiBotChannel to handle potential missing dependency
-            from src.channel_impl.ai_bot_channel import AiBotChannel
+
             ai_bot = AiBotChannel()
             ai_response: str = ai_bot.handle_message(content)
 
@@ -393,6 +509,7 @@ def send_message() -> Response:
 
 
 @app.route("/message/<channel_id>", methods=["GET"])
+@login_required
 def fetch_messages(channel_id: str) -> Response:
     """
     Fetch all messages from a specific channel.
@@ -416,6 +533,7 @@ def fetch_messages(channel_id: str) -> Response:
 # --------------------- Direct Messages ---------------------
 
 @app.route("/start_dm", methods=["POST"])
+@login_required
 def start_direct_message() -> Response:
     """
     Start or retrieve a direct message channel between two users.
@@ -430,12 +548,13 @@ def start_direct_message() -> Response:
         Response: A JSON response with the channel ID.
                  Format: {"channel_id": id}
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-        
-    sender_id: str = data["sender_id"]
-    receiver_id: str = data["receiver_id"]
+
+    # Use current_user.id instead of data.get("sender_id")
+    sender_id = current_user.id
+    receiver_id = data.get("receiver_id")
 
     # Sort user IDs to ensure consistent channel naming
     user_ids: List[str] = sorted([sender_id, receiver_id])
@@ -465,7 +584,7 @@ def bad_request(error):
 
 @app.errorhandler(404)
 def not_found(error):
-    """Handles HTTP 404 Not Found errors.""" 
+    """Handles HTTP 404 Not Found errors."""
     app.logger.warning(f"404 Not Found: {str(error)}")
     return jsonify({"error": "Not found", "message": str(error)}), 404
 
@@ -479,7 +598,7 @@ def internal_server_error(error):
 
 @app.errorhandler(Exception)
 def unhandled_exception(error):
-    """Catches and handles uncaught exceptions.""" 
+    """Catches and handles uncaught exceptions."""
     app.logger.exception(f"Unhandled Exception: {str(error)}")
     return jsonify({"error": "An unexpected error occurred"}), 500
 
