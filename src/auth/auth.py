@@ -88,26 +88,41 @@ def token_required(f):
         token = None
         auth_header = request.headers.get('Authorization')
 
-        # Check if Authorization header exists and has the right format
+        # Debug logging to see what's being received
+        current_app.logger.info(f"Auth header: {auth_header}")
+
         if auth_header:
             if auth_header.startswith('Bearer '):
                 token = auth_header.split(' ')[1]
 
-        # Return error if no token is provided
         if not token:
+            current_app.logger.warning("No token provided in request")
             return jsonify({'error': 'Authentication required'}), 401
 
-        # Decode and validate the token
-        payload = decode_token(token)
-        if not payload:
-            return jsonify({'error': 'Invalid or expired token'}), 401
+        try:
+            # Debug token decoding
+            current_app.logger.info(f"Attempting to decode token: {token[:10]}...")
+            payload = decode_token(token)
 
-        # Fetch the user from the database
-        current_user = db.session.get(UserModel, payload['sub'])
-        if not current_user:
-            return jsonify({'error': 'User not found'}), 401
+            if not payload:
+                current_app.logger.warning("Invalid token payload")
+                return jsonify({'error': 'Invalid token'}), 401
 
-        # Call the wrapped function with the authenticated user
+            user_id = payload.get('sub')
+            if not user_id:
+                current_app.logger.warning("No user_id in token payload")
+                return jsonify({'error': 'Invalid token format'}), 401
+
+            current_user = db.session.get(UserModel, user_id)
+
+            if not current_user:
+                current_app.logger.warning(f"User not found for ID: {user_id}")
+                return jsonify({'error': 'User not found'}), 401
+
+        except Exception as e:
+            current_app.logger.error(f"Token validation error: {str(e)}")
+            return jsonify({'error': 'Token validation failed'}), 401
+
         return f(current_user, *args, **kwargs)
 
     return decorated
