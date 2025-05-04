@@ -137,11 +137,16 @@ def register() -> Tuple[Response, int]:
                Success: ({"user_id": id, "username": username}, 200)
                Error: ({"error": message}, error_code)
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+        return jsonify({"error": "Invalid or missing input"}), 400
+
     username: str = data.get("username")
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
 
     existing_user: Optional[UserModel] = UserModel.query.filter_by(
         username=username).first()
@@ -168,11 +173,16 @@ def login() -> Tuple[Response, int]:
                Success: ({"user_id": id, "username": username}, 200)
                Error: ({"error": message}, error_code)
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+        return jsonify({"error": "Invalid or missing input"}), 400
+
     username: str = data.get("username")
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
 
     user: Optional[UserModel] = UserModel.query.filter_by(username=username).first()
     if not user:
@@ -194,10 +204,13 @@ def create_channel() -> Tuple[Response, int]:
         tuple: A JSON response with channel details and HTTP status code.
                Success: ({"channel_id": id, "name": name}, 200)
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+        return jsonify({"error": "Invalid or missing input"}), 400
+
     name: str = data.get("name")
 
     new_channel = ChannelModel(id=str(uuid.uuid4()), name=name)
@@ -226,9 +239,12 @@ def join_channel() -> Tuple[Response, int]:
                Success: ({"joined": True}, 200)
                Error: ({"error": message}, error_code)
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
+        return jsonify({"error": "Invalid or missing input"}), 400
         
     user_id: str = data.get("user_id")
     channel_id: str = data.get("channel_id")
@@ -334,9 +350,12 @@ def send_message() -> Response:
         Response: A JSON response with message details, and AI response if applicable.
                  Format: [{"message_id": id, "sender_id": sender, ...}, ...]
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
+        return jsonify({"error": "Invalid or missing input"}), 400
         
     sender_id: str = data.get("sender_id")
     channel_id: str = data.get("channel_id")
@@ -430,10 +449,13 @@ def start_direct_message() -> Response:
         Response: A JSON response with the channel ID.
                  Format: {"channel_id": id}
     """
-    data: Dict[str, Any] = request.get_json(silent=True)
+    if request.is_json:
+        data: Dict[str, Any] = request.get_json(silent=True)
+    else:
+        data: Dict[str, Any] = request.form.to_dict()
     if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
-        
+        return jsonify({"error": "Invalid or missing input"}), 400
+  
     sender_id: str = data["sender_id"]
     receiver_id: str = data["receiver_id"]
 
