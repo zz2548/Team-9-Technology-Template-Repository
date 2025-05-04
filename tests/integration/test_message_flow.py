@@ -1,3 +1,14 @@
+"""
+Integration tests for message-related API endpoints in the Flask application,
+including tests for the following functionality:
+- Sending and retrieving messages in a regular channel
+- Interacting with an AI-powered 'ai-helpdesk' channel
+- Creating and initiating direct messages (DMs) between users
+
+Fixtures are used to manage user registration, channel creation, and cleanup
+using a test client and an in-memory database.
+"""
+
 import pytest
 
 from app import app, db
