@@ -32,7 +32,6 @@ jobs:
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
             echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
             echo "export MYPYPATH=$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
-            source .venv/bin/activate
 
       - run:
           name: Install Dependencies
@@ -44,7 +43,11 @@ jobs:
           command: |
             mypy src
             ruff check . --config pyproject.toml
-
+      - run:
+          name: Initiate database
+          command: |
+            source .venv/bin/activate
+            flask init-db
       - run:
           name: Run All Tests with pytest
           command: |
