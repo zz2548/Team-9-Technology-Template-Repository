@@ -47,6 +47,7 @@ jobs:
           name: Initiate database
           command: |
             source .venv/bin/activate
+            source $BASH_ENV
             flask init-db
       - run:
           name: Run All Tests with pytest
