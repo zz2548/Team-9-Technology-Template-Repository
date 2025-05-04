@@ -33,20 +33,42 @@ git submodule update --init --recursive
 
 # Running the Server
 
-First, initialize the database:
+## Setup environment
 
 ```bash
-$env:FLASK_APP = "app.py"     # (Windows PowerShell)
-flask shell
->>> from src.models import db
->>> db.create_all()
->>> exit()
+# On Linux/macOS
+export FLASK_APP=app.py
+
+# On Windows PowerShell
+$env:FLASK_APP = "app.py"
+
+# On Windows Command Prompt
+set FLASK_APP=app.py
 ```
-
-Then start the Flask server:
-
+## Initialize the database
 ```bash
+# Create database tables
+flask init-db
+
+# Create AI bot user
+flask seed-ai-bot
+```
+## Start the server
+```bash
+# Option 1: Using Flask run command
+flask run
+
+# Option 2: Using Python directly
 python app.py
+```
+## Additional commands
+```bash
+# Drop all database tables (will prompt for confirmation)
+flask drop-db
+
+# Then recreate them
+flask init-db
+flask seed-ai-bot
 ```
 
 Server will run at: `http://127.0.0.1:5000/`
