@@ -5,16 +5,14 @@ import re
 from pathlib import Path
 from typing import cast, Optional, Tuple
 from flask import current_app
-from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
-from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
-
 # add submodule path to sys.path for local dev
 current_file = Path(__file__).resolve()
 ai_module_path = current_file.parent.parent.parent / "external" / "ai_convo_client"
 issue_tracker_path = current_file.parent.parent.parent / "external" / "issue_tracker"
 sys.path.append(str(ai_module_path))
 sys.path.append(str(issue_tracker_path))
-
+from ai_conversation_client.providers import OpenAIClient # type: ignore[import-not-found]
+from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClient # type: ignore[import-not-found]
 
 
 # Create a singleton for the issue tracker
