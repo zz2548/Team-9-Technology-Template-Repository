@@ -279,7 +279,16 @@ def list_channel_users(channel_id: str) -> Response:
     memberships = ChannelUserModel.query.filter_by(channel_id=channel_id).all()
     user_ids: List[str] = [membership.user_id for membership in memberships]
 
-    return jsonify({"users": user_ids})
+    # Fetch user details for each user ID
+    user_details = []
+    for user_id in user_ids:
+        user = db.session.get(UserModel, user_id)
+        if user:
+            user_details.append({
+                "id": user.id,
+                "username": user.username
+            })
+    return jsonify({"users": user_details})
 
 
 @app.route("/channels", methods=["GET"])

@@ -12,23 +12,27 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
+
         .panel {
             background: white;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             flex: 1;
             min-width: 300px;
         }
+
         .chat-window {
             flex: 2;
             min-width: 500px;
         }
+
         .message-container {
             height: 400px;
             overflow-y: auto;
@@ -38,6 +42,7 @@
             margin-bottom: 10px;
             background-color: #fff;
         }
+
         .message {
             margin-bottom: 10px;
             padding: 8px 12px;
@@ -45,24 +50,29 @@
             max-width: 70%;
             word-wrap: break-word;
         }
+
         .message.received {
             background-color: #e9e9eb;
             align-self: flex-start;
         }
+
         .message.sent {
             background-color: #007aff;
             color: white;
             align-self: flex-end;
             margin-left: auto;
         }
+
         .message.ai {
             background-color: #34c759;
             color: white;
         }
+
         .message-input {
             display: flex;
             margin-top: 10px;
         }
+
         .message-input input {
             flex: 1;
             padding: 10px;
@@ -70,6 +80,7 @@
             border-radius: 4px;
             margin-right: 10px;
         }
+
         button {
             background-color: #007aff;
             color: white;
@@ -79,9 +90,11 @@
             cursor: pointer;
             font-weight: bold;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         input, select {
             padding: 8px;
             margin-bottom: 10px;
@@ -90,494 +103,531 @@
             width: 100%;
             box-sizing: border-box;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
+
         .channel-list, .user-list {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .channel-list li, .user-list li {
             padding: 8px;
             border-bottom: 1px solid #eee;
             cursor: pointer;
         }
+
         .channel-list li:hover, .user-list li:hover {
             background-color: #f9f9f9;
         }
+
         .channel-list li.active, .user-list li.active {
             background-color: #e6f7ff;
             border-left: 3px solid #007aff;
         }
+
         .sender-info {
             font-size: 0.8em;
             margin-bottom: 4px;
             font-weight: bold;
         }
+
         .time-info {
             font-size: 0.7em;
             text-align: right;
             margin-top: 2px;
             opacity: 0.7;
         }
+
         #status-message {
             color: #dc3545;
             margin-top: 10px;
             font-weight: bold;
         }
+
         .success-message {
             color: #28a745;
         }
     </style>
 </head>
 <body>
-    <h1>Simple Chat Client</h1>
+<h1>Simple Chat Client</h1>
 
-    <div class="container">
-        <!-- User Panel -->
-        <div class="panel">
-            <h2>User</h2>
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <button id="register-btn">Register</button>
-                <button id="login-btn">Login</button>
-            </div>
-            <div id="user-info" style="display: none;">
-                <p>Logged in as: <span id="logged-user"></span></p>
-                <p>User ID: <span id="user-id"></span></p>
-            </div>
-            <div id="status-message"></div>
+<div class="container">
+    <!-- User Panel -->
+    <div class="panel">
+        <h2>User</h2>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter username">
         </div>
-
-        <!-- Channel Panel -->
-        <div class="panel">
-            <h2>Channels</h2>
-            <div class="form-group">
-                <label for="channel-name">Create Channel:</label>
-                <input type="text" id="channel-name" placeholder="Channel name">
-                <button id="create-channel-btn">Create</button>
-            </div>
-            <div class="form-group">
-                <h3>Available Channels</h3>
-                <ul class="channel-list" id="channel-list">
-                    <!-- Channels will be listed here -->
-                </ul>
-            </div>
-            <div id="channel-users" style="display: none;">
-                <h3>Users in Channel</h3>
-                <ul class="user-list" id="channel-users-list">
-                    <!-- Channel users will be listed here -->
-                </ul>
-            </div>
+        <div class="form-group">
+            <button id="register-btn">Register</button>
+            <button id="login-btn">Login</button>
         </div>
+        <div id="user-info" style="display: none;">
+            <p>Logged in as: <span id="logged-user"></span></p>
+            <p>User ID: <span id="user-id"></span></p>
+        </div>
+        <div id="status-message"></div>
+    </div>
 
-        <!-- Chat Window -->
-        <div class="panel chat-window">
-            <h2>Chat: <span id="current-channel">No Channel Selected</span></h2>
-            <div class="message-container" id="messages">
-                <!-- Messages will be displayed here -->
-            </div>
-            <div class="message-input">
-                <input type="text" id="message-input" placeholder="Type your message..." disabled>
-                <button id="send-btn" disabled>Send</button>
-            </div>
+    <!-- Channel Panel -->
+    <div class="panel">
+        <h2>Channels</h2>
+        <div class="form-group">
+            <label for="channel-name">Create Channel:</label>
+            <input type="text" id="channel-name" placeholder="Channel name">
+            <button id="create-channel-btn">Create</button>
+        </div>
+        <div class="form-group">
+            <h3>Available Channels</h3>
+            <ul class="channel-list" id="channel-list">
+                <!-- Channels will be listed here -->
+            </ul>
+        </div>
+        <div id="channel-users" style="display: none;">
+            <h3>Users in Channel</h3>
+            <ul class="user-list" id="channel-users-list">
+                <!-- Channel users will be listed here -->
+            </ul>
         </div>
     </div>
 
-    <script>
-        // API URL
-        const API_URL = 'http://127.0.0.1:5000';
+    <!-- Chat Window -->
+    <div class="panel chat-window">
+        <h2>Chat: <span id="current-channel">No Channel Selected</span></h2>
+        <div class="message-container" id="messages">
+            <!-- Messages will be displayed here -->
+        </div>
+        <div class="message-input">
+            <input type="text" id="message-input" placeholder="Type your message..."
+                   disabled>
+            <button id="send-btn" disabled>Send</button>
+        </div>
+    </div>
+</div>
 
-        // Store user and channel information
-        let currentUser = {
-            id: null,
-            username: null
-        };
+<script>
+    // API URL
+    const API_URL = 'http://127.0.0.1:5000';
 
-        let currentChannel = {
-            id: null,
-            name: null
-        };
+    // Store user and channel information
+    let currentUser = {
+        id: null,
+        username: null
+    };
 
-        let channels = [];
-        let channelUsers = [];
+    let currentChannel = {
+        id: null,
+        name: null
+    };
 
-        // DOM Elements
-        const usernameInput = document.getElementById('username');
-        const registerBtn = document.getElementById('register-btn');
-        const loginBtn = document.getElementById('login-btn');
-        const userInfo = document.getElementById('user-info');
-        const loggedUser = document.getElementById('logged-user');
-        const userId = document.getElementById('user-id');
-        const statusMessage = document.getElementById('status-message');
+    let channels = [];
+    let channelUsers = [];
 
-        const channelNameInput = document.getElementById('channel-name');
-        const createChannelBtn = document.getElementById('create-channel-btn');
-        const channelList = document.getElementById('channel-list');
-        const channelUsersSection = document.getElementById('channel-users');
-        const channelUsersList = document.getElementById('channel-users-list');
+    // DOM Elements
+    const usernameInput = document.getElementById('username');
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+    const userInfo = document.getElementById('user-info');
+    const loggedUser = document.getElementById('logged-user');
+    const userId = document.getElementById('user-id');
+    const statusMessage = document.getElementById('status-message');
 
-        const currentChannelSpan = document.getElementById('current-channel');
-        const messages = document.getElementById('messages');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
+    const channelNameInput = document.getElementById('channel-name');
+    const createChannelBtn = document.getElementById('create-channel-btn');
+    const channelList = document.getElementById('channel-list');
+    const channelUsersSection = document.getElementById('channel-users');
+    const channelUsersList = document.getElementById('channel-users-list');
 
-        // Event Listeners
-        registerBtn.addEventListener('click', registerUser);
-        loginBtn.addEventListener('click', loginUser);
-        createChannelBtn.addEventListener('click', createChannel);
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+    const currentChannelSpan = document.getElementById('current-channel');
+    const messages = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
 
-        // User Functions
-        async function registerUser() {
-            const username = usernameInput.value.trim();
-            if (!username) {
-                showStatus('Please enter a username', false);
-                return;
-            }
+    // Event Listeners
+    registerBtn.addEventListener('click', registerUser);
+    loginBtn.addEventListener('click', loginUser);
+    createChannelBtn.addEventListener('click', createChannel);
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
 
-            try {
-                const response = await fetch(`${API_URL}/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Registration failed');
-                }
-
-                const data = await response.json();
-                currentUser.id = data.user_id;
-                currentUser.username = data.username;
-
-                showUserInfo();
-                showStatus('Registration successful!', true);
-
-                // Load channels after registration
-                loadChannels();
-
-            } catch (error) {
-                showStatus('Error: ' + error.message, false);
-            }
+    // User Functions
+    async function registerUser() {
+        const username = usernameInput.value.trim();
+        if (!username) {
+            showStatus('Please enter a username', false);
+            return;
         }
 
-        async function loginUser() {
-            const username = usernameInput.value.trim();
-            if (!username) {
-                showStatus('Please enter a username', false);
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Login failed');
-                }
-
-                const data = await response.json();
-                currentUser.id = data.user_id;
-                currentUser.username = data.username;
-
-                showUserInfo();
-                showStatus('Login successful!', true);
-
-                // Load channels after login
-                loadChannels();
-
-            } catch (error) {
-                showStatus('Error: ' + error.message, false);
-            }
-        }
-
-        // Channel Functions
-        async function createChannel() {
-            const channelName = channelNameInput.value.trim();
-            if (!channelName) {
-                showStatus('Please enter a channel name', false);
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/channel`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: channelName })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to create channel');
-                }
-
-                const data = await response.json();
-                showStatus(`Channel ${channelName} created successfully!`, true);
-                channelNameInput.value = '';
-
-                // Add the new channel to the list
-                channels.push(data);
-                updateChannelList();
-
-            } catch (error) {
-                showStatus('Error: ' + error.message, false);
-            }
-        }
-
-        async function loadChannels() {
-            try {
-                const response = await fetch(`${API_URL}/channels`);
-                if (!response.ok) {
-                    throw new Error('Failed to load channels');
-                }
-
-                const data = await response.json();
-                channels = data;
-                updateChannelList();
-            } catch (error) {
-                showStatus('Error loading channels: ' + error.message, false);
-            }
-        }
-
-
-
-        function updateChannelList() {
-            channelList.innerHTML = '';
-
-            channels.forEach(channel => {
-                const li = document.createElement('li');
-                li.textContent = channel.name;
-                li.dataset.id = channel.channel_id;
-
-                li.addEventListener('click', () => selectChannel(channel));
-
-                channelList.appendChild(li);
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username})
             });
-        }
 
-        async function selectChannel(channel) {
-            // Highlight the selected channel
-            const items = channelList.querySelectorAll('li');
-            items.forEach(item => item.classList.remove('active'));
-            const selectedItem = channelList.querySelector(`li[data-id="${channel.channel_id}"]`);
-            if (selectedItem) {
-                selectedItem.classList.add('active');
+            if (!response.ok) {
+                throw new Error('Registration failed');
             }
 
-            // Join the channel if not already joined
-            try {
-                const response = await fetch(`${API_URL}/channel/join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        user_id: currentUser.id,
-                        channel_id: channel.channel_id
-                    })
-                });
+            const data = await response.json();
+            currentUser.id = data.user_id;
+            currentUser.username = data.username;
 
-                if (!response.ok) {
-                    throw new Error('Failed to join channel');
-                }
+            showUserInfo();
+            showStatus('Registration successful!', true);
 
-                // Set current channel
-                currentChannel.id = channel.channel_id;
-                currentChannel.name = channel.name;
-                currentChannelSpan.textContent = channel.name;
+            // Load channels after registration
+            loadChannels();
 
-                // Enable message input
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
+        } catch (error) {
+            showStatus('Error: ' + error.message, false);
+        }
+    }
 
-                // Load channel messages
-                loadMessages();
-
-                // Load channel users
-                loadChannelUsers();
-
-            } catch (error) {
-                showStatus('Error: ' + error.message, false);
-            }
+    async function loginUser() {
+        const username = usernameInput.value.trim();
+        if (!username) {
+            showStatus('Please enter a username', false);
+            return;
         }
 
-        async function loadChannelUsers() {
-            try {
-                const response = await fetch(`${API_URL}/channel/${currentChannel.id}/users`);
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username})
+            });
 
-                if (!response.ok) {
-                    throw new Error('Failed to load channel users');
-                }
-
-                const data = await response.json();
-                channelUsers = data.users;
-
-                // Update users list
-                channelUsersList.innerHTML = '';
-                channelUsers.forEach(userId => {
-                    const li = document.createElement('li');
-                    li.textContent = userId === currentUser.id ?
-                        `${userId} (You)` : userId;
-                    channelUsersList.appendChild(li);
-                });
-
-                channelUsersSection.style.display = 'block';
-
-            } catch (error) {
-                console.error('Error loading channel users:', error);
+            if (!response.ok) {
+                throw new Error('Login failed');
             }
+
+            const data = await response.json();
+            currentUser.id = data.user_id;
+            currentUser.username = data.username;
+
+            showUserInfo();
+            showStatus('Login successful!', true);
+
+            // Load channels after login
+            loadChannels();
+
+        } catch (error) {
+            showStatus('Error: ' + error.message, false);
+        }
+    }
+
+    // Channel Functions
+    async function createChannel() {
+        const channelName = channelNameInput.value.trim();
+        if (!channelName) {
+            showStatus('Please enter a channel name', false);
+            return;
         }
 
-        // Message Functions
-        async function loadMessages() {
-            messages.innerHTML = '';
+        try {
+            const response = await fetch(`${API_URL}/channel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: channelName})
+            });
 
-            try {
-                const response = await fetch(`${API_URL}/message/${currentChannel.id}`);
+            if (!response.ok) {
+                throw new Error('Failed to create channel');
+            }
 
-                if (!response.ok) {
-                    throw new Error('Failed to load messages');
+            const data = await response.json();
+            showStatus(`Channel ${channelName} created successfully!`, true);
+            channelNameInput.value = '';
+
+            // Add the new channel to the list
+            channels.push(data);
+            updateChannelList();
+
+        } catch (error) {
+            showStatus('Error: ' + error.message, false);
+        }
+    }
+
+    async function loadChannels() {
+        try {
+            const response = await fetch(`${API_URL}/channels`);
+            if (!response.ok) {
+                throw new Error('Failed to load channels');
+            }
+
+            const data = await response.json();
+            channels = data;
+            updateChannelList();
+        } catch (error) {
+            showStatus('Error loading channels: ' + error.message, false);
+        }
+    }
+
+
+    function updateChannelList() {
+        channelList.innerHTML = '';
+
+        channels.forEach(channel => {
+            const li = document.createElement('li');
+            li.textContent = channel.name;
+            li.dataset.id = channel.channel_id;
+
+            li.addEventListener('click', () => selectChannel(channel));
+
+            channelList.appendChild(li);
+        });
+    }
+
+    async function selectChannel(channel) {
+        // Highlight the selected channel
+        const items = channelList.querySelectorAll('li');
+        items.forEach(item => item.classList.remove('active'));
+        const selectedItem = channelList.querySelector(`li[data-id="${channel.channel_id}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('active');
+        }
+
+        // Join the channel if not already joined
+        try {
+            const response = await fetch(`${API_URL}/channel/join`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    channel_id: channel.channel_id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to join channel');
+            }
+
+            // Set current channel
+            currentChannel.id = channel.channel_id;
+            currentChannel.name = channel.name;
+            currentChannelSpan.textContent = channel.name;
+
+            // Enable message input
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+
+            // Load channel messages
+            loadMessages();
+
+            // Load channel users
+            await loadChannelUsers(); // Load users first to build cache
+            loadMessages();
+
+        } catch (error) {
+            showStatus('Error: ' + error.message, false);
+        }
+    }
+
+    async function loadChannelUsers() {
+        try {
+            const response = await fetch(`${API_URL}/channel/${currentChannel.id}/users`);
+
+            if (!response.ok) {
+                throw new Error('Failed to load channel users');
+            }
+
+            const data = await response.json();
+
+            // The API now returns objects with id and username properties
+            const users = data.users;
+
+            // Update users list
+            channelUsersList.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                // Check if this user is the current user
+                if (user.id === currentUser.id) {
+                    li.textContent = `${user.username} (You)`;
+                } else {
+                    li.textContent = user.username;
                 }
+                channelUsersList.appendChild(li);
+            });
 
-                const data = await response.json();
+            channelUsersSection.style.display = 'block';
 
-                // Display messages
+        } catch (error) {
+            console.error('Error loading channel users:', error);
+        }
+    }
+
+    // Store a map of user IDs to usernames for message display
+    let userCache = {};
+
+    // Function to ensure we have user details
+    function cacheUserDetails(users) {
+        users.forEach(user => {
+            userCache[user.id] = user.username;
+        });
+        // Always make sure current user is in cache
+        userCache[currentUser.id] = currentUser.username;
+        // Add AI bot to cache
+        userCache['ai_bot'] = 'AI Assistant';
+    }
+
+    // Message Functions
+    async function loadMessages() {
+        messages.innerHTML = '';
+
+        try {
+            const response = await fetch(`${API_URL}/message/${currentChannel.id}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to load messages');
+            }
+
+            const data = await response.json();
+
+            // Load channel users to build username cache first
+            await loadChannelUsers();
+
+            // Display messages
+            data.forEach(msg => {
+                displayMessage(msg);
+            });
+
+            // Scroll to bottom
+            messages.scrollTop = messages.scrollHeight;
+
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    }
+
+    async function sendMessage() {
+        const content = messageInput.value.trim();
+        if (!content) return;
+
+        try {
+            const response = await fetch(`${API_URL}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender_id: currentUser.id,
+                    channel_id: currentChannel.id,
+                    content: content
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send message');
+            }
+
+            const data = await response.json();
+
+            // Clear input
+            messageInput.value = '';
+
+            // If the channel is ai-helpdesk, display both the user message and AI response
+            if (currentChannel.name === 'ai-helpdesk' && Array.isArray(data)) {
                 data.forEach(msg => {
                     displayMessage(msg);
                 });
-
-                // Scroll to bottom
-                messages.scrollTop = messages.scrollHeight;
-
-            } catch (error) {
-                console.error('Error loading messages:', error);
-            }
-        }
-
-        async function sendMessage() {
-            const content = messageInput.value.trim();
-            if (!content) return;
-
-            try {
-                const response = await fetch(`${API_URL}/message`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        sender_id: currentUser.id,
-                        channel_id: currentChannel.id,
-                        content: content
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to send message');
-                }
-
-                const data = await response.json();
-
-                // Clear input
-                messageInput.value = '';
-
-                // If the channel is ai-helpdesk, display both the user message and AI response
-                if (currentChannel.name === 'ai-helpdesk' && Array.isArray(data)) {
-                    data.forEach(msg => {
-                        displayMessage(msg);
-                    });
-                } else {
-                    // Display the sent message
-                    const msgObj = Array.isArray(data) ? data[0] : data;
-                    displayMessage(msgObj);
-                }
-
-                // Scroll to bottom
-                messages.scrollTop = messages.scrollHeight;
-
-            } catch (error) {
-                showStatus('Error: ' + error.message, false);
-            }
-        }
-
-        function displayMessage(msg) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-
-            if (msg.sender_id === currentUser.id) {
-                messageDiv.classList.add('sent');
-            } else if (msg.sender_id === 'ai_bot') {
-                messageDiv.classList.add('ai');
             } else {
-                messageDiv.classList.add('received');
+                // Display the sent message
+                const msgObj = Array.isArray(data) ? data[0] : data;
+                displayMessage(msgObj);
             }
 
-            const senderInfo = document.createElement('div');
-            senderInfo.classList.add('sender-info');
-            senderInfo.textContent = msg.sender_id === currentUser.id ? 'You' :
-                                    (msg.sender_id === 'ai_bot' ? 'AI Assistant' : msg.sender_id);
+            // Scroll to bottom
+            messages.scrollTop = messages.scrollHeight;
 
-            const messageContent = document.createElement('div');
-            messageContent.textContent = msg.content;
+        } catch (error) {
+            showStatus('Error: ' + error.message, false);
+        }
+    }
 
-            const timeInfo = document.createElement('div');
-            timeInfo.classList.add('time-info');
-            timeInfo.textContent = new Date().toLocaleTimeString();
+    function displayMessage(msg) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
 
-            messageDiv.appendChild(senderInfo);
-            messageDiv.appendChild(messageContent);
-            messageDiv.appendChild(timeInfo);
-
-            messages.appendChild(messageDiv);
+        if (msg.sender_id === currentUser.id) {
+            messageDiv.classList.add('sent');
+        } else if (msg.sender_id === 'ai_bot') {
+            messageDiv.classList.add('ai');
+        } else {
+            messageDiv.classList.add('received');
         }
 
-        // Helper Functions
-        function showUserInfo() {
-            userInfo.style.display = 'block';
-            loggedUser.textContent = currentUser.username;
-            userId.textContent = currentUser.id;
-        }
+        const senderInfo = document.createElement('div');
+        senderInfo.classList.add('sender-info');
 
-        function showStatus(message, isSuccess = false) {
-            statusMessage.textContent = message;
-            statusMessage.className = isSuccess ? 'success-message' : '';
+        // Use username from cache or fallback to ID
+        const username = userCache[msg.sender_id] || `User ${msg.sender_id.substring(0, 8)}...`;
+        senderInfo.textContent = username;
 
-            // Clear status after 5 seconds
-            setTimeout(() => {
-                statusMessage.textContent = '';
-            }, 5000);
-        }
+        const messageContent = document.createElement('div');
+        messageContent.textContent = msg.content;
 
-        // Initialize
-        function init() {
-            loadChannels(); // fetch the real channels from backend
-        }
+        const timeInfo = document.createElement('div');
+        timeInfo.classList.add('time-info');
+        timeInfo.textContent = new Date().toLocaleTimeString();
+
+        messageDiv.appendChild(senderInfo);
+        messageDiv.appendChild(messageContent);
+        messageDiv.appendChild(timeInfo);
+
+        messages.appendChild(messageDiv);
+    }
 
 
-        // Start the app
-        init();
-    </script>
+    // Helper Functions
+    function showUserInfo() {
+        userInfo.style.display = 'block';
+        loggedUser.textContent = currentUser.username;
+        userId.textContent = currentUser.id;
+    }
+
+    function showStatus(message, isSuccess = false) {
+        statusMessage.textContent = message;
+        statusMessage.className = isSuccess ? 'success-message' : '';
+
+        // Clear status after 5 seconds
+        setTimeout(() => {
+            statusMessage.textContent = '';
+        }, 5000);
+    }
+
+    // Initialize
+    function init() {
+        loadChannels(); // fetch the real channels from backend
+    }
+
+
+    // Start the app
+    init();
+</script>
 </body>
 </html>
