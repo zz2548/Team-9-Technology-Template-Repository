@@ -17,9 +17,22 @@ from external.issue_tracker.api.src.issue_tracker import MemoryIssueTrackerClien
 
 # Create a singleton for the issue tracker
 class IssueTrackerSingleton:
+    """
+    A singleton class that provides a single instance of the issue tracker client.
+
+    This class ensures that only one instance of 'MemoryIssueTrackerClient' is created
+    and reused across the application. It is useful for maintaining shared state and
+    reducing redundant initialization of external clients.
+    """
+    
     _instance: Optional[MemoryIssueTrackerClient] = None
     @classmethod
     def get_instance(cls) -> Optional[MemoryIssueTrackerClient]:
+        """ 
+        Returns an instance of 'MemoryIssueTrackerClient'. If one has not yet been intiailzed,
+        a new instance is created and stored for future use.
+        """
+        
         if cls._instance is None:
             try:
                 cls._instance = MemoryIssueTrackerClient()
@@ -30,6 +43,14 @@ class IssueTrackerSingleton:
         return cls._instance
 
 class AiBotChannel:
+    """
+    A class that integrates an AI conversational client with an issue tracker.
+
+    This class handles user interaction with an AI chat client and enables
+    task creation within an issue tracker based on user input. It extracts structured
+    task data from user prompts and appends current tasks to the client's response.
+    """
+    
     def __init__(self) -> None:
         self.client = OpenAIClient()
         self.conversation = self.client.create_conversation(
