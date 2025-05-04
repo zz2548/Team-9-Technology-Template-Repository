@@ -34,7 +34,7 @@ def test_client() -> None:
     db.create_all()
 
     # Set up test users and channels
-    global USER_IDS, AUTH_TOKENS, CHANNEL_ID, AI_CHANNEL_ID
+    global USER_IDS, AUTH_TOKENS, CHANNEL_ID, AI_CHANNEL_ID # noqa: PLW0603, PLW0602
 
     # Register test users
     for user_data in TEST_USERS:
@@ -77,7 +77,7 @@ def test_client() -> None:
     db.drop_all()
     ctx.pop()
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def authenticated_client(test_client) -> None:
     """
     Returns a test client with an authenticated session for the first test user.

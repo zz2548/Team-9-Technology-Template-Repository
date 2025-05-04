@@ -88,16 +88,15 @@ def token_required(f: F) -> F:
     """
 
     @wraps(f)
-    def decorated(*args, **kwargs) -> Any:
+    def decorated(*args:object , **kwargs:object) -> Any:
         token = None
         auth_header = request.headers.get('Authorization')
 
         # Debug logging to see what's being received
         current_app.logger.info(f"Auth header: {auth_header}")
 
-        if auth_header:
-            if auth_header.startswith('Bearer '):
-                token = auth_header.split(' ')[1]
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
 
         if not token:
             current_app.logger.warning("No token provided in request")

@@ -40,4 +40,5 @@ class UserModel(db.Model, UserMixin):
         return self.id
 
     def __repr__(self) -> str:
+        """Return string representation of the user object."""
         return f"<User {self.username}>"

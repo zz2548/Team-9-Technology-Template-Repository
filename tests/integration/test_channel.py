@@ -40,7 +40,7 @@ def test_client():
     register_response = testing_client.post("/register", json=TEST_USER)
     user_data = register_response.get_json()
 
-    global TEST_USER_ID, AUTH_TOKEN
+    global TEST_USER_ID, AUTH_TOKEN # noqa: PLW0603, PLW0602
     TEST_USER_ID = user_data.get("user_id")
     AUTH_TOKEN = user_data.get("token")
 
@@ -49,7 +49,7 @@ def test_client():
     db.drop_all()
     ctx.pop()
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def authenticated_client(test_client):
     """
     Returns a test client with an authenticated session.
@@ -64,7 +64,7 @@ def authenticated_client(test_client):
 
 def test_create_channel(authenticated_client):
     """Tests the creation of a new channel."""
-    global CREATED_CHANNEL_ID
+    global CREATED_CHANNEL_ID # noqa: PLW0603, PLW0602
 
     response = authenticated_client.post("/channel", json={"name": "general"})
     assert response.status_code == 200
@@ -87,7 +87,7 @@ def test_list_channels(authenticated_client):
 
 def test_join_channel(authenticated_client):
     """Tests joining a channel using the authenticated user."""
-    global CREATED_CHANNEL_ID
+    global CREATED_CHANNEL_ID # noqa: PLW0603, PLW0602
 
     # Make sure we have a channel to join
     if not CREATED_CHANNEL_ID:
@@ -107,7 +107,7 @@ def test_join_channel(authenticated_client):
 
 def test_list_channel_users(authenticated_client):
     """Tests the retrieval of users in a specific channel."""
-    global CREATED_CHANNEL_ID
+    global CREATED_CHANNEL_ID # noqa: PLW0603, PLW0602
 
     # Ensure CREATED_CHANNEL_ID is available
     if not CREATED_CHANNEL_ID:
@@ -135,7 +135,7 @@ def test_list_channel_users(authenticated_client):
 # Alternative approach using JWT token authentication
 def test_api_create_channel_with_token():
     """Tests creating a channel using token authentication."""
-    global AUTH_TOKEN
+    global AUTH_TOKEN # noqa: PLW0603, PLW0602
 
     # Create a new test client for this test
     client = app.test_client()
