@@ -5,6 +5,7 @@ from src.user_api import User
 class MockUser(User):
     def __init__(self, user_id: str, username: str) -> None:
         super().__init__(user_id, username)
+        self.password_hash = None
 
     def get_id(self) -> str:
         return self.user_id
@@ -15,13 +16,25 @@ class MockUser(User):
     def list_channels(self) -> list[str]:
         return ["general", "random"]
 
+    def set_password(self, password: str) -> None:
+        # This is a mock method, so we don't actually hash the password
+        self.password_hash = f"mock_hash_{password}"
+
+    def check_password(self, password: str) -> bool:
+        # For testing purposes, just check if it matches our simple mock pattern
+        return self.password_hash == f"mock_hash_{password}" if self.password_hash else False
+
     @staticmethod
     def register(username: str) -> "User":
-        return MockUser("u123", username)
+        # Keep the original signature
+        user = MockUser("u123", username)
+        return user
 
     @staticmethod
     def login(username: str) -> "User":
-        return MockUser("u123", username)
+        # Keep the original signature
+        user = MockUser("u123", username)
+        return user
 
 
 def test_register_and_login() -> None:

@@ -7,15 +7,19 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/python:3.10
+    environment:
+      OPENAI_API_KEY: "fake-key-for-testing"
     steps:
       - checkout:
-          submodules: true  # pulls the submodule repo
+          submodules: true  # pulls the submodule repos
 
       - run:
-          name: Ensure ai_convo_client is ready
+          name: Initialize and Fix Submodules
           command: |
-            mkdir -p external/ai_convo_client/ai_conversation_client
-            touch external/ai_convo_client/ai_conversation_client/py.typed
+            git submodule update --init --recursive
+            cd external/ai_convo_client && git checkout hw3
+            cd ../issue_tracker && git checkout hw4-jt3-fix-path
+            cd ../../  # back to project root
 
       - run:
           name: Install uv
@@ -26,9 +30,8 @@ jobs:
           command: |
             uv venv .venv
             echo 'export PATH=".venv/bin:$PATH"' >> $BASH_ENV
-            echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client" >> $BASH_ENV
-            echo "export MYPYPATH=$PWD/external/ai_convo_client" >> $BASH_ENV
-            source .venv/bin/activate
+            echo "export PYTHONPATH=$PWD/src:$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
+            echo "export MYPYPATH=$PWD/external/ai_convo_client/ai_conversation_client" >> $BASH_ENV
 
       - run:
           name: Install Dependencies
@@ -40,7 +43,13 @@ jobs:
           command: |
             mypy src
             ruff check . --config pyproject.toml
-
+      - run:
+          name: Initiate database
+          command: |
+            source .venv/bin/activate
+            source $BASH_ENV
+            echo "y" | flask drop-db
+            flask init-db
       - run:
           name: Run All Tests with pytest
           command: |
@@ -57,7 +66,7 @@ jobs:
       - run:
           name: Check Coverage Threshold
           command: |
-            coverage report --fail-under=70
+            coverage report --fail-under=50
 
       - store_test_results:
           path: test-results

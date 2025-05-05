@@ -4,10 +4,12 @@ This project implements a basic **chat client server** in Python using **Flask**
 It provides RESTful APIs for:
 
 - User registration and login
+- Token based authentication
 - Creating and joining chat channels
 - Sending and fetching messages
 - Direct messaging between two users
 - **AI chatbot integration** powered by the external `ai_convo_client` module using GIT Submodules
+- **Issuer tracker integration** powered by the external `issuer_tracker` module using GIT Submodules
 
 
 # Features
@@ -22,27 +24,77 @@ It provides RESTful APIs for:
 - **Chat with AI bot** in dedicated `ai-helpdesk` channel
 - **Persistent database** using SQLite
 
+# Cloning the project
+```bash
+git clone https://github.com/zz2548/Team-9-Technology-Template-Repository.git
+
+git submodule update --init --recursive
+
+```
 
 # Running the Server
 
-First, initialize the database:
+## Setup environment
 
 ```bash
-$env:FLASK_APP = "app.py"     # (Windows PowerShell)
-flask shell
->>> from src.models import db
->>> db.create_all()
->>> exit()
+# On Linux/macOS
+export FLASK_APP=app.py
+
+# On Windows PowerShell
+$env:FLASK_APP = "app.py"
+
+# On Windows Command Prompt
+set FLASK_APP=app.py
 ```
-
-Then start the Flask server:
-
+## Initialize the database
 ```bash
+# Create database tables
+flask init-db
+
+# Create AI bot user
+flask seed-ai-bot
+```
+## Start the server
+```bash
+# Option 1: Using Flask run command
+flask run
+
+# Option 2: Using Python directly
 python app.py
+```
+## Additional commands
+```bash
+# Drop all database tables (will prompt for confirmation)
+flask drop-db
+
+# Then recreate them
+flask init-db
+flask seed-ai-bot
 ```
 
 Server will run at: `http://127.0.0.1:5000/`
 
+# Frontend UI
+The UI provides a user-friendly interface for:
+- Registering and logging in users
+- Token based authentication and logging out users
+- Creating and joining channels
+- Sending and receiving messages
+- Chatting with the AI bot in the ai-helpdesk channel
+
+## Screenshot
+![image](https://github.com/user-attachments/assets/11e617d4-9037-4efd-9d11-a976b815c6e7)
+
+# Integration Tests
+Integration tests are located under the tests/integration/ directory.
+Tested scenarios include:
+
+- User registration and login flows
+- Token based authentication
+- Channel creation and joining
+- Sending and receiving messages
+- AI bot interaction through ai-helpdesk channel
+- Direct messaging between two users
 
 # API Endpoints 
 
@@ -188,8 +240,6 @@ Server will run at: `http://127.0.0.1:5000/`
 
 - Add timestamps (`created_at`) for messages.
 - Allow editing and deleting messages.
-- Add password for user login
-- Add authentication tokens for user sessions.
 - Improve models with relational links.
 - Add Docker support for easier deployment.
 - Persist conversation history for AI bot
@@ -201,5 +251,6 @@ Server will run at: `http://127.0.0.1:5000/`
 
 - Jerry Zou
 - Keshav Rajput
-- Terry Xu
+- Terry Mu
 - Jinglin Tao
+- Mahin Lalani
