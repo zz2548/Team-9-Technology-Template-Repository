@@ -4,6 +4,7 @@ This project implements a basic **chat client server** in Python using **Flask**
 It provides RESTful APIs for:
 
 - User registration and login
+- Token based authentication
 - Creating and joining chat channels
 - Sending and fetching messages
 - Direct messaging between two users
@@ -76,18 +77,20 @@ Server will run at: `http://127.0.0.1:5000/`
 # Frontend UI
 The UI provides a user-friendly interface for:
 - Registering and logging in users
+- Token based authentication and logging out users
 - Creating and joining channels
 - Sending and receiving messages
 - Chatting with the AI bot in the ai-helpdesk channel
 
 ## Screenshot
-![Image](https://github.com/user-attachments/assets/d8dc4713-30ad-4007-a9d7-2c03f3064cde)
+![image](https://github.com/user-attachments/assets/11e617d4-9037-4efd-9d11-a976b815c6e7)
 
 # Integration Tests
 Integration tests are located under the tests/integration/ directory.
 Tested scenarios include:
 
 - User registration and login flows
+- Token based authentication
 - Channel creation and joining
 - Sending and receiving messages
 - AI bot interaction through ai-helpdesk channel
@@ -237,8 +240,6 @@ Tested scenarios include:
 
 - Add timestamps (`created_at`) for messages.
 - Allow editing and deleting messages.
-- Add password for user login
-- Add authentication tokens for user sessions.
 - Improve models with relational links.
 - Add Docker support for easier deployment.
 - Persist conversation history for AI bot
@@ -252,3 +253,4 @@ Tested scenarios include:
 - Keshav Rajput
 - Terry Mu
 - Jinglin Tao
+- Mahin Lalani
