@@ -3,6 +3,7 @@ import unittest
 from src.channel import Channel
 
 
+
 class MockChannel(Channel):
     def __init__(self, channel_id: str, name: str) -> None:
         super().__init__(channel_id, name)
