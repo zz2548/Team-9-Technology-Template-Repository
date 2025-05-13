@@ -26,7 +26,8 @@ def analyze_diff_coverage(
             results.append({
                 "file": file,
                 "line": line,
-                "before": cast(Literal["covered", "not_covered", "not_found"], before),
+                "before": cast(Literal["covered",
+                "not_covered", "not_found"], before),
                 "after": cast(Literal["covered", "not_covered", "not_found"], after),
             })
 
