@@ -27,7 +27,7 @@ jobs:
           command: |
             uv pip install ".[dev]"
             uv pip install mypy ruff nose2 coverage
-            uv pip install PyPDF2 requests
+            uv pip install PyPDF2 requests reportlab
 
       - run:
           name: Cleanup old coverage data
