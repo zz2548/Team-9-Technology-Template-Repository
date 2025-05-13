@@ -1,11 +1,11 @@
 [project]
-name = "technology-template-repository"
+name = "pdf_generator"
 version = "0.1.0"
-description = "A Python project template."
+description = "A util to obtain PR info"
 authors = [
     {name = "Jerry Zou", email = "zz2548@nyu.edu"},
     {name = "Keshav Rajput", email = "kr3412@nyu.edu"},
-    {name = "Terry Xu", email = "xm2204@nyu.edu"},
+    {name = "Terry Mu", email = "xm2204@nyu.edu"},
     {name = "Jinglin Tao", email = "jt4296@nyu.edu"}
 ]
 license = { file = "LICENSE" }
@@ -15,11 +15,12 @@ requires-python = ">=3.10.9, <3.11"
 dev = [
     "coverage>=7.6.12",
     "mypy>=1.15.0",
-    "ruff>=0.9.6",
     "nose2>=0.15.1",
+    "ruff>=0.9.6",
     "pre-commit>=4.1.0",
     "pytest",
     "types-requests",
+    "types-pytest"
 ]
 
 dependencies = [
@@ -46,14 +47,12 @@ select = ["ALL"]
 ignore = [
     "D100", "D101", "D102", "D103", "D104", "D107",
     "D203", "T201", "S101", "PLR2004", "TRY003", "EM101",
-    "D212", "FIX002", "TD002", "TD003", "PT009", "PT027",
-    "S603", "S607"
+    "D212", "FIX002", "TD002", "TD003", "PT009", "PT027"
 ]
 
 [tool.mypy]
 python_version = "3.10"
 strict = true
-ignore_missing_imports = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -68,17 +67,17 @@ warn_unreachable = true
 strict_optional = true
 exclude = [".venv", "build", "dist"]
 
+[tool.pytest.ini_options]
+addopts = "-ra -q --cov=. --cov-report=html --cov-report=xml"
+testpaths = ["test"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
 [tool.coverage.run]
 branch = true
-source = ["src"]
-omit = [
-    "tests/*",
-    ".venv/*",
-    "build/*",
-    "dist/*",
-    "*/test/*",
-    "*/pre_commit_test.py"
-]
+source = ["."]
+omit = [".venv/*", "build/*", "dist/*"]
 
 [tool.coverage.report]
 exclude_lines = [
