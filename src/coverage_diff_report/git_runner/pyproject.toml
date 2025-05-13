@@ -1,5 +1,5 @@
 [project]
-name = "github_util"
+name = "gith_runner"
 version = "0.1.0"
 description = "A util to obtain PR info"
 authors = [
