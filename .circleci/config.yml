@@ -47,18 +47,22 @@ jobs:
             COVERAGE_FILE=.coverage.calculator nose2 -v -s src/calculator/test/ --with-coverage --coverage=src.calculator --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/calculator.xml
             COVERAGE_FILE=.coverage.logger nose2 -v -s src/logger/test/ --with-coverage --coverage=src.logger --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/logger.xml
             COVERAGE_FILE=.coverage.notifier nose2 -v -s src/notifier/test/ --with-coverage --coverage=src.notifier --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/notifier.xml
+            COVERAGE_FILE=.coverage.channel nose2 -v -s src/channel/test/ --with-coverage --coverage=src.channel --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/channel.xml
+            COVERAGE_FILE=.coverage.message nose2 -v -s src/message/test/ --with-coverage --coverage=src.message --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/message.xml
+            COVERAGE_FILE=.coverage.user nose2 -v -s src/user/test/ --with-coverage --coverage=src.user --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/unit/user.xml
 
       - run:
           name: Run Integration Tests
           command: |
             mkdir -p test-results/integration
-            COVERAGE_FILE=.coverage.integration nose2 -s tests/integration/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration/results.xml
+            COVERAGE_FILE=.coverage.integration PYTHONPATH=src python -m nose2 -s tests/integration --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/integration/results.xml
+
 
       - run:
           name: Run End-to-End Tests
           command: |
             mkdir -p test-results/e2e
-            COVERAGE_FILE=.coverage.e2e nose2 -s tests/e2e/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e/results.xml
+            COVERAGE_FILE=.coverage.e2e PYTHONPATH=src python -m nose2 -s tests/e2e/ --with-coverage --plugin=nose2.plugins.junitxml --junit-xml-path=test-results/e2e/results.xml
 
       - run:
           name: Combine Coverage Reports
