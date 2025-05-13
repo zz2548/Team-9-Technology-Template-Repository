@@ -29,6 +29,11 @@ jobs:
             uv pip install mypy ruff nose2 coverage
             uv pip install PyPDF2
 
+      - restore_cache:
+          keys:
+            - v2-deps-{{ checksum "requirements.txt" }}
+
+
       - run:
           name: Cleanup old coverage data
           command: |
