@@ -45,14 +45,14 @@ def main() -> None:
 
     # Run the installation command
     print("Installing dependencies...")
-    install_result = subprocess.run(install_cmd, shell=False, check=False)  # noqa: S603
+    install_result = subprocess.run(install_cmd, shell=False, check=False)
     if install_result.returncode != 0:
         print("Failed to install dependencies")
         sys.exit(install_result.returncode)
 
     # Run the test command
     print("Running tests...")
-    test_result = subprocess.run(test_cmd, shell=False, check=False)  # noqa: S603
+    test_result = subprocess.run(test_cmd, shell=False, check=False)
     sys.exit(test_result.returncode)
 
 
