@@ -9,16 +9,16 @@ def run_coverage_scan(source_dir: Path, coverage_json_path: Path) -> None:
 
     Assumes that the source already contains tests.
     """
-    subprocess.run(["coverage", "erase"], cwd=source_dir, check=True)
+    subprocess.run(["python", "-m","coverage", "erase"], cwd=source_dir, check=True)
 
     subprocess.run(
-        ["coverage", "run", "--source=src", "--source=.", "-m", "nose2", "-v"],
+        ["python", "-m","coverage", "run", "--source=src", "--source=.", "-m", "nose2", "-v"],
         cwd=source_dir,
         check=True,
     )
 
     subprocess.run(
-        ["coverage", "json", "--ignore-errors", "-o", str(coverage_json_path)],
+        ["python", "-m","coverage", "json", "--ignore-errors", "-o", str(coverage_json_path)],
         cwd=source_dir,
         check=False,
     )
