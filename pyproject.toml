@@ -20,7 +20,6 @@ dev = [
     "pre-commit>=4.1.0",
     "pytest",
     "types-requests",
-    "types-pytest"
 ]
 
 dependencies = [
