@@ -1,87 +1,84 @@
 import uuid
-from typing import Any, Protocol
+from typing import Protocol
 
 
 class MessageContent(Protocol):
-    """Protocol defining the interface for message content"""
 
     def get_content_type(self) -> str:
-        """Return the content type of the message"""
         ...
 
-    def get_data(self) -> Any:
-        """Return the actual content data"""
+    def get_data(self) -> dict[str, str]:
         ...
 
 
 class TextContent:
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self.text = text
 
     def get_content_type(self) -> str:
         return "text"
 
-    def get_data(self) -> str:
-        return self.text
+    def get_data(self) -> dict[str, str]:
+        return {"text": self.text}
 
 
 class ImageContent:
-    def __init__(self, url: str, alt_text: str = ""):
+    def __init__(self, url: str, alt_text: str = "") -> None:
         self.url = url
         self.alt_text = alt_text
 
     def get_content_type(self) -> str:
         return "image"
 
-    def get_data(self) -> dict:
+    def get_data(self) -> dict[str, str]:
         return {"url": self.url, "alt_text": self.alt_text}
 
 
 class VideoContent:
-    def __init__(self, url: str, title: str = ""):
+    def __init__(self, url: str, title: str = "") -> None:
         self.url = url
         self.title = title
 
     def get_content_type(self) -> str:
         return "video"
 
-    def get_data(self) -> dict:
+    def get_data(self) -> dict[str, str]:
         return {"url": self.url, "title": self.title}
 
 
 class AudioContent:
-    def __init__(self, url: str, title: str = ""):
+    def __init__(self, url: str, title: str = "") -> None:
         self.url = url
         self.title = title
 
     def get_content_type(self) -> str:
         return "audio"
 
-    def get_data(self) -> dict:
+    def get_data(self) -> dict[str, str]:
         return {"url": self.url, "title": self.title}
 
 
 class DocumentContent:
-    def __init__(self, url: str, filename: str):
+    def __init__(self, url: str, filename: str) -> None:
         self.url = url
         self.filename = filename
 
     def get_content_type(self) -> str:
         return "document"
 
-    def get_data(self) -> dict:
+    def get_data(self) -> dict[str, str]:
         return {"url": self.url, "filename": self.filename}
 
 
 class ReplyContent:
-    def __init__(self, text: str, reply_to_id: str):
+    def __init__(self, text: str, reply_to_id: str) -> None:
         self.text = text
         self.reply_to_id = reply_to_id
 
     def get_content_type(self) -> str:
         return "reply"
 
-    def get_data(self) -> dict:
+    def get_data(self) -> dict[str, str]:
         return {"text": self.text, "reply_to_id": self.reply_to_id}
 
 

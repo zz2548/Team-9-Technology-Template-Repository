@@ -2,18 +2,14 @@ from typing import ClassVar, Protocol
 
 
 class ChannelProtocol(Protocol):
-    """Protocol defining the interface for channels"""
 
     def get_id(self) -> str:
-        """Return the channel ID"""
         ...
 
     def get_name(self) -> str:
-        """Return the channel name"""
         ...
 
     def list_users(self) -> list[str]:
-        """List all users in the channel"""
         ...
 
 
@@ -23,7 +19,8 @@ class Channel:
     # New: store channel creators
     _creators: ClassVar[dict[str, str]] = {}
 
-    def __init__(self, channel_id: str, name: str, creator_id: str = None) -> None:
+    def __init__(self, channel_id: str,
+                 name: str, creator_id: str | None = None) -> None:
         self.channel_id = channel_id
         self.name = name
         if channel_id not in Channel._channels:
@@ -47,15 +44,12 @@ class Channel:
         return Channel._channels.get(self.channel_id, []) or []
 
     def get_creator(self) -> str | None:
-        """Get the creator (admin) of this channel"""
         return Channel._creators.get(self.channel_id)
 
     def is_admin(self, user_id: str) -> bool:
-        """Check if a user is the admin (creator) of this channel"""
         return user_id == self.get_creator()
 
     def add_user(self, user_id: str, added_by: str) -> bool:
-        """Add a user to the channel if added by the admin"""
         # Check if adder is the admin
         if not self.is_admin(added_by):
             return False
@@ -64,7 +58,6 @@ class Channel:
         return Channel.join_channel(user_id, self.channel_id)
 
     def remove_user(self, user_id: str, removed_by: str) -> bool:
-        """Remove a user from the channel if removed by the admin"""
         # Creator/admin cannot be removed
         if user_id == self.get_creator():
             return False
@@ -80,7 +73,7 @@ class Channel:
         return False
 
     @staticmethod
-    def create_channel(name: str, creator_id: str = None) -> "Channel":
+    def create_channel(name: str, creator_id: str | None = None) -> "Channel":
         new_id = f"chan_{len(Channel._channels) + 1}"
         return Channel(new_id, name, creator_id)
 

@@ -1,7 +1,8 @@
 import unittest
-from src.user import User
+
 from src.channel import Channel
-from src.message import Message
+from src.message import Message, TextContent
+from src.user import User
 
 
 class TestChatClientIntegration(unittest.TestCase):
@@ -26,8 +27,9 @@ class TestChatClientIntegration(unittest.TestCase):
         self.assertIn("alice_id", users)
 
     def test_message_sending_and_fetching(self) -> None:
-        msg = Message.send_message("alice_id", "chan_1", "Hello world!")
-        self.assertEqual(msg.get_content(), "Hello world!")
+        msg = Message.send_message("alice_id",
+                                   "chan_1", TextContent("Hello world!"))
+        self.assertEqual(msg.get_content().get_data()["text"], "Hello world!")
         self.assertEqual(msg.get_sender(), "alice_id")
         self.assertEqual(msg.get_channel(), "chan_1")
 
@@ -36,6 +38,6 @@ class TestChatClientIntegration(unittest.TestCase):
         self.assertTrue(all(isinstance(m, Message) for m in recent))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("✅ Running test_chat_client.py")
     unittest.main()

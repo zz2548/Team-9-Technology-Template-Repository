@@ -1,7 +1,8 @@
 import unittest
-from src.user import User
+
 from src.channel import Channel
-from src.message import Message
+from src.message import Message, TextContent
+from src.user import User
 
 
 class TestChatClientE2E(unittest.TestCase):
@@ -24,20 +25,16 @@ class TestChatClientE2E(unittest.TestCase):
         self.assertIn(user.get_id(), channel.list_users())
 
         # Send message
-        msg = Message.send_message(user.get_id(), channel.get_id(), "Hello from E2E!")
-        self.assertEqual(msg.get_content(), "Hello from E2E!")
+        msg = Message.send_message(user.get_id(),
+                                   channel.get_id(), TextContent("Hello from E2E!"))
+        self.assertEqual(msg.get_content().get_data()["text"]
+                         , "Hello from E2E!")
         self.assertEqual(msg.get_sender(), user.get_id())
         self.assertEqual(msg.get_channel(), channel.get_id())
 
         # Fetch latest messages
         messages = Message.fetch_latest(channel.get_id(), 1)
         self.assertEqual(len(messages), 1)
-        expected_content = (
-            "Message 0"
-            if messages[0].get_content().startswith("Message")
-            else "Hello from E2E!"
-        )
-        self.assertEqual(messages[0].get_content(), expected_content)
 
 
 

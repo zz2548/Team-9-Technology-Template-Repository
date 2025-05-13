@@ -4,18 +4,14 @@ from typing import Protocol
 
 # Define the User Protocol interface
 class UserProtocol(Protocol):
-    """Protocol defining the interface for a user"""
 
     def get_id(self) -> str:
-        """Return the user ID"""
         ...
 
     def get_username(self) -> str:
-        """Return the username"""
         ...
 
     def list_channels(self) -> list[str]:
-        """Return a list of channels the user has access to"""
         ...
 
 
