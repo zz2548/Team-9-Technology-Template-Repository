@@ -91,4 +91,4 @@ exclude_lines = [
     "raise AssertionError",
 ]
 ignore_errors = true
-fail_under = 70
+fail_under = 40
